@@ -1,0 +1,16 @@
+/* Change la couleur de la barre de chargement */
+#nprogress .bar {
+    background: #00ff00 !important; /* Vert */
+  }
+  
+  /* Personnalise l'effet d'attente (spinner) */
+  #nprogress .spinner-icon {
+    border-top-color: #00ff00 !important;
+    border-left-color: #00ff00 !important;
+  }
+  
+  /* Change la couleur de la barre qui s'élargit (flash) */
+  #nprogress .peg {
+    box-shadow: 0 0 10px #00ff00, 0 0 5px #00ff00 !important;
+  }
+  
