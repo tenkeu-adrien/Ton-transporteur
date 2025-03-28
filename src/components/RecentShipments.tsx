@@ -4,6 +4,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "./../../lib/firebaseConfig"; // Assurez-vous d'avoir configuré Firebase
 import Link from "next/link";
 import { getShipments } from "../../lib/firebaseUtils";
+import Image from "next/image";
 
 const RecentShipments = () => {
   const [shipments, setShipments] = useState([]);
@@ -37,10 +38,12 @@ const RecentShipments = () => {
             <div className="flex flex-col md:flex-row gap-4">
               {/* Afficher l'image si elle existe */}
               {shipment.images && shipment.images.length > 0 && (
-                <img
+                <Image
                   src={shipment.images[0]} // Afficher la première image du tableau
                   alt={shipment.objectName || "Image du colis"}
                   className="w-full md:w-1/3 h-48 object-cover rounded-md"
+                  width={200}
+                  height={300}
                 />
               )}
               {/* Contenu */}

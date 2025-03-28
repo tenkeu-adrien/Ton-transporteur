@@ -73,7 +73,7 @@ export default function ExpeditionSystem() {
     toast.info("vous n'avez pas connecter fait le ou creer un compte")
     router.replace('/auth/signin')
 }
- } ,[])
+ } ,[user,router])
   const [step, setStep] = useState(1);
   const [showSizeModal, setShowSizeModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -307,7 +307,7 @@ console.log("data de l'envoie" ,data)
               {step === 1 && (
                 <div>
                   <h2 className="text-xl font-semibold text-green-800 mb-4">1. Décrivez votre colis</h2>
-                  <label htmlFor="">Nom de l'object</label>
+                  <label htmlFor="">Nom de l&apos;object</label>
                   <input
                     type="text"
                     {...register('objectName')}
@@ -323,7 +323,7 @@ console.log("data de l'envoie" ,data)
                     className="w-full p-3 border border-green-300 rounded-lg mb-4"
                   />
                   {errors.quantity && <p className="text-red-500">{errors.quantity.message}</p>}
-                <label htmlFor="poids">poids de l'object</label>
+                <label htmlFor="poids">poids de l&apos;object</label>
                   <select {...register('weight')} className="w-full p-3 border border-green-300 rounded-lg mb-4">
                     <option value="">Sélectionnez le poids</option>
                     <option value="-7kg">-7kg</option>
@@ -333,7 +333,7 @@ console.log("data de l'envoie" ,data)
                     <option value="+105kg">+105kg</option>
                   </select>
                   {errors.weight && <p className="text-red-500">{errors.weight.message}</p>}
-<label htmlFor="">Taille de l'object</label>
+<label htmlFor="">Taille de l&apos;object</label>
                   <select
                     {...register('size')}
                     className="w-full p-3 border border-green-300 rounded-lg mb-4"
@@ -346,7 +346,7 @@ console.log("data de l'envoie" ,data)
                     <option value="XXL">XXL</option>
                   </select>
                   {errors.size && <p className="text-red-500">{errors.size.message}</p>}
-                  <label htmlFor="">Autre informations sur l'object</label>
+                  <label htmlFor="">Autre informations sur l&apos;object</label>
                   <textarea
                     {...register('additionalInfo')}
                     placeholder="Ex: le canapé est en cuir"
@@ -470,7 +470,7 @@ console.log("data de l'envoie" ,data)
 
 </div>
 
-<h5 className="text-xl font-semibold text-green-800 mb-4">Sélectionnez le type d'enlèvement</h5>
+<h5 className="text-xl font-semibold text-green-800 mb-4">Sélectionnez le type d&apos;enlèvement</h5>
 
                   <select
                     {...register('pickupType')}

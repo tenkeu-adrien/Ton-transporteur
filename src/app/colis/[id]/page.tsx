@@ -3,12 +3,12 @@
 
 "use client"; // Indique que ce composant est exécuté côté client
 
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../../lib/firebaseConfig";
 import TransporteurColis from "@/components/TransporteurColis";
-import { AuthContext } from "../../../../context/AuthContext";
+// import { AuthContext } from "../../../../context/AuthContext";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 

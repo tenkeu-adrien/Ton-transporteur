@@ -20,6 +20,11 @@ const config: Config = {
       ...defaultTheme.screens,
     },
     extend: {
+      animation: {
+        'delay-200': 'pulse 1.5s infinite 200ms',
+        'delay-400': 'pulse 1.5s infinite 400ms',
+        'delay-600': 'pulse 1.5s infinite 600ms',
+      },
       colors: {
         current: "currentColor",
         transparent: "transparent",

@@ -25,7 +25,6 @@ const ECommerce: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useContext(AuthContext);
 
-  console.log("")
   useEffect(() => {
     const fetchStats = async () => {
       try {

@@ -48,7 +48,7 @@ const EditModal = ({ shipment, onClose, onSave }: EditModalProps) => {
           {/* Nom de l'objet */}
           <div>
             <label htmlFor="objectName" className="block text-sm font-medium mb-1">
-              Nom de l'objet
+              Nom de l&apos;objet
             </label>
             <input
               type="text"
@@ -105,7 +105,7 @@ const EditModal = ({ shipment, onClose, onSave }: EditModalProps) => {
           {/* Prix */}
           <div>
             <label htmlFor="price" className="block text-sm font-medium mb-1">
-              Prix de l'expédition
+              Prix de l&apos;expédition
             </label>
             <input
               type="number"

@@ -33,7 +33,7 @@ const router =useRouter()
           <span className="block text-sm font-medium text-black dark:text-white">
             {user && userData?.lastName}
           </span>
-          <span className="block text-xs">Expediteur</span>
+          <span className="block text-xs">{user && userData?.role}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">

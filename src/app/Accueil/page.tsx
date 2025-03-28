@@ -4,7 +4,7 @@ import Image from "next/image";
  import Head from "next/head";
 import Link from "next/link";
 import { auth, messaging } from "../../../lib/firebaseConfig";
-import {useRouter} from 'next/navigation'
+import {useRouter} from "next/navigation"
 import { FaFacebook } from "react-icons/fa";
 import { AuthContext } from "../../../context/AuthContext";
 import Chat from "@/components/Chat";
@@ -47,7 +47,7 @@ const handleStart =()=>{
     <>
       <Head>
   <title>Ton Transporteur - Service de Livraison Fiable et Écologique</title>
-  <meta name="description" content="Avec Ton Transporteur, bénéficiez d'un service de livraison fiable et écologique. Suivez vos colis en temps réel et améliorez l'efficacité de vos opérations logistiques." />
+  <meta name="description" content="Avec Ton Transporteur, bénéficiez d&apos;un service de livraison fiable et écologique. Suivez vos colis en temps réel et améliorez l&apos;efficacité de vos opérations logistiques." />
 </Head>
 
       {/* demande de permission pour la notification */}
@@ -69,7 +69,7 @@ const handleStart =()=>{
   </h1>
   <span className="mb-3">Bienvenue sur Trouve ton transporteur</span>
   <p className="text-gray-600 mb-8">
-    Envoyez et recevez vos colis partout en France et en Europe. Économisez de l'argent car aucun frais de commission n'est appliqué : vous payez exactement vos frais de transport.
+    Envoyez et recevez vos colis partout en France et en Europe. Économisez de l&apos;argent car aucun frais de commission n&apos;est appliqué : vous payez exactement vos frais de transport.
   </p>
   <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
     <button className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition duration-300" onClick={() => handleStart()}>
@@ -82,15 +82,17 @@ const handleStart =()=>{
 </div>
 
           {/* Image illustrative */}
-          <div className="relative h-[500px]">
+          {/* <div className="relative h-[500px]">
             <Image
               src="/images/home_page.avif" // Remplacez par le chemin de votre image
               alt="Transport de colis"
               layout="fill"
               objectFit="cover"
+              width={100}
+              height={100}
               className="rounded-lg shadow-lg"
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
@@ -141,7 +143,7 @@ const handleStart =()=>{
 
       {/* Section : Comment ça marche ? */}
       <div className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-8">Comment s'effectue une expédition chez nous ?</h2>
+        <h2 className="text-3xl font-bold text-center mb-8">Comment s&apos;effectue une expédition chez nous ?</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 className="text-xl font-semibold mb-4">1. Publiez votre colis</h3>
@@ -232,7 +234,7 @@ const handleStart =()=>{
         <h2 className="text-3xl font-bold mb-4">Prêt à commencer ?</h2>
         <p className="text-lg mb-8">Rejoignez notre communauté dès aujourd&aposhui.</p>
         <Link href="/auth/signup" className="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100">
-          S'inscrire maintenant
+          S&apos;inscrire maintenant
         </Link>
       </div>
     </div>

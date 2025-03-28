@@ -9,23 +9,23 @@ const { user, userData, loading, error  ,logout} = useContext(AuthContext);
 
   return (
     <>
-    <Navbar   user={user} logout={logout} message={"en cours de chargement"}  />
+    <Navbar   user={user} logout={logout}  />
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-6">CONDITIONS GÉNÉRALES D'UTILISATION (CGU)</h1>
+      <h1 className="text-3xl font-bold text-center mb-6">CONDITIONS GÉNÉRALES D&apos;UTILISATION (CGU)</h1>
       
       <h2 className="text-2xl font-bold mt-6">1. DÉFINITIONS</h2>
-      <p className="mt-2">Les termes suivants ont la signification qui suit dans les CGU lorsqu’ils sont rédigés avec une majuscule :</p>
+      <p className="mt-2">Les termes suivants ont la signification qui suit dans les CGU lorsqu&apos;ils sont rédigés avec une majuscule :</p>
       <ul className="list-disc ml-6 mt-2">
-        <li><strong>"Annonce"</strong> : désigne la proposition publiée sur la Plateforme par un Client en vue de la réalisation d’un Transport.</li>
-        <li><strong>"Client"</strong> : désigne toute personne utilisant la Plateforme pour expédier ou recevoir un Colis.</li>
-        <li><strong>"Application"</strong> : désigne l’application mobile éditée par Ton_Transporteur, disponible sur iOS et Android.</li>
-        <li><strong>"Colis"</strong> : désigne un bien déplacé ou transporté dans le cadre d’un Transport.</li>
-        <li><strong>"Ton_Transporteur"</strong> : désigne la société exploitant la Plateforme numérique permettant la mise en relation entre Clients et le Transporteur.</li>
-        <li><strong>"Compte"</strong> : désigne l’espace numérique dédié et individualisé d’un Utilisateur sur la Plateforme.</li>
-        <li><strong>"Transport"</strong> : désigne le déplacement d’un Colis effectué par le Transporteur.</li>
-        <li><strong>"Transporteur"</strong> : désigne Ton_Transporteur en tant que professionnel du transport de biens.</li>
-        <li><strong>"Utilisateur"</strong> : désigne toute personne utilisant la Plateforme.</li>
-        <li><strong>"Plateforme"</strong> : désigne le site web et l’application mobile Ton_Transporteur permettant aux Clients d’accéder au service de transport.</li>
+        <li><strong>{"Annonce"}</strong> : désigne la proposition publiée sur la Plateforme par un Client en vue de la réalisation d’un Transport.</li>
+        <li><strong>{"Client"}</strong> : désigne toute personne utilisant la Plateforme pour expédier ou recevoir un Colis.</li>
+        <li><strong>{"Application"}</strong> : désigne l’application mobile éditée par Ton_Transporteur, disponible sur iOS et Android.</li>
+        <li><strong>{"Colis"}</strong> : désigne un bien déplacé ou transporté dans le cadre d’un Transport.</li>
+        <li><strong>{"Ton_Transporteur"}</strong> : désigne la société exploitant la Plateforme numérique permettant la mise en relation entre Clients et le Transporteur.</li>
+        <li><strong>{"Compte"}</strong> : désigne l’espace numérique dédié et individualisé d’un Utilisateur sur la Plateforme.</li>
+        <li><strong>{"Transport"}</strong> : désigne le déplacement d’un Colis effectué par le Transporteur.</li>
+        <li><strong>{"Transporteur"}</strong> : désigne Ton_Transporteur en tant que professionnel du transport de biens.</li>
+        <li><strong>{"Utilisateur"}</strong> : désigne toute personne utilisant la Plateforme.</li>
+        <li><strong>{"Plateforme"}</strong> : désigne le site web et l’application mobile Ton_Transporteur permettant aux Clients d’accéder au service de transport.</li>
       </ul>
       
       <h2 className="text-2xl font-bold mt-6">2. OBJET</h2>
@@ -38,10 +38,10 @@ const { user, userData, loading, error  ,logout} = useContext(AuthContext);
       <p className="mt-2">Le Client s’engage à fournir des informations exactes et complètes lors de son inscription et à les maintenir à jour.</p>
       
       <h2 className="text-2xl font-bold mt-6">4. RESPONSABILITÉS</h2>
-      <p className="mt-2">Ton_Transporteur est responsable de l’acheminement des Colis confiés par les Clients. Toutefois, la responsabilité ne saurait être engagée en cas de force majeure ou de faute du Client (ex. : informations erronées, non-respect des consignes d’emballage).</p>
+      <p className="mt-2">Ton_Transporteur est responsable de l&apos;acheminement des Colis confiés par les Clients. Toutefois, la responsabilité ne saurait être engagée en cas de force majeure ou de faute du Client (ex. : informations erronées, non-respect des consignes d&apos;emballage).</p>
       
       <h2 className="text-2xl font-bold mt-6">5. ASSURANCES</h2>
-      <p className="mt-2">Ton_Transporteur propose une couverture d’assurance pour les Colis transportés. Le montant de l’indemnisation en cas de perte ou de dommage est précisé dans les conditions générales d’assurance.</p>
+      <p className="mt-2">Ton_Transporteur propose une couverture d&apos;assurance pour les Colis transportés. Le montant de l&apos;indemnisation en cas de perte ou de dommage est précisé dans les conditions générales d&apos;assurance.</p>
       
       <h2 className="text-2xl font-bold mt-6">6. MODIFICATIONS DES CGU</h2>
       <p className="mt-2">Ton_Transporteur se réserve le droit de modifier les CGU à tout moment. Les Utilisateurs seront informés de toute modification par notification sur la Plateforme.</p>

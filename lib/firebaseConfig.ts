@@ -21,17 +21,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// if ("serviceWorker" in navigator) {
-//   navigator.serviceWorker
-//     .register("/firebase-messaging-sw.js")
-//     .then((registration) => {
-//       console.log("Service Worker Firebase enregistré avec succès:", registration);
-//     })
-//     .catch((err) => {
-//       console.error("Erreur d'enregistrement du Service Worker Firebase:", err);
-//     });
-// }
-// Vérifier si le navigateur supporte les notifications push avant d'initialiser
+
 let messaging;
 if (typeof window !== "undefined" && "serviceWorker" in navigator) {
   messaging = getMessaging(app);

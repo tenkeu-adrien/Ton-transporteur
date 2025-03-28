@@ -8,6 +8,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import PhoneLink from "./PhoneLink";
+import Image from "next/image";
 
 const ShipmentModal = ({ shipment, onClose }) => {
   if (!shipment) return null;
@@ -35,7 +36,7 @@ const ShipmentModal = ({ shipment, onClose }) => {
         >
           {shipment.images?.map((img, index) => (
             <SwiperSlide key={index}>
-              <img src={img} alt={`Image ${index + 1}`} className="w-full h-64 object-cover" />
+              <Image src={img} alt={`Image ${index + 1}`} className="w-full h-64 object-cover" />
             </SwiperSlide>
           ))}
         </Swiper>
@@ -59,7 +60,7 @@ const ShipmentModal = ({ shipment, onClose }) => {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="text-sm text-gray-600">Nom de l'objet</p>
+              <p className="text-sm text-gray-600">Nom de l&apos;objet</p>
               <p className="font-medium">{shipment.objectName}</p>
             </div>
 

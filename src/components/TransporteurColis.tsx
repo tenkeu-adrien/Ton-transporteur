@@ -13,6 +13,7 @@ import { auth, db } from "../../lib/firebaseConfig";
 import { toast } from "react-toastify";
 import { FaUser, FaUserCircle, FaEnvelope, FaPhone } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 // import Navbar from "./Navbar";
  
 
@@ -102,6 +103,7 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
       const messageRef = await addDoc(collection(db, "messages"), {
         sender: currentUser.uid,
         receiver: shipment.expediteurId,
+        shipmentId:shipment.id,
         timestamp: serverTimestamp(),
         isRead: false,
         // senderName: currentUser.displayName,
@@ -125,7 +127,20 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
     toast.success("Offre envoyée avec succès");
     
     // Redirection vers la page de chat
-    router.push(`/chat/${shipment.expediteurId}?offer=true`);
+    // router.push(`/chat/${shipment.expediteurId}?offer=true$isTransporteur=true`);
+    // const queryParams = new URLSearchParams({
+     let offer="true"
+     const isTransporteur= "true"
+    // });
+    
+//     if (shipment.id) {
+//       queryParams.append("shipmentid", shipment.id);
+//     }
+// console.log("log des  shipment" , queryParams.toString())
+    
+    // router.push(`/chat/${shipment.expediteurId}?${shipment?.id}`);
+
+    router.push(`/chat/${shipment.expediteurId}?sh=${shipment.id}&isOffer=${offer}&isTransporter=${isTransporteur}`);
 
   } catch (error) {
     console.error("Erreur:", error);
@@ -175,7 +190,7 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
 
         <div className="p-4 sm:p-5 bg-white dark:bg-dark-700 rounded-lg shadow-sm mt-8">
   <h2 className="text-xl font-semibold text-gray-700 dark:text-dark-100">
-    Points de départ et d'arrivée
+    Points de départ et d&apos;arrivée
   </h2>
   <div className="mt-4 space-y-3">
     {/* Point de départ */}
@@ -219,11 +234,13 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
             </h2>
             <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
               {shipment.images.map((image, index) => (
-                <img
+                <Image
                   key={index}
                   src={image}
                   alt={`Image ${index + 1}`}
                   className="w-full h-32 object-cover rounded-lg"
+                  width={20}
+                  height={32}
                 />
               ))}
             </div>
@@ -283,7 +300,7 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
                     <FaCalendarAlt className="text-yellow-600 dark:text-yellow-300" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-700 dark:text-dark-100">Date d'enlèvement</p>
+                    <p className="text-sm font-medium text-gray-700 dark:text-dark-100">Date d&apos;enlèvement</p>
                     <p className="text-sm text-gray-600 dark:text-dark-300">
                     {shipment.pickupDate && shipment.pickupDate .toDate
                                   ? shipment.pickupDate.toDate().toLocaleString("fr-FR", {
@@ -342,7 +359,7 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
   <div className="p-4 sm:p-5">
     <h2 className="text-xl font-semibold text-gray-700 dark:text-dark-100 flex items-center space-x-2">
       <FaUser className="text-green-600 dark:text-green-300" />
-      <span>Informations de l'Expéditeur</span>
+      <span>Informations de l&apos;Expéditeur</span>
     </h2>
     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Nom complet */}
@@ -527,10 +544,12 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
               <div className="flex items-start p-3 bg-gray-50 dark:bg-dark-600 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
                 {/* Image du colis (plus petite) */}
                 {otherShipment.images && otherShipment.images.length > 0 && (
-                  <img
+                  <Image
                     src={otherShipment.images[0]} // Afficher la première image
                     alt={`Image de ${otherShipment.objectName}`}
-                    className="w-20 h-20 object-cover rounded-lg mr-4" // Taille réduite
+                    className="w-20 h-20 object-cover rounded-lg mr-4"
+                    width={20} // Taille réduite
+                    height={20}
                   />
                 )}
 

@@ -18,6 +18,7 @@ import Navbar from '@/components/Navbar';
 import { sendEmailVerification } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../../lib/firebaseConfig';
+import Image from 'next/image';
 
 const schema = z.object({
   profile: z.string().min(1, "Veuillez sélectionner un profil"),
@@ -290,7 +291,7 @@ const customStyles = {
 // Formatteur pour afficher le drapeau et le nom dans le select
 const formatOptionLabel = ({ label, flag }) => (
   <div style={{ display: "flex", alignItems: "center" }}>
-    <img src={flag} alt={label} style={{ width: "20px", marginRight: "10px" }} />
+    <Image src={flag} alt={label} style={{ width: "20px", marginRight: "10px" }} />
     <span>{label}</span>
   </div>
 );
@@ -301,12 +302,12 @@ const formatOptionLabel = ({ label, flag }) => (
 <Navbar  user={user} logout={logout}  />
 
 
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-12">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-10">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
 
       
         {/* Augmentation de la largeur */}
-        <h1 className="text-2xl font-bold mb-2 text-center">Formulaire d'Inscription</h1>
+        <h1 className="text-2xl font-bold mb-2 text-center">Formulaire d&apos;Inscription</h1>
       
         <div className="text-center"> 
               <Link className=" inline-block text-3xl text-green-400" href="/Accueil" >
@@ -493,7 +494,7 @@ const formatOptionLabel = ({ label, flag }) => (
           {...register("terms")}
         />
         <label className="ml-2 text-sm text-gray-700">
-          J'accepte les conditions d'utilisation <a href="/politique-confidentialite" className='text-green-600'>politique d'utilisattion</a>
+          J&apos;accepte les conditions d&apos;utilisation <a href="/politique-confidentialite" className='text-green-600'>politique d&apos;utilisattion</a>
         </label>
 
       </div>
@@ -565,7 +566,7 @@ const formatOptionLabel = ({ label, flag }) => (
           
           <div className="flex justify-between items-center">
             <p className="text-sm text-gray-500">
-              Vous n'avez pas reçu le code ? 
+              Vous n&apos;avez pas reçu le code ? 
               <button 
                 onClick={() => {
                   const newCode = generateVerificationCode();

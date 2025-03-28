@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "./Navbar";
 import { AuthContext } from "../../context/AuthContext";
 import { FaMapMarkerAlt, FaMoneyBillWave, FaCalendarAlt } from "react-icons/fa";
+import Image from "next/image";
 const Transporteur = ({ data, isLoading }) => {
   const [filterStatus, setFilterStatus] = useState("Tous");
   const [selectedShipment, setSelectedShipment] = useState(null);
@@ -260,10 +261,12 @@ const router =useRouter()
             <div className="flex">
               {/* Image du colis */}
               <div className="w-1/3 h-48 bg-gray-200 relative">
-                <img
+                <Image
                   src={shipment.images[0] || "https://via.placeholder.com/400x200"}
                   alt="Image du colis"
                   className="w-full h-full object-cover"
+                  width={300}
+                  height={300}
                 />
                 <span
                   className={`absolute top-2 right-2 px-3 py-1 text-white text-sm rounded ${getStatusColor(
@@ -309,7 +312,7 @@ const router =useRouter()
               <FaCalendarAlt className="text-yellow-600 dark:text-yellow-300" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-700 dark:text-dark-100">Date d'enlèvement</p>
+              <p className="text-sm font-medium text-gray-700 dark:text-dark-100">Date d&apos;enlèvement</p>
               <p className="text-sm text-gray-600 dark:text-dark-300">
               {shipment.pickupDate && shipment.pickupDate .toDate
                             ? shipment.pickupDate.toDate().toLocaleString("fr-FR", {
@@ -363,14 +366,16 @@ const router =useRouter()
             {/* Informations de l'expéditeur */}
             <div className="p-4 border-t border-gray-200 flex items-center space-x-4">
               <div className="w-10 h-10 rounded-full overflow-hidden">
-                <img
+                <Image
                   src={shipment.images[0] || "https://via.placeholder.com/40"}
                   alt="Photo de l'expéditeur"
                   className="w-full h-full object-cover"
+                  width={300}
+                  height={300}
                 />
               </div>
               <div>
-                <p className="font-medium">{shipment.expediteur.firstName || "Expéditeur inconnu"}</p>
+                <p className="font-medium">{shipment?.expediteur?.firstName || "Expéditeur inconnu"}</p>
                 <p className="text-sm text-gray-500">Expéditeur</p>
               </div>
             </div>

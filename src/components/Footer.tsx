@@ -6,6 +6,17 @@ import { FaInstagram } from "react-icons/fa6";
 import Head from "next/head";
  // Fonction pour recentrer la carte et ajuster le zoom
  const Footer = () => {
+
+
+  const phoneNumber = "+330757953218"; // Remplacez par votre numéro de téléphone
+  const message = "Bonjour, j'ai une question à propos de votre service."
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+  const handleClick = () => {
+    window.open(whatsappUrl, "_blank");
+  };
+
+
   //  const map = useMap();
  
   //  useEffect(() => {
@@ -69,7 +80,7 @@ import Head from "next/head";
       {/* <!-- Première partie : Titre et description --> */}
       <div>
         <h2 className="text-2xl font-bold text-green-500">Ton-Transporteur</h2>
-        <p className="mt-4 text-sm">Votre partenaire fiable pour l'expédition de colis. Rapide, sécurisé et économique.</p>
+        <p className="mt-4 text-sm">Votre partenaire fiable pour l&apos;expédition de colis. Rapide, sécurisé et économique.</p>
         <div className="flex items-center gap-2"> 
           <a href="/cgu" className="text-green-500 hover:underline">CGU</a>
  <a href="/politique-confidentialite" className="text-green-500 hover:underline">Politique de Confidentialité</a>
@@ -137,19 +148,19 @@ import Head from "next/head";
         <ul className="mt-4 space-y-2">
           <li>
             <a href="#" className="flex items-center text-sm hover:text-green-500">
-              <span className="mr-2">→</span> Centre d'aide
+              <span className="mr-2">→</span> Centre d&apos;aide
             </a>
           </li>
         </ul>
         <div className="mt-6 flex space-x-4">
-          <a href="#" className="text-white hover:text-green-500">
+          <a href="https://www.facebook.com/profile.php?id=61574925503075" className="text-white hover:text-green-500"    target="_blank" rel="noopener noreferrer" >
           <FaFacebook  className="w-8 h-8" />
           </a>
-          <a href="#" className="text-white hover:text-green-500">
+          <a href="#" className="text-white hover:text-green-500" rel="noopener noreferrer"  target="_blank">
           <FaInstagram className="w-8 h-8" />
 
           </a>
-          <a href="#" className="text-white hover:text-green-500">
+          <a href="#"   onClick={handleClick} className="text-white hover:text-green-500"  rel="noopener noreferrer" >
           <IoLogoWhatsapp className="w-8 h-8" />
 
           </a>

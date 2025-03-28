@@ -11,6 +11,7 @@ import { db } from "../../lib/firebaseConfig";
 import { doc, updateDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import Image from "next/image";
 const ShippedPackages = () => {
   const [filterStatus, setFilterStatus] = useState("Tous");
   const [isLoading, setIsLoading] = useState(true);
@@ -172,10 +173,13 @@ const ShippedPackages = () => {
                 <div className="flex">
                   {/* Image du colis */}
                   <div className="w-1/3 h-48 bg-gray-200 relative">
-                    <img
+                    <Image
                       src={shipment.images[0] || "https://via.placeholder.com/400x200"}
                       alt="Image du colis"
                       className="w-full h-full object-cover"
+                      width={300}
+                      height={300}
+                      
                     />
                     <span
                       className={`absolute top-2 right-2 px-3 py-1 text-white text-sm rounded ${getStatusColor(
@@ -223,7 +227,7 @@ const ShippedPackages = () => {
         <FaCalendarAlt className="text-yellow-600 dark:text-yellow-300" />
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-medium text-gray-700 dark:text-dark-100">Date d'enlèvement</p>
+        <p className="text-sm font-medium text-gray-700 dark:text-dark-100">Date d&apos;enlèvement</p>
         <p className="text-sm text-gray-600 dark:text-dark-300 truncate">
           {shipment.pickupDate && shipment.pickupDate.toDate
             ? shipment.pickupDate.toDate().toLocaleString("fr-FR", {
