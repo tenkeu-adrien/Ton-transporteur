@@ -21,6 +21,7 @@ import Image from "next/image";
 import { updateShipmentStatus } from "../../../../lib/functions";
 import { MdCancel } from "react-icons/md";
 import { useRef, useCallback } from 'react';
+import { FiPackage } from "react-icons/fi";
 // Ajoutez aussi l'interface Message
 interface Message {
   id: string;
@@ -818,7 +819,7 @@ return (
             />
           </div>
         )}
-
+<div ref={messagesEndRef} />
         <Box
           className={clsx(
             isSentByMe
@@ -909,7 +910,7 @@ return (
       </div>
     );
   })}
- <div ref={messagesEndRef} />
+ 
 <div className="flex gap-2 p-4 bg-white max-w-2xl mx-auto w-full">
   <input
     type="text"
@@ -983,7 +984,8 @@ return (
   </div>
 ) : (
   <div className="bg-white p-4 m-4 rounded-lg shadow">
-    <p className="text-center text-gray-500">Aucun autre colis à expédier.</p>
+     <FiPackage className="text-green-600 text-4xl mx-auto" />
+    <p className="text-center text-gray-500">Aucun  autre  colis actif trouvé </p>
   </div>
 )}
  </div>

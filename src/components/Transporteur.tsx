@@ -10,6 +10,7 @@ import { FaMapMarkerAlt, FaMoneyBillWave, FaCalendarAlt } from "react-icons/fa";
 import Image from "next/image";
 import Loader from "./Loader";
 import { AuthContext } from "../../context/AuthContext";
+import { FiPackage } from "react-icons/fi";
 const Transporteur = ({ data, isLoading }) => {
   const [filterStatus, setFilterStatus] = useState("Tous");
   const [selectedShipment, setSelectedShipment] = useState(null);
@@ -96,14 +97,14 @@ const Transporteur = ({ data, isLoading }) => {
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
     {isLoading && (
     <div className="col-span-full text-center py-5">
-      <FaSpinner className="animate-spin text-blue-500 text-4xl mx-auto" />
+      <FaSpinner className="animate-spin text-green-500 text-4xl mx-auto" />
       <p className="text-gray-500 mt-2">Chargement des données...</p>
     </div>
   )}
   {!isLoading && filteredShipments.length === 0 && (
     <div className="col-span-full text-center py-5">
-      <MdInfoOutline className="text-gray-500 text-4xl mx-auto" />
-      <p className="text-gray-500 mt-2">Aucune donnée disponible</p>
+    <FiPackage className="text-green-600 text-4xl mx-auto" />
+      <p className="text-gray-500 mt-2">Aucun colis actif trouvé.</p>
     </div>
   )}
 

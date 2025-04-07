@@ -201,7 +201,7 @@ export async function POST(request: Request) {
           badge: `${BASE_URL}/images/signin2.png`,
           vibrate: [200, 100, 200, 100, 200],
           requireInteraction: true,
-          // sound: `${BASE_URL}sound/notification.mp3`,
+          sound: `${BASE_URL}sound/notification.mp3`,
           actions: [
 
             {

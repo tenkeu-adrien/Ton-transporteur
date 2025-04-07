@@ -12,6 +12,7 @@ import { updateShipmentStatus } from "../../lib/functions";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Loader from "./Loader";
+import { FiPackage } from "react-icons/fi";
 const ShipmentCard = ({ shipment, handleClick, handleCancelShipment }) => {
   // Déplacer les états de la modale dans un composant séparé
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -416,8 +417,9 @@ console.log("shipments" , shipments)
 
         {!isLoading && currentCards.length === 0 && (
           <div className="col-span-full text-center py-5">
-            <MdInfoOutline className="text-gray-500 text-4xl mx-auto" />
-            <p className="text-gray-500 mt-2">Aucune  donnée disponible</p>
+            <FiPackage className="text-green-600 text-4xl mx-auto" />
+            <p className="text-gray-500 mt-2">Aucun colis actif trouvé.</p>
+            
           </div>
         )}
 

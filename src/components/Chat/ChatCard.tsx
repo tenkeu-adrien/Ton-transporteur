@@ -388,27 +388,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
     }
   };
 
-  // const sendStatusEmail = async (shipment, action) => {
-  //   const subject = action === 'enlevement' 
-  //     ? 'Confirmation d\'enlèvement de colis' 
-  //     : 'Confirmation de déchargement de colis';
-    
-  //   const text = action === 'enlevement'
-  //     ? `L'enlèvement du colis ${shipment.nomColis} a été confirmé par le transporteur.`
-  //     : `Le déchargement du colis ${shipment.nomColis} a été confirmé par le transporteur.`;
-    
-  //   try {
-  //     await sendEmailNotification({
-  //       to: shipment.expediteurEmail, // À remplacer par le champ approprié
-  //       subject,
-  //       text
-  //     });
-  //   } catch (error) {
-  //     console.error("Erreur d'envoi d'email:", error);
-  //   }
-  // };
-
-  // Vérifier et notifier les dates atteintes
+ 
   const checkDueDates = (shipment) => {
     const today = new Date();
     const pickupDate = new Date(shipment.dateDepart);
@@ -566,7 +546,16 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
   
     fetchShipmentsWithSenders();
   }, []);
-
+  const [showEnlevement, setShowEnlevement] = useState(false);
+  const [showDechargement, setShowDechargement] = useState(false);
+  
+  // Appliquer le filtre
+  const filteredShipments = shipmentss.filter((shipment) => {
+    const matchEnlevement = showEnlevement ? shipment.enlevement === true : true;
+    const matchDechargement = showDechargement ? shipment.dechargement === true : true;
+    return matchEnlevement && matchDechargement;
+  });
+  
 
 
   useEffect(() => {
@@ -638,7 +627,30 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
  
 
   return (
-    <div className="col-span-12 rounded-sm border border-stroke bg-white py-6 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4 mr-2 ml-2 mt-12">
+    <div className="col-span-12 rounded-sm border border-stroke bg-white py-6 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4 space-x-4   mt-12">
+      {/* Filtres booléens */}
+<div className="flex gap-4 items-center mb-6 ml-4">
+  <label className="flex items-center space-x-2 text-sm">
+    <input
+      type="checkbox"
+      checked={showEnlevement}
+      onChange={() => setShowEnlevement(!showEnlevement)}
+      className="rounded border-gray-300 focus:ring-green-500"
+    />
+    <span className="text-xl">Afficher les enlèvements</span>
+  </label>
+
+  <label className="flex items-center space-x-2 text-sm">
+    <input
+      type="checkbox"
+      checked={showDechargement}
+      onChange={() => setShowDechargement(!showDechargement)}
+      className="rounded border-gray-300 focus:ring-green-500"
+    />
+    <span className="text-xl">Afficher les déchargements</span>
+  </label>
+</div>
+
   <h4 className="mb-6 px-7.5 text-xl font-semibold text-black dark:text-white">
     {currentUser?.role === "expediteur" ? "Mes Colis" : "Mes Transports"}
   </h4>
@@ -662,11 +674,21 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
             </h1>
             <p className="text-gray-500">Gérez vos envois et discussions</p>
           </div>
+
           
-          {shipments.length === 0 ? (
-            <div className="p-4 bg-gray-100 text-gray-700 rounded-lg text-center">
-              Aucun colis actif trouvé.
-            </div>
+          {shipments.length === 0 ?(
+  <div className="p-6 bg-gray-100 text-gray-700 rounded-lg text-center flex flex-col items-center space-y-3">
+    <FiPackage className="text-green-600 text-4xl" />
+    <p>Aucun colis actif trouvé.</p>
+  </div>
+
+
+
+          // {shipments.length === 0 ? (
+          //   <div className="p-4 bg-gray-100 text-gray-700 rounded-lg text-center">
+          //     Aucun colis actif trouvé.
+          //   </div>
+
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {shipments.map((shipment) => (
@@ -723,7 +745,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
       {/* Section Transporteurs - 2 par ligne sur grand écran */}
       {currentUser?.role === "transporteur" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {shipmentss.map((shipment) => (
+          {filteredShipments.map((shipment) => (
             <div 
               key={shipment.id}
               className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:border-green-200 transition-all duration-300 h-full"
@@ -855,8 +877,17 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
               </div>
             </div>
           ))}
+
+          
         </div>
       )}
+
+{filteredShipments.length === 0 && (
+  <div className="p-6 bg-gray-100 text-gray-700 rounded-lgflex justify-center items-center h-64text-center flex flex-col items-center space-y-3">
+    <FiPackage className="text-green-600 text-4xl" />
+    <p>Aucun colis actif trouvé.</p>
+  </div>
+)}
     </div>
   )}
       
