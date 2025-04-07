@@ -6,21 +6,18 @@ import ClickOutside from "@/components/ClickOutside";
 import {AuthContext} from  "../../../context/AuthContext";
 import { useRouter } from 'next/navigation';
 import { toast } from "react-toastify";
+import { Avatar } from "../Avartar";
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { user, userData, loading, error ,setUser  ,logout} = useContext(AuthContext);
 const router =useRouter()
   const dologout =async ()=>{
      await logout()
-     toast.success('Connexion réussie !', {
-             position: "top-right", // Positionner le toast en haut à droite
-             autoClose: 5000, // Fermer automatiquement après 5 secondes
-           });
-     
+     toast.success('Deconnexion réussie !');
+    return    router.push("/Accueil");
            // Rediriger vers le tableau de bord après la connexion
-           setTimeout(() => {
-             router.push("/Accueil");
-           }, 2000); // Attendre 2 secondes avant la redirection
+            
+          //  }, 1000); // Attendre 2 secondes avant la redirection
   }
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
@@ -37,7 +34,7 @@ const router =useRouter()
         </span>
 
         <span className="h-12 w-12 rounded-full">
-          <Image
+          {/* <Image
             width={112}
             height={112}
             src={"/images/user/user-01.png"}
@@ -46,7 +43,16 @@ const router =useRouter()
               height: "auto",
             }}
             alt="User"
-          />
+          /> */}
+
+<Avatar
+        size={10}
+        src={user.profle}
+        name={user.uid !== userData?.id 
+          ? `${userData?.firstName} ${userData?.lastName}` 
+          : `${userData?.firstName} ${userData?.lastName}`}
+      />
+
         </span>
 
         <svg
@@ -75,7 +81,7 @@ const router =useRouter()
             <li>
               <Link
                 href="/profile"
-                className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+                className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-green-500 lg:text-base"
               >
                 <svg
                   className="fill-current"
@@ -144,7 +150,7 @@ const router =useRouter()
               </Link>
             </li> */}
           </ul>
-          <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"  onClick={()=>dologout()}>
+          <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-green-400 lg:text-base"  onClick={()=>dologout()}>
             <svg
               className="fill-current"
               width="22"

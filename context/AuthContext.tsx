@@ -4,7 +4,6 @@ import { auth, db } from '../lib/firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth'; // Réintégrez useAuthState
 import { doc, getDoc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
 // Créez le contexte avec une valeur par défaut
 type AuthContextType = {
   user: any;
@@ -36,7 +35,6 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null); // Pour stocker les données supplémentaires de l'utilisateur
   const [loading, setLoading] = useState(true); // Pour gérer le chargement global
   const [error, setError] = useState(null); // Pour gérer les erreurs globales
- const router = useRouter()
   useEffect(() => {
     if (firebaseUser) {
       // Si l'utilisateur est connecté, récupérez ses informations supplémentaires

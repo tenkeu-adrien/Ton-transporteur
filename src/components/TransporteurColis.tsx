@@ -6,7 +6,7 @@ import { AuthContext } from "../../context/AuthContext";
 import MapWithRoute from "./MapWithRoute";
 import { IoMdArrowBack } from "react-icons/io";
 import Link from "next/link";
-import { FaChevronLeft, FaChevronRight, FaMapMarkerAlt, FaSpinner } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaMapMarkerAlt, FaRegComments, FaSpinner } from "react-icons/fa";
 import { FaBox, FaMoneyBillWave, FaCalendarAlt, FaInfoCircle } from "react-icons/fa"; // Importez les icônes nécessaires
 import { addDoc, collection, doc, getDocs, query, serverTimestamp, setDoc, where } from "firebase/firestore";
 import { auth, db } from "../../lib/firebaseConfig";
@@ -14,6 +14,8 @@ import { toast } from "react-toastify";
 import { FaUser, FaUserCircle, FaEnvelope, FaPhone } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { FiMessageSquare } from "react-icons/fi";
+import Loader from "./Loader";
 // import Navbar from "./Navbar";
  
 
@@ -33,10 +35,24 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
   const currentCards = otherShipments.slice(indexOfFirstCard, indexOfLastCard);
-  const router= useRouter()
 
   const currentUser = auth.currentUser
  
+
+  const router = useRouter();
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/signin'); // Redirige vers la page d'accueil si l'utilisateur n'est pas connecté
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return <Loader />; // Affiche un message de chargement pendant la vérification
+  }
+
+  if (!user) {
+    return null; // Ne rend rien si l'utilisateur n'est pas connecté (la redirection se fait dans useEffect)
+  }
   
 
 
@@ -46,31 +62,48 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
 
   // Fonction pour changer de page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "En cours":
+        return "bg-blue-500";
+      case "Livré":
+        return "bg-green-500";
+      case "Annulé":
+        return "bg-red-500";
+      case "En attente":
+        return "bg-yellow-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
 
  
-  useEffect(() => {
-    const fetchOtherShipments = async () => {
-      try {
-        const shipmentsRef = collection(db, "shipments");
-        const q = query(
-          shipmentsRef,
-          where("price", ">", 0)
-        );
-        const querySnapshot = await getDocs(q);
-        const shipmentsData = querySnapshot.docs
-          .map(doc => ({ id: doc.id, ...doc.data() }))
-          .filter(s => s.id !== shipment.id);
+  // useEffect(() => {
+  //   const fetchOtherShipments = async () => {
+  //     try {
+  //       const shipmentsRef = collection(db, "shipments");
+  //       const q = query(
+  //         shipmentsRef,
+  //         where("price", ">", 0)
+  //       );
+  //       const querySnapshot = await getDocs(q);
+  //       const shipmentsData = querySnapshot.docs
+  //         .map(doc => ({ id: doc.id, ...doc.data() }))
+  //         .filter(s => s.id !== shipment.id);
   
-        setOtherShipments(shipmentsData);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des autres shipments :", error);
-      }
-    };
+  //       setOtherShipments(shipmentsData);
+  //     } catch (error) {
+  //       console.error("Erreur lors de la récupération des autres shipments :", error);
+  //     }
+  //   };
   
-    fetchOtherShipments();
-  }, [shipment?.id]);
+  //   fetchOtherShipments();
+  // }, [shipment?.id]);
 
- 
+ const handleClick =()=>{
+
+  router.push(`/chat/${shipment.id}`)
+ }
 
 
 
@@ -127,11 +160,9 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
     toast.success("Offre envoyée avec succès");
     
     // Redirection vers la page de chat
-    // router.push(`/chat/${shipment.expediteurId}?offer=true$isTransporteur=true`);
+    router.push(`/chat/${shipment.id}?isTransporteur=true`);
     // const queryParams = new URLSearchParams({
-     let offer="true"
-     const isTransporteur= "true"
-    // });
+  
     
 //     if (shipment.id) {
 //       queryParams.append("shipmentid", shipment.id);
@@ -140,7 +171,7 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
     
     // router.push(`/chat/${shipment.expediteurId}?${shipment?.id}`);
 
-    router.push(`/chat/${shipment.expediteurId}?sh=${shipment.id}&isOffer=${offer}&isTransporter=${isTransporteur}`);
+    // router.push(`/chat/${shipment?.id}`);
 
   } catch (error) {
     console.error("Erreur:", error);
@@ -205,6 +236,7 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
           {shipment.pickupAddress}
         </p>
       </div>
+      
     </div>
     
 
@@ -509,22 +541,33 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
             </div>
 
             {/* Bouton pour Soumettre l'Offre */}
-            <div className="mt-6">  
-            <button
-                           onClick={handleSubmitOffer}
-                           disabled={isSubmitting}
-                           className="w-full bg-green-500 hover:bg-primary-600 text-white p-3   rounded-lg flex items-center justify-center disabled:bg-green-300"
-                         >
-                           {isSubmitting ? (
-                             <>
-                               <FaSpinner className="animate-spin mr-2" />
-                               Soumission en cours...
-                             </>
-                           ) : (
-                             "Soumettre"
-                           )}
-                         </button>
-            </div>
+            <div className="mt-6 flex items-center gap-4">
+  <button
+    onClick={handleSubmitOffer}
+    disabled={isSubmitting}
+    className="flex-1 bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg flex items-center justify-center disabled:bg-green-300"
+  >
+    {isSubmitting ? (
+      <>
+        <FaSpinner className="animate-spin mr-2" />
+        Soumission en cours...
+      </>
+    ) : (
+      "Soumettre"
+    )}
+  </button>
+  
+  <span className="text-gray-500">ou</span>
+  
+  <button
+    onClick={handleClick}
+    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 transition duration-300"
+  >
+    <FaRegComments className="w-5 h-5" />
+    <span>Discuter</span>
+    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+  </button>
+</div>
           </div>
         </div>
 

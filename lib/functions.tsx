@@ -1,6 +1,6 @@
 "use client"
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc ,updateDoc} from "firebase/firestore";
 import { getApp } from "firebase/app";
 import {db,auth} from './firebaseConfig'
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
@@ -126,6 +126,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 // import { auth } from '../lib/firebaseConfig';
 import React, { useEffect } from 'react';
+import Loader from "@/components/Loader";
 
 const ProtectedRoute = ({ children }) => {
   const [user, loading] = useAuthState(auth);
@@ -138,7 +139,7 @@ const ProtectedRoute = ({ children }) => {
   }, [user, loading, router]);
 
   if (loading) {
-    return <div>En cours de chargement</div>; // Affiche un message de chargement pendant la vérification
+    return <Loader />; // Affiche un message de chargement pendant la vérification
   }
 
   if (!user) {
@@ -149,3 +150,51 @@ const ProtectedRoute = ({ children }) => {
 };
 
 export default ProtectedRoute;
+
+
+
+
+
+
+
+/**
+ * Met à jour le statut d'un shipment
+ * @param shipmentId - ID du shipment à mettre à jour
+ * @param newStatus - Nouveau statut ("En attente", "Accepté", "Annulé", etc.)
+ * @param cancelReason - [Optionnel] Raison de l'annulation
+ * @returns Promise<void>
+ */
+export const updateShipmentStatus = async (
+  shipmentId: string,
+  newStatus: string,
+  cancelReason?: string,
+  user?:string,
+): Promise<void> => {
+  try {
+    const shipmentRef = doc(db, "shipments", shipmentId);
+    
+    const updateData: {
+      status: string;
+      updatedAt: Date;
+      cancelReason?: string;
+      cancelledBy?: string;
+      user?:string
+    } = {
+      status: newStatus,
+      updatedAt: new Date(),
+    };
+
+    // Si c'est une annulation, ajoute la raison
+    if (newStatus === "Annuler" && cancelReason) {
+      updateData.cancelReason = cancelReason;
+      updateData.cancelledBy = user; // ou "transporteur" selon votre logique
+    }
+console.log(newStatus , user ,shipmentId)
+    await updateDoc(shipmentRef, updateData);
+    
+    console.log(`Statut du shipment ${shipmentId} mis à jour à: ${newStatus}`);
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du statut:", error);
+    throw new Error("Échec de la mise à jour du statut");
+  }
+};

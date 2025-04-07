@@ -1,27 +1,52 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
+import Loader from "@/components/Loader";
+import { firebaseConfig } from "../../lib/firebaseConfig";
 
 export default function Home() {
   const router = useRouter();
+  const [showLoader, setShowLoader] = useState(true);
 
   useEffect(() => {
-    NProgress.start(); // Démarre la barre de chargement
+    NProgress.start();
 
-    router.push("/Accueil"); // Redirige vers la page d'accueil
+    // Timer pour le loader (5 secondes)
+    const loaderTimer = setTimeout(() => {
+      setShowLoader(false);
+    }, 1000);
 
-    const timeout = setTimeout(() => {
-      NProgress.done(); // Arrête la barre de chargement après un petit délai
-    }, 500);
+    // Redirection après 5 secondes
+    const redirectTimer = setTimeout(() => {
+      router.push("/Accueil");
+      NProgress.done();
+    }, 1000);
 
     return () => {
-      clearTimeout(timeout);
-      NProgress.done(); // S'assure que NProgress s'arrête si le composant est démonté
+      clearTimeout(loaderTimer);
+      clearTimeout(redirectTimer);
+      NProgress.done();
     };
   }, [router]);
+  useEffect(() => {
+    if ('serviceWorker' in navigator && firebaseConfig) {
+      navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        .then(registration => {
+          console.log('SW registered');
+        })
+        .catch(err => {
+          console.log('SW registration failed:', err);
+        });
+    }
+  }, []);
 
-  return null; // Aucun affichage nécessaire
+  if (showLoader) {
+    return <Loader />
+      
+  }
+
+  return null;
 }

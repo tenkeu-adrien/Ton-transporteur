@@ -291,7 +291,7 @@ const customStyles = {
 // Formatteur pour afficher le drapeau et le nom dans le select
 const formatOptionLabel = ({ label, flag }) => (
   <div style={{ display: "flex", alignItems: "center" }}>
-    <Image src={flag} alt={label} style={{ width: "20px", marginRight: "10px" }} />
+    <Image src={flag} alt={label} style={{ width: "20px", marginRight: "10px" }}  width={10} height={10}/>
     <span>{label}</span>
   </div>
 );
@@ -407,7 +407,7 @@ const formatOptionLabel = ({ label, flag }) => (
       {/* Numéro de Téléphone */}
       <div>
       <label className="block text-sm font-medium text-gray-700">Numéro de Téléphone :</label>
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row gap-2 items-center">
         <Select
           options={countries}
           value={selectedCountry}

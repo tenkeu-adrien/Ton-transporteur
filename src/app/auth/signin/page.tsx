@@ -46,7 +46,7 @@ const onSubmit = async (data) => {
   setIsSubmitting(true);
   try {
     const response = await loginUser(data.email, data.password); // Connexion
-
+ console.log("data" ,data)
     if (response.success && response.user) {
       const user = response.user; // Utilise l'objet `user` du résultat
 
@@ -146,10 +146,10 @@ useEffect(() => {
 
     <>
     <Navbar  user={user}  logout={logout}/>
-    <div className="rounded-sm border border-stroke bg-white shadow-default darkk:border-strokedark darkk:bg-boxdark min-h-screen justify-center m-[50] ">
+    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark min-h-screen justify-center  pt-[70px] ">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
-            <div className="px-26 py-17.5 text-center"> 
+            <div className="text-center -mr-[350px]"> 
               <Link className="mb-5.5 inline-block text-3xl text-green-400" href="/Accueil" >
                Ton-Transporteur
               </Link>
@@ -160,7 +160,7 @@ useEffect(() => {
 
               <span className="inline-block">
               
-            <svg xmlns="http://www.w3.org/2000/svg" width="500" height="" viewBox="0 0 720 722.539" role="img" className="mt-8"  >
+            <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 720 722.539" role="img" className="mt-12 "  >
   <g id="Group_64" data-name="Group 64" transform="translate(-600.001 -166)">
     <g id="Group_63" data-name="Group 63" transform="translate(39.127 -21.613)">
       <path id="Path_1-1224" data-name="Path 1" d="M275.321,690.449,270.949,673.2a223.916,223.916,0,0,0-23.758-8.524l-.552,8.015-2.238-8.83c-10.012-2.862-16.824-4.121-16.824-4.121s9.2,34.987,28.5,61.735l22.486,3.95-17.469,2.519a90.608,90.608,0,0,0,7.811,8.28c28.072,26.057,59.34,38.013,69.838,26.7s-3.749-41.6-31.822-67.656c-8.7-8.078-19.635-14.56-30.579-19.664Z" transform="translate(417.297 140.418)" fill="#f2f2f2"/>
@@ -290,11 +290,6 @@ useEffect(() => {
                 </div>
 
                 <div className="mb-5">
-                  {/* <input
-                    type="submit"
-                    value="Se connecterr"
-                    className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
-                  /> */}
                   <button
                            type="submit"
                            disabled={isSubmitting}
@@ -316,29 +311,12 @@ useEffect(() => {
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300" />
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Ou continuez avec</span>
-            </div>
+          
           </div>
         </div>
 
-        {/* Connexion par Google et Facebook */}
         <div className="mt-6 gridd gridd-colss-2 gap-3">
-  {/* Bouton Google */}
-  <button
-  type="button"
-    onClick={() => handleGoogleLogin()}
-    className="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-  >
-    <Image
-      src="/images/icon/search.png" // Chemin de l'icône Google
-      alt="Google"
-      width={20} // Largeur de l'icône
-      height={20} // Hauteur de l'icône
-      className="mr-2 " // Marge à droite pour espacer l'icône du texte
-    />
-    Google
-  </button>
+ 
 </div>
                 <div className="mt-6 text-center">
                   <p>

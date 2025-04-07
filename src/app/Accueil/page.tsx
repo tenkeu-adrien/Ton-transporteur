@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image";
  import Head from "next/head";
 import Link from "next/link";
 import { auth, messaging } from "../../../lib/firebaseConfig";
@@ -21,20 +20,7 @@ import { ChatButton } from "@/components/ChatButton";
 
 export default function Home() {
 
-  const [message, setMessage] = useState("Chargement...");
 
-
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:5001/projecttextfirebase/us-central1/helloWorld")
-      .then((res) => res.text())
-      .then(setMessage)
-      .catch(() => setMessage("Erreur de chargement"));
-  }, []);
-
-
- 
-  
 
   const { user,logout} = useContext(AuthContext);
 const handleStart =()=>{
@@ -54,7 +40,7 @@ const handleStart =()=>{
       {/* <FCMSetup /> */}
 
  <Navbar  user={user} logout={logout}  />
-{user && <ChatButton recipientId={user?.uid}/>}
+{/* {user && <ChatButton recipientId={user?.uid}/>} */}
 <div className="bg-gray-100 min-h-screen">
 <section className="relative bg-green-300 py-16 overflow-hidden">
       {/* Fond avec arrondis en bas */}
@@ -75,9 +61,9 @@ const handleStart =()=>{
     <button className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition duration-300" onClick={() => handleStart()}>
       Expédier ou recevoir un colis
     </button>
-    <button className="bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700 transition duration-300">
+    <Link href="/mes-colis" className="bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700 transition duration-300">
       Voir les colis sur ma route
-    </button>
+    </Link>
   </div>
 </div>
 
@@ -151,7 +137,7 @@ const handleStart =()=>{
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 className="text-xl font-semibold mb-4">2. Trouvez un transporteur</h3>
-            <p>Recevez des propositions de transporteurs fiables et sélectionnez celui qui vous convient.</p>
+            <p>Recevez des propositions du transporteurs fiables et sélectionnez celui qui vous convient.</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 className="text-xl font-semibold mb-4">3. Suivez votre colis</h3>

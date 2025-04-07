@@ -42,7 +42,16 @@
 .tableCheckbox:checked ~ div {
     @apply border-primary bg-primary;
 }
-
+/* Dans votre fichier global CSS */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
 .apexcharts-legend-text {
     @apply !text-body dark:!text-bodydark;
 }

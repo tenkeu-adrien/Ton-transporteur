@@ -2,23 +2,25 @@
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import {  useSearchParams } from 'next/navigation';
 import { toast } from "react-toastify";
-import { useContext, useEffect, useState } from "react";
+import {useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { db, auth } from "../../../../lib/firebaseConfig";
-import { collection, query, where, onSnapshot, addDoc, serverTimestamp, updateDoc, doc, getDoc} from "firebase/firestore";
-import { AuthContext } from "../../../../context/AuthContext";
+import { db, auth,  subscribeToMessages } from "../../../../lib/firebaseConfig";
+import { collection, query, where, onSnapshot, addDoc, serverTimestamp, updateDoc, doc, getDoc, getDocs, limit, orderBy} from "firebase/firestore";
+// import { AuthContext } from "../../../../context/AuthContext";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Avatar } from "@/components/Avartar";
 import { Box } from "@/components/Box";
-import { FaBox, FaCalendarCheck, FaCalendarAlt,FaMapMarkerAlt, FaMoneyBillWave, FaSortNumericUp, FaSpinner, FaWeightHanging, FaRulerCombined, FaTruckPickup, FaImage } from "react-icons/fa";
+import { FaBox, FaCalendarCheck, FaCalendarAlt,FaMapMarkerAlt, FaMoneyBillWave, FaSortNumericUp, FaSpinner, FaWeightHanging, FaRulerCombined, FaTruckPickup, FaImage, FaTimes, FaCheck, FaHashtag } from "react-icons/fa";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getMessaging, getToken} from "firebase/messaging";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import Link from "next/link";
 import { FaCheckCircle } from 'react-icons/fa';
 import Image from "next/image";
+import { updateShipmentStatus } from "../../../../lib/functions";
+import { MdCancel } from "react-icons/md";
+import { useRef, useCallback } from 'react';
 // Ajoutez aussi l'interface Message
 interface Message {
   id: string;
@@ -27,6 +29,8 @@ interface Message {
   receiver: string;
   timestamp: any;
   isRead: boolean;
+  expediteurId:string,
+  shipmentId:string,
   senderName: string;
   avatar?: string;
 }
@@ -55,115 +59,56 @@ interface Shipment {
   status: 'En attente' | 'accepted' | 'completed';
   find:any
 }
+const useMessageObserver = (onIntersect) => {
+  const observer = useRef(null);
 
+  return useCallback(node => {
+    if (observer.current) observer.current.disconnect();
 
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        onIntersect();
+      }
+    });
+
+    if (node) observer.current.observe(node);
+  }, [onIntersect]);
+};
       // const shipmentsRef = collection(db, "shipments");
 export default function ChatRoom({ params}) {
   // ... autres états
   const searchParams = useSearchParams();
-  const isFromOffer = searchParams.get('offer') === 'true';
-  const isTransporter = searchParams.get('isTransporteur') === 'true';
-  const sh = searchParams.get('shs') ;
-const { id} = useParams();
-  const [messages, setMessages] = useState<any[]>([]);
+  // const sh = searchParams.get('shs') ;
+  // const shipmentId = searchParams.get('shipmentId'); // Ajout pour le cas d'initialisation par le transporteur
+  const { id: shipmentId } = useParams(); // id est maintenant expediteurId
+  
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [chatPartner, setChatPartner] = useState(null);
 const [isUploading, setIsUploading] = useState(false);
 const [user ,setUser] = useState(null)
 const [isvalid ,setValid] =useState(false)
-const [currentShipment, setCurrentShipment] = useState<Shipment | null>(null);
-  const [otherShipments, setOtherShipments] = useState<Shipment[]>([]);
-console.log("ortheShipment" ,otherShipments)
-console.log("currentShipment" , currentShipment)
-console.log("chatPartner user" ,chatPartner)
+const [isModalOpen, setIsModalOpen] = useState(false);
+const [cancelReason, setCancelReason] = useState("");
+const [currentShipment, setCurrentShipment] = useState(null);
+  const [otherShipments, setOtherShipments] = useState([]);
+  const [transporteur, setTransporteur] = useState(null);
+  const [isOfferAccepted, setIsOfferAccepted] = useState(false);
+  const messagesEndRef = useRef(null);
+const typingTimeoutRef = useRef(null);
+
+const [isTyping, setIsTyping] = useState(false);
+
+// console.log("messages" , messages)
+// console.log("currentShipment" , currentShipment)
+// console.log("transporteur" ,transporteur)
+// console.log("user" ,user)
+// console.log("chatPartner user" ,chatPartner)
 const uid = auth?.currentUser?.uid;
 
-console.log("id de url " ,id ,"shipmentid" ,sh)
-  // Ajoutez cet useEffect pour charger les colis
-  // useEffect(() => {
-  //   if (!id) return;
 
-  //   const fetchShipments = async () => {
-  //     const shipmentsRef = collection(db, "shipments");
-    
-  //   let q;
 
-  //   if (isTransporter) { 
-  //     // Si l'utilisateur est le transporteur, récupérer tous les colis disponibles
-  //     q = query(shipmentsRef, where("status", "in", ["En attente", "accepted"]));
-  //   } else {
-  //     // Sinon, récupérer seulement les colis de l'expéditeur connecté
-  //     if (shipmentid) {
-  //       q = query(shipmentsRef, where("shipmentId", "==", shipmentid));
-  //     } else {
-  //       q = query(shipmentsRef, where("expediteurId", "==", id));
-  //     }
-  //   }
-  //     onSnapshot(q, (snapshot) => {
-  //       const shipments = snapshot.docs.map(doc => ({
-  //         id: doc.id,
-  //         ...doc.data()
-  //       })) as Shipment[];
 
-  //     const  shipmentss = shipments.filter(s => s.price !== 0);
-  //       // // Séparer le colis actuel des autres colis
-  //       // const current = shipments.find(s => s.status === 'En attente' || s.status === "accepted");
-  //       // const others = shipments.filter(s => s.status === 'En attente' && s.shipmentId !== current?.id);
-  //       const current = shipmentss[0]; // Assuming the first shipment is the current one
-  //       const others = shipmentss.slice(1)
-  //       setCurrentShipment(current || null);
-  //       setOtherShipments(others);
-  //     });
-  //     // return () => unsubscribe();
-  //   };
-
-  //   fetchShipments();
-  // }, [id ,isTransporter]);
-  useEffect(() => {
-    if (!id) return;
-  
-    const fetchShipments = async () => {
-      const shipmentsRef = collection(db, "shipments");
-      console.log("shipmentRef" ,shipmentsRef)
-      let q;
-  if (sh) {
-    // Si on a un shipmentId, on récupère uniquement ce colis spécifique
-    q = query(shipmentsRef, where("shimentId", "==", sh));
-  } else if (isTransporter) {
-    // Si c'est un transporteur, récupérer les colis disponibles
-    q = query(shipmentsRef, where("status", "in", ["En attente", "accepted"]));
-  } else {
-    // Pour l'expéditeur, récupérer ses colis
-    q = query(shipmentsRef, where("expediteurId", "==", id));
-  }
-
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    const shipments = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as Shipment[];
-
-    const filteredShipments = shipments.filter(s => s.price !== 0);
-    
-    if (sh) {
-      // Si on a un shipmentId, le colis correspondant devient le current
-      const targetShipment = filteredShipments.find(s => s.id === sh);
-      setCurrentShipment(targetShipment || null);
-      setOtherShipments(filteredShipments.filter(s => s.id !== sh));
-    } else {
-      // Sinon, comportement par défaut
-      const current = filteredShipments[0];
-      const others = filteredShipments.slice(1);
-      setCurrentShipment(current || null);
-      setOtherShipments(others);
-    }
-  });
-
-  return () => unsubscribe();
-};
-
-fetchShipments();
-}, [id, isTransporter, sh]);
   const getUserData = async (uid) => {
     try {
       // Crée une référence au document de l'utilisateur dans la collection 'users'
@@ -175,7 +120,7 @@ fetchShipments();
       if (userSnap.exists()) {
         // Retourne les données si l'utilisateur existe
         const userData = userSnap.data();
-        console.log('Données utilisateur:', userData);
+        // console.log('Données utilisateur:', userData);
         return userData;
       } else {
         console.log('Aucun utilisateur trouvé avec cet UID');
@@ -186,6 +131,10 @@ fetchShipments();
       throw error;
     }
   };
+
+ 
+
+
 
   useEffect(()=>{
     const fetchUser = async () => {
@@ -200,9 +149,28 @@ fetchShipments();
   fetchUser()
   } ,[uid])
   
-  // const { user} = useContext(AuthContext);
+  useEffect( () => {
 
-  const sendEmailNotification = async (shipmentId: string, type: string) => {
+    const fetchTransporteur = async () => {
+      const q = query(
+        collection(db, "users"),
+        where("role", "==", "transporteur"), // Filtre par rôle
+        limit(1) // Vous n'en avez qu'un
+      );
+      
+      const snapshot = await getDocs(q);
+      if (!snapshot.empty) {
+        const doc = snapshot.docs[0];
+        setTransporteur({ id: doc.id, ...doc.data() });
+        setChatPartner({ id: doc.id, ...doc.data() })
+      }
+    };
+  
+    fetchTransporteur();
+  }, []);
+
+    const sendEmailNotification = async (shipmentId: string, type: string) => 
+    {
   
     try {
     
@@ -212,352 +180,277 @@ fetchShipments();
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: chatPartner.email, // Utilisation de l'email récupéré
-          shipment: { objectName: currentShipment.objectName },
+          email: chatPartner?.email ?? transporteur?.email, // Utilisation de l'email récupéré
+          shipment: { objectName: currentShipment.objectName ,id:currentShipment.id },
           type,
-          chatId: id,
+          chatId: shipmentId,
+          user:{firstName:user?.firstName  , lastName:user?.lastName}
         }),
       });
   
       const data = await response.json();
       if (!response.ok) {
-        console.error("Erreur lors de l'envoi de l'email :", data.error);
+        return {error:data.error}
+      }else{
+        return data
       }
     } catch (error) {
-      console.error("Erreur lors de la requête :", error);
+return {
+  error:error
+}
     }
   };
   
 
+  const markMessageAsRead = async (messageId) => {
+    if (!messageId) return;
+    
+    try {
+      await updateDoc(doc(db, "messages", messageId), {
+        isRead: true
+      });
+    } catch (error) {
+      console.error("Erreur lors du marquage du message:", error);
+    }
+  };
 
-//   const sendPushNotification = async (shipmentId: string, type: string) => {
-//     const shipment = currentShipment || otherShipments.find(s => s.id === shipmentId);
-//     if (!shipment) return;
+  // Hook personnalisé pour observer les messages
+  const messageObserver = useMessageObserver((messageId) => {
+    markMessageAsRead(messageId);
+  });
 
-// const userRef = doc(db, "users", id);
-// const userDoc = await getDoc(userRef);
-//     // const userDoc = await getDoc(doc(db, "users", id));
-//     const fcmToken = userDoc.data()?.fcmToken;
+  // Fonction pour faire défiler vers le dernier message
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
-//     await fetch('/api/send-notification', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify({
-//         userId: id,
-//         title: type === "acceptance" ? "Offre acceptée" : "Nouveau message",
-//         body: `Colis: ${shipment.objectName}`,
-//         type: type,
-//         fcmToken: fcmToken,
-//         data: {
-//           shipmentId: shipmentId,
-//           chatId: id
-//         }
-//       })
-//     });
-//   };
+const sendPushNotification = async (shipmentId: string, type: string) => {
+    const shipment = currentShipment || otherShipments.find(s => s.id === shipmentId);
+    console.log("chatPatner user" ,chatPartner , 'transporteur' ,transporteur)
+    if (!shipment) return;
+  const response =   await fetch('/api/send-notification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId:  chatPartner?.id ?? transporteur?.id,
+        title: type === "acceptance" ? "Offre de transport acceptée" : "Nouveau message",
+        body: `Colis: ${shipment?.objectName}`,
+        type: type,
+        data: {
+          shipmentId: shipmentId,
+          chatId: shipmentId
+        }
+      })
+    });
+    if (!response.ok) {
+      const errorData = await response.text(); // Lire d'abord comme texte
+      console.error('Server responded with:', errorData);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  };
 
   // Fonction pour accepter une offre
   const handleAcceptShipment = async (shipmentId: string) => {
     try {
-      await updateDoc(doc(db, "shipments", shipmentId), {
-        status: 'accepted',
-        transporteurId: uid
-      });
-      toast.success("Offre acceptée avec succès!");
+     
+      let newStatus="Accepter"
+      await updateShipmentStatus(shipmentId,newStatus ,user.uid)
       sendEmailNotification(shipmentId, "acceptance");
-      // sendPushNotification(shipmentId, "acceptance");
+      sendPushNotification(shipmentId, "acceptance");
     } catch (error) {
-      toast.error("Erreur lors de l'acceptation de l'offre");
+      throw error
     }
   };
 
-  // useEffect(() => {
-  //   if (!id) return;
-  //   const fetchMessages = async () => {
-  //     const messagesRef = collection(db, "messages");
-
-  //     // Requête pour les messages où l'utilisateur actuel est un participant
-  //     const q = query(messagesRef, where("users", "array-contains", uid));
-
-  //     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  //       const messages = [];
-  //       querySnapshot.forEach((doc) => {
-  //         const data = doc.data();
-
-
-  //         // Vérifier que `users` existe et est un tableau
-  //         if (data.users && Array.isArray(data.users) && data.users.includes(id)) {
-  //           messages.push({ id: doc.id, ...data });
-  //         }
-  //       });
-
-  //       // Trier les messages par timestamp (du plus ancien au plus récent)
-  //       messages.sort((a, b) => a.timestamp - b.timestamp);
-
-  //       // Mettre à jour l'état `messages`
-  //       setMessages(messages);
-  //     });
-
-  //     return unsubscribe;
-  //   };
-
-  //   fetchMessages();
-  // }, [uid, id]);
-
-  // useEffect(() => {
-  //   if (!id) return;
-    
-  //   const fetchMessagesAndUsers = async () => {
-  //     const messagesRef = collection(db, "messages");
-  //     const usersRef = collection(db, "users");
-  
-  //     const q = query(messagesRef, where("users", "array-contains", uid));
-  
-  //     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-  //       const messagesPromises = querySnapshot.docs.map(async (doc) => {
-  //         const data = doc.data();
-          
-  //         if (!(data.users && Array.isArray(data.users) && data.users.includes(id))) {
-  //           return null;
-  //         }
-  //  console.log("data de user receiver" ,data)
-  //         // Récupérer les infos de l'utilisateur (receiver)
-  //         let userData = null;
-  //         try {
-  //           // const userDoc = await getDoc(doc(usersRef, data.receiver));
-  //           const userDoc = await getDoc(doc(db, "users", data.receiver));
-  //           console.log("userDoc apres receiver" ,userDoc)
-  //           if (userDoc.exists()) {
-  //             userData = userDoc.data();
-  //           }
-  //         } catch (error) {
-  //           console.error("Error fetching user data:", error);
-  //         }
-  
-  //         return {
-  //           id: doc.id,
-  //           ...data,
-  //           userInfo: userData
-  //         };
-  //       });
-  
-  //       // Attendre que toutes les promesses soient résolues
-  //       const messages = (await Promise.all(messagesPromises)).filter(Boolean);
-        
-  //       // Trier les messages
-  //       messages.sort((a, b) => a.timestamp - b.timestamp);
-  //       setMessages(messages);
-  //     });
-  
-  //     return unsubscribe;
-  //   };
-  
-  //   fetchMessagesAndUsers();
-  // }, [uid, id]);
-
-
-  // useEffect(() => {
-  //   if (!id || !currentShipment) return;
-    
-  //   const fetchMessagesAndUsers = async () => {
-  //     const messagesRef = collection(db, "messages");
-  //     const q = query(
-  //       messagesRef,
-  //       where("shipmentId", "==", shipmentid ?? currentShipment?.id),
-  //       where("users", "array-contains", uid)
-  //     );
-  
-  //     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-  //       const messagesPromises = querySnapshot.docs.map(async (doc) => {
-  //         const data = doc.data();
-  //         let userData = null;
-  //         try {
-  //           // const userDoc = await getDoc(doc(db, "users", data?.sender));
-  //           console.log("sender data" ,data);
-            
-  //           const userRef = doc(db, "users", data?.sender); // ✅ Crée une référence
-  //   const userDoc = await getDoc(userRef); 
-  //           if (userDoc.exists()) {
-  //             userData = userDoc.data();
-  //           }
-  //         } catch (error) {
-  //           console.error("Error fetching user data:", error);
-  //         }
-  
-  //         return {
-  //           id: doc.id,
-  //           ...data,
-  //           userInfo: userData
-  //         };
-  //       });
-  
-  //       const messages = (await Promise.all(messagesPromises)).filter(Boolean);
-  //       messages.sort((a, b) => a.timestamp - b.timestamp);
-  //       setMessages(messages);
-  //     });
-  
-  //     return unsubscribe;
-  //   };
-  
-  //   fetchMessagesAndUsers();
-  // }, [uid]);
+ 
+const handleTyping = () => {
+  setIsTyping(true);
+  if (typingTimeoutRef.current) {
+    clearTimeout(typingTimeoutRef.current);
+  }
+  typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000);
+};
 
   useEffect(() => {
-    if (!id || !currentShipment?.id) return;
     
-    const fetchMessagesAndUsers = async () => {
+    if (!currentShipment || !uid) return;
+  
+    const fetchMessagesAndPartner = async () => {
       const messagesRef = collection(db, "messages");
       const q = query(
         messagesRef,
         where("shipmentId", "==", currentShipment.id),
-        where("users", "array-contains", uid)
+        where("users", "array-contains", uid),
+        // orderBy("timestamp", "asc") // Ajouter l'ordre explicite
       );
-      const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-        const messagesPromises = querySnapshot.docs.map(async (doc) => {
-          const data = doc.data();
-          let userData = null;
-          try {
-            const userRef = doc(db, "users", data?.sender);
-            const userDoc = await getDoc(userRef);
-            if (userDoc.exists()) {
-              userData = userDoc.data();
-            }
-          } catch (error) {
-            console.error("Error fetching user data:", error);
-          }
   
-          return {
-            id: doc.id,
-            ...data,
-            userInfo: userData,
-            // timestamp: data.timestamp?.toDate() // Conversion du timestamp
-          };
+      const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+        const messages = [];
+        let partnerId = null;
+  
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+  
+          // Vérification que le message concerne bien l'envoi actuel
+          if (data.users && Array.isArray(data.users)) {
+            messages.push({ id: doc.id, ...data });
+  
+            // Trouver l'ID du partenaire (celui qui n'est pas l'utilisateur actuel)
+            const otherUser = data.users.find((userId) => userId !== uid);
+            if (otherUser) partnerId = otherUser;
+          }
         });
   
-        const messages = (await Promise.all(messagesPromises)).filter(Boolean);
+        // Trier les messages par timestamp
         messages.sort((a, b) => a.timestamp - b.timestamp);
         setMessages(messages);
+   scrollToBottom();
+        // Récupérer les infos du partenaire si trouvé
+        if (partnerId) {
+          const partnerDoc = await getDoc(doc(db, "users", partnerId));
+          if (partnerDoc.exists()) {
+            setChatPartner({ id: partnerDoc.id, ...partnerDoc.data() });
+          }
+        } else {
+          setChatPartner(null); // Réinitialiser si aucun partenaire trouvé
+        }
       });
   
-      return () => unsubscribe();
+      return unsubscribe;
     };
   
-    fetchMessagesAndUsers();
-  }, [uid, id, currentShipment?.id]);
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (!id) return;
-      try {
-        const userDoc = await getDoc(doc(db, "users", id));
-        if (userDoc.exists()) {
-          setChatPartner(userDoc.data());
-        }
-      } catch (error) {
-        console.error("Erreur lors de la récupération des informations utilisateur:", error);
-      }
-    };
+    fetchMessagesAndPartner();
+  }, [uid, currentShipment?.id]); // Déclencheur : uid ou ID de l'envoi change
   
-    fetchUserInfo();
-  }, [id]);
-  useEffect(() => {
-    const initializeNotifications = async () => {
-      try {
-        const messaging = getMessaging();
-        const permission = await Notification.requestPermission();
-        
-        if (permission === 'granted') {
-          const token = await getToken(messaging, {
-            vapidKey: 'VOTRE_VAPID_KEY' // Ajoutez votre clé VAPID
-          });
-          
-          // Sauvegarder le token dans Firestore pour l'utilisateur
-          if (token && auth.currentUser) {
-            await updateDoc(doc(db, 'users', auth.currentUser.uid), {
-              fcmToken: token
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Erreur d'initialisation des notifications:", error);
-      }
-    };
-  
-    initializeNotifications();
-  }, []);
-
-//   const sendMessage = async () => {
-//     if (!newMessage.trim()) return;
-
-//     // Envoyer le message
-//     const messageRef = await addDoc(collection(db, "messages"), {
-//       message: newMessage,
-//       sender: auth.currentUser?.uid,
-//       receiver: id,
-//       shipmentId:currentShipment.id,
-//       isRead: false,
-//       timestamp: serverTimestamp(),
-//       users: [auth.currentUser?.uid, id],
-//     });
-
-//     const userDoc = await getDoc(doc(db, "users", id));
-// const fcmToken = userDoc.data()?.fcmToken;
-    
-//     sendEmailNotification(currentShipment?.expediteurId, "Nouveau message");
-
-//     // await fetch('/api/send-notification', {
-//     //   method: 'POST',
-//     //   headers: {
-//     //     'Content-Type': 'application/json',
-//     //   },
-//     //   body: JSON.stringify({
-//     //     userId: id,
-//     //     title: `Nouveau message de ${user?.firstName}`,
-//     //     body: newMessage,
-//     //     type: 'new_message',
-//     //     fcmToken: fcmToken,
-//     //     data: {
-//     //       messageId: messageRef.id,
-//     //       chatId: id
-//     //     }
-//     //   })
-//     // });
-
-//     setNewMessage("");
-//   };
-
 
 const sendMessage = async () => {
-  if (!newMessage.trim() || !currentShipment?.id) return;
+  if (!newMessage.trim() || !currentShipment?.id || !transporteur?.id) return;
+
+  // Déterminer dynamiquement sender/receiver
+  const isUserExpediteur = uid === currentShipment.expediteurId;
+  const receiverId = isUserExpediteur ? transporteur.id : currentShipment.expediteurId;
+
+  // Message temporaire
+  const tempMessage = {
+    id: Date.now().toString(),
+    message: newMessage,
+    sender: uid,
+    receiver: receiverId,
+    shipmentId: currentShipment.id,
+    expediteurId: currentShipment.expediteurId,
+    transporteurId: transporteur.id,
+    timestamp: serverTimestamp(),
+    isRead: false,
+    users: [uid, receiverId],
+    userInfo: user ,
+    pending:true 
+  };
+
+  // Optimistic update
+  setMessages(prev => [...prev, tempMessage]);
+  setNewMessage("");
 
   try {
-    await addDoc(collection(db, "messages"), {
-      message: newMessage,
-      sender: auth.currentUser?.uid,
-      receiver: id,
-      shipmentId: currentShipment.id,
-      isRead: false,
-      timestamp: serverTimestamp(),
-      users: [auth.currentUser?.uid, id],
-    });
+    // 1. Envoi principal du message (critique)
+    const docRef = await addDoc(collection(db, "messages"), tempMessage);
 
-    setNewMessage("");
-    
-    // Envoi de la notification email
-    if (chatPartner?.email) {
-      await sendEmailNotification(currentShipment.id, "Nouveau message");
+    // 2. Notifications secondaires (non critiques - exécutées en parallèle)
+    if (receiverId !== uid) {
+      // Email (gestion d'erreur indépendante)
+      if (chatPartner?.email) {
+        sendEmailNotification(currentShipment.id, "Nouveau message")
+          .then(email => console.log("Email envoyé:", email))
+          .catch(emailError => console.error("Erreur email:", emailError));
+      }
+
+      setNewMessage("");
+      scrollToBottom();
+      // Push notification (gestion d'erreur indépendante)
+      sendPushNotification(currentShipment.id, "Nouveau message")
+        .then(result => console.log("Notification push:", result))
+        .catch(pushError => console.error("Erreur push:", pushError));
     }
+
   } catch (error) {
-    console.error("Erreur lors de l'envoi du message:", error);
-    toast.error("Erreur lors de l'envoi du message");
+    console.error("Erreur d'envoi du message:", error);
+    // Rollback de l'optimistic update
+    setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id));
+    // toast.error("Échec de l'envoi du message");
   }
 };
+
+
   const handleShipmentChange = (shipment: Shipment) => {
     setCurrentShipment(shipment);
     const others = otherShipments.filter(s => s.id !== shipment.id);
     setOtherShipments([...others, currentShipment]); // Ajoute l'ancien colis actuel à la liste
   };
+ // 1. Charger le shipment et l'expéditeur associé
+ useEffect(() => {
+  if (!shipmentId) return;
+
+  const fetchShipmentAndExpeditor = async () => {
+    try {
+      const shipmentRef = doc(db, "shipments", shipmentId);
+      const unsubscribe = onSnapshot(shipmentRef, async (shipmentDoc) => {
+        if (!shipmentDoc.exists()) return;
+
+        const shipmentData = { id: shipmentDoc.id, ...shipmentDoc.data() };
+        setCurrentShipment(shipmentData);
+
+        // Récupération des autres shipments de l'expéditeur
+        const shipmentsRef = collection(db, "shipments");
+        const shipmentQuery = query(shipmentsRef, where("expediteurId", "==", shipmentData.expediteurId));
+
+        const querySnapshot = await getDocs(shipmentQuery);
+        const filteredShipments = querySnapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((shipment) => shipment.id !== shipmentId); // Exclure le currentShipment
+
+        setOtherShipments(filteredShipments);
+      });
+
+      return () => unsubscribe();
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données:", error);
+    }
+  };
+
+  fetchShipmentAndExpeditor();
+}, [shipmentId]);         
+
+
+
+const handleCancelShipment =  async () => {
+  if (!cancelReason) return alert("Veuillez sélectionner une raison.");
+
+  const isUserExpediteur = uid === currentShipment.expediteurId;
+  const receiverId = isUserExpediteur ? transporteur.id : currentShipment.expediteurId;
+ let newStatus="Annuler"
+ let shipmentId =currentShipment?.id
+ let user = uid
+  await updateShipmentStatus(shipmentId ,newStatus,cancelReason, user)
+
+  if (receiverId !== uid) {
+    // Email (gestion d'erreur indépendante)
+    if (chatPartner?.email) {
+      sendEmailNotification(currentShipment.id, "Annuler")
+        .then(email => console.log("Email envoyé:", email))
+        .catch(emailError => console.error("Erreur email:", emailError));
+    }
+
+    // Push notification (gestion d'erreur indépendante)
+    sendPushNotification(currentShipment.id, "Annuler")
+      .then(result => console.log("Notification push:", result))
+      .catch(pushError => console.error("Erreur push:", pushError));
+  }
+  setIsModalOpen(false);
+};
+
 
   // Fonction pour déterminer si un message est le dernier du groupe
   const isLastMessageOfGroup = (message, index) => {
@@ -565,6 +458,34 @@ const sendMessage = async () => {
       index === messages.length - 1 ||
       messages[index + 1].sender !== message.sender
     );
+  };
+  const handleOfferAcceptance = async (msg) => {
+    let shipmentId = currentShipment?.id;
+    let newStatus = "Accepter";
+  
+    try {
+      await updateDoc(doc(db, "messages", msg.id), { isRead: true });
+      await updateShipmentStatus(shipmentId, newStatus, user);
+  
+      await fetch("/api/send-mail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: transporteur?.email,
+          shipment: { objectName: currentShipment.objectName },
+          type: "acceptance",
+          chatId: shipmentId,
+          user: { firstName: transporteur?.firstName, lastName: transporteur?.lastName },
+        }),
+      });
+
+      await sendPushNotification(shipmentId ,'acceptance')
+      // Mettre à jour l'état local pour afficher immédiatement l'offre acceptée
+      setIsOfferAccepted(true);
+      toast.success("Offre validée avec succès!");
+    } catch (error) {
+      toast.error("Erreur lors de la validation de l'offre");
+    }
   };
 
   // Fonction pour déterminer si un message est le premier du groupe
@@ -583,23 +504,15 @@ const handleImageUpload = async (e) => {
     await uploadBytes(storageRef, file);
     const imageUrl = await getDownloadURL(storageRef);
 
-    await addDoc(collection(db, "messages"), {
-      sender: auth.currentUser?.uid,
-      receiver: id,
-      isRead: false,
-      timestamp: serverTimestamp(),
-      users: [auth.currentUser?.uid, id],
-      type: "image",
-      imageUrl: imageUrl
-    });
+   
   } catch (error) {
-    toast.error("Erreur lors de l'envoi de l'image");
+    // toast.error("Erreur lors de l'envoi de l'image");
   } finally {
     setIsUploading(false);
   }
 };
- console.log("user role" ,user?.role)
-  console.log("messages" ,messages)
+//  console.log("user role" ,user?.role)
+  // console.log("messages" ,messages)
   return (
     <>
 
@@ -609,16 +522,28 @@ const handleImageUpload = async (e) => {
 <div className="flex flex-col h-screen bg-gray-100">
 
 <div className="bg-white shadow-sm p-4">
-  <div className="flex items-center justify-between max-w-4xl mx-auto">
+
+  
+
+
+<div className="flex items-center justify-between max-w-4xl mx-auto">
     <div className="flex items-center space-x-4">
       <Avatar
-        size={10}
-        src={chatPartner?.photoURL}
-        name={`${chatPartner?.firstName} ${chatPartner?.lastName}`}
+        size={8}
+        src={uid !== transporteur?.id ? transporteur?.photoURL : chatPartner?.photoURL}
+        name={uid !== transporteur?.id 
+          ? `${transporteur?.firstName} ${transporteur?.lastName}` 
+          : `${chatPartner?.firstName} ${chatPartner?.lastName}`}
       />
       <div>
         <h2 className="font-semibold">
-          {chatPartner ? `${chatPartner.firstName} ${chatPartner.lastName} / ${chatPartner.phoneNumber}` : 'Chargement...'}
+          {uid !== transporteur?.id 
+            ? transporteur 
+              ? `${transporteur.firstName} ${transporteur.lastName} / ${transporteur.phoneNumber}` 
+              : 'Chargement...'
+            : chatPartner 
+              ? `${chatPartner.firstName} ${chatPartner.lastName} / ${chatPartner.phoneNumber}` 
+              : 'Chargement...'}
         </h2>
         <p className="text-sm text-gray-500">
           {messages.some(m => !m.isRead) ? 'En ligne' : 'Hors ligne'}
@@ -626,61 +551,17 @@ const handleImageUpload = async (e) => {
       </div>
     </div>
     <div>
-     <Link href="/Dashboard"> <AiOutlineArrowLeft  className="text-2xl"/></Link>
-      </div>
+      <Link href={uid == transporteur?.id ? "/shipments" : "/mes-colis"}> 
+        <AiOutlineArrowLeft className="text-2xl"/>
+      </Link>
+    </div>
 </div>
+
 </div>
       
 
 
-{/* 
-{currentShipment && user?.role=="transporteur" && (
-          <div className="bg-white p-4 m-4 rounded-lg shadow flex flex-col space-y-3">
-            <h3 className="text-lg font-semibold mb-4 flex items-center">
-              <FaBox className="mr-2" /> Colis à expédier
-            </h3>
-            <div className="flex flex-wrap gap-4">
-              <p className="flex items-center">
-                <FaBox className="mr-2" /> Objet: {currentShipment.objectName}
-              </p>
-              <p className="flex items-center">
-                <FaMapMarkerAlt className="mr-2" /> Adresse de retrait: {currentShipment.pickupAddress}
-              </p>
-              <p className="flex items-center">
-                <FaMapMarkerAlt className="mr-2" /> Adresse de livraison: {currentShipment.deliveryAddress}
-              </p>
-              <p>Prix: {currentShipment.price}€</p>
-              <p>Quantité: {currentShipment.quantity}</p>
-              <p>Date de retrait:  {currentShipment.pickupDate && currentShipment.pickupDate .toDate
-                            ? currentShipment.pickupDate.toDate().toLocaleString("fr-FR", {
-                                weekday: "long",
-                                day: "numeric",
-                                month: "long",
-                                year: "numeric",
-                              })
-                            : "Date invalide"}</p>
-              <p>Date de livraison:  {currentShipment.pickupDate && currentShipment.pickupDate .toDate
-                            ? currentShipment.pickupDate.toDate().toLocaleString("fr-FR", {
-                                weekday: "long",
-                                day: "numeric",
-                                month: "long",
-                                year: "numeric",
-                              })
-                            : "Date invalide"}</p>
-              <p>Poids: {currentShipment.weight} kg</p>
-              <p>Taille: {currentShipment.size}</p>
-              <p>Type d'enlèvement: {currentShipment.pickupType}</p>
-            </div>
-            {currentShipment.status === 'En attente' && (
-              <button
-                onClick={() => handleAcceptShipment(currentShipment.id)}
-                className="w-full mt-4 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
-              >
-                Accepter l'offre de transport
-              </button>
-            )}
-          </div>
-        )} */}
+
 
 
 {currentShipment && (
@@ -688,7 +569,7 @@ const handleImageUpload = async (e) => {
     <h3 className="text-sm font-semibold mb-2 flex items-center">
       <FaBox className="mr-1" /> Colis à expédier
     </h3>
-    {currentShipment.status === 'accepted' && (
+    {currentShipment.status == 'Accepter' && (
       <div className="flex items-center text-green-500 text-xs">
         <FaCheckCircle className="mr-1" />
         <span>Offre acceptée</span>
@@ -700,6 +581,10 @@ const handleImageUpload = async (e) => {
       <p className="flex items-center text-xs">
         <FaBox className="mr-1" /> Objet : {currentShipment.objectName}
       </p>
+      <p className="flex items-center">
+      <FaHashtag className="mr-1" /> {/* Ajoutez l'icône ici */}
+      <span className="font-medium text-sm">Référence du colis:</span> {currentShipment?.reference ?? '11569'}
+    </p>
       <p className="flex items-center text-xs">
         <FaMoneyBillWave className="mr-1" /> Prix : {currentShipment.price}€
       </p>
@@ -758,31 +643,170 @@ const handleImageUpload = async (e) => {
     </div>
 
     {/* Bouton d'action */}
+    <div className="flex items-center space-x-2 mt-2">
+       {/* Bouton Accepter l'offre (uniquement transporteur) */}
+       <div className="w-full">
+  {/* Barre verte d'acceptation (si colis accepté) */}
+  {currentShipment.status === "Accepter" && (
+    <div className="flex items-center bg-green-100 text-green-800 p-2 mb-3 rounded-t-lg">
+      <FaCheckCircle className="mr-2 text-green-500" />
+      <span className="text-sm font-medium">Cette offre a été acceptée</span>
+    </div>
+  )}
+
+{currentShipment.status === "Annuler" && (
+    <div className="flex items-center bg-red-100 text-red-800 p-2 mb-3 rounded-t-lg">
+   <MdCancel  className="mr-2 text-red-500"/>   
+      <span className="text-sm font-medium">Cette offre a été Annuler</span>
+    </div>
+  )}
+
+  {/* Conteneur des boutons */}
+  <div className="flex space-x-2 w-full">
+    {/* Bouton Accepter l'offre (uniquement transporteur) */}
     {currentShipment.status === "En attente" && user?.role === "transporteur" && (
       <button
         onClick={() => handleAcceptShipment(currentShipment.id)}
-        className="w-full mt-2 bg-green-500 text-white py-1 px-3 rounded-lg text-sm hover:bg-green-600"
+        className="flex-1 flex items-center justify-center gap-2 bg-green-500 text-white py-2 px-3 rounded-lg text-sm hover:bg-green-600 transition-colors"
       >
-        Accepter l&apos;offre de transport
+        <FaCheck className="w-4 h-4" />
+        <span>Accepter l'offre</span>
       </button>
     )}
+
+    {/* Bouton Annuler l'offre (visible selon conditions) */}
+    {(currentShipment.status === "En attente" || 
+      (currentShipment.status === "Accepter" && user?.role === "transporteur")) && (
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm hover:bg-red-600 transition-colors ${
+          currentShipment.status === "Accepté" 
+            ? "bg-red-500 text-white" 
+            : "bg-red-500 text-white"
+        }`}
+      >
+        <FaTimes className="w-4 h-4" />
+        <span>Annuler l'offre</span>
+      </button>
+    )}
+  </div>
+</div>
+
+
+
+  {/* Bouton Annuler l'offre (expéditeur et transporteur) */}
+ 
+
+      {/* Modale d'annulation */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-5 rounded-lg shadow-lg w-80">
+            <h3 className="text-lg font-semibold mb-3">Pourquoi annuler l'offre ?</h3>
+            <div className="space-y-2">
+  {user?.role === "transporteur" ? (
+    <>
+      <label className="flex items-center space-x-2">
+        <input
+          type="radio"
+          name="cancelReason"
+          value="transporteur_annulation"
+          onChange={(e) => setCancelReason(e.target.value)}
+          className="form-radio"
+        />
+        <span>J'ai décidé d'annuler la livraison</span>
+      </label>
+
+      <label className="flex items-center space-x-2">
+        <input
+          type="radio"
+          name="cancelReason"
+          value="client_annulation"
+          onChange={(e) => setCancelReason(e.target.value)}
+          className="form-radio"
+        />
+        <span>Le client a décidé d'annuler le transport</span>
+      </label>
+    </>
+  ) : (
+    <>
+      <label className="flex items-center space-x-2">
+        <input
+          type="radio"
+          name="cancelReason"
+          value="client_annulation"
+          onChange={(e) => setCancelReason(e.target.value)}
+          className="form-radio"
+        />
+        <span>J'ai décidé d'annuler ma demande</span>
+      </label>
+
+      <label className="flex items-center space-x-2">
+        <input
+          type="radio"
+          name="cancelReason"
+          value="transporteur_annulation"
+          onChange={(e) => {
+            e.preventDefault() ;
+            e.stopPropagation()
+            setCancelReason(e.target.value)}}
+          className="form-radio"
+        />
+        <span>Le transporteur a décidé d'annuler la livraison</span>
+      </label>
+    </>
+  )}
+</div>
+
+            <div className="flex justify-end space-x-2 mt-4">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-300 px-3 py-1 rounded-lg text-sm"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={(e)=>{
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleCancelShipment()}}
+                className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600"
+              >
+                Confirmer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
+</div>
+
+
+
+
   </div>
 )}
 
  <div className="flex flex-col h-screen p-4 bg-gray-100">
  <div className="flex-1 overflow-y-autoo space-y-2 max-w-2xl mx-auto w-full">
-   {messages.map((msg, i) => {
+   {messages
+   .filter((msg) => msg.shipmentId === currentShipment.id)
+   .map((msg, i) => {
      const isLast = isLastMessageOfGroup(msg, i);
      const isFirst = isFirstMessageOfGroup(msg, i);
      const isSentByMe = msg.sender === uid;
+        const shouldMarkAsRead = !isSentByMe && !msg.isRead;
 // // Étendre dayjs avec le plugin relativeTime
 dayjs.extend(relativeTime);
 return (
       <div
         key={msg.id}
+         ref={shouldMarkAsRead ? (node) => messageObserver(node) : null}
         className={clsx(
           "flex items-end gap-2",
-          isSentByMe ? "justify-end" : "justify-start"
+          isSentByMe ? "justify-end" : "justify-start" ,
+           msg.pending && "opacity-100"
         )}
       >
         {!isSentByMe && isLast && (
@@ -791,7 +815,6 @@ return (
               size={8}
               src={msg.avatar}
               name={`${chatPartner?.firstName} ${chatPartner?.lastName}`}
-              initialColor="auto"
             />
           </div>
         )}
@@ -827,7 +850,16 @@ return (
   ) : msg.offerDetails ? (
     <div className="space-y-2">
     <div className="font-semibold text-lg">📦 Nouvelle offre de transport</div>
+    {(currentShipment.status === "Accepter" && isOfferAccepted  ) && (
+    <div className="flex items-center bg-green-100 text-green-800 p-2 mb-3 rounded-t-lg">
+      <FaCheckCircle className="mr-2 text-green-500" />
+      <span className="text-sm font-medium">Cette offre a été acceptée</span>
+    </div>
+  )}
     <div className="space-y-1">
+     <p className="flex items-center text-sm">
+        <FaBox className="mr-1" /> Object : {currentShipment.objectName}
+      </p>
       <p>💰 Prix proposé: {msg.offerDetails.price}€</p>
       <p>📅 Date de début: {msg.offerDetails.startDate}</p>
       {msg.offerDetails.endDate && (
@@ -841,28 +873,7 @@ return (
         <input
           type="checkbox"
           id={`validate-${msg.id}`}
-          onChange={async () => {
-            try {
-              await updateDoc(doc(db, "messages", msg.id), {
-                isRead: true
-              });
-              await fetch("/api/send-mail", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  email: chatPartner.email, // Utilisation de l'email récupéré
-                  shipment: { objectName: currentShipment.objectName },
-                  type:"acceptance",
-                  chatId: id,
-                }),
-              });
-              toast.success("Offre validée avec succès!");
-            } catch (error) {
-              toast.error("Erreur lors de la validation de l'offre");
-            }
-          }}
+          onChange={() =>{handleOfferAcceptance(msg)}}
           className="form-checkbox h-4 w-4 text-green-600"
         />
         <label htmlFor={`validate-${msg.id}`} className="text-sm">
@@ -881,14 +892,10 @@ return (
   ) : (
     <p>{msg.message}</p> // ... code existant pour les messages normaux ...
   )}
- <p className="text-xs text-gray-500 mt-1">
+ {/* <p className="text-xs text-gray-500 mt-1">
             {dayjs(msg.timestamp?.toDate()).fromNow()}
-          </p>
+          </p> */}
         </Box>
-
-
-
-
 
         {isSentByMe && isLast && (
           <div className="size-8">
@@ -896,14 +903,13 @@ return (
               size={8}
               src={user?.photoURL}
               name={user?.firstName}
-              initialColor="auto"
             />
           </div>
         )}
       </div>
     );
   })}
-
+ <div ref={messagesEndRef} />
 <div className="flex gap-2 p-4 bg-white max-w-2xl mx-auto w-full">
   <input
     type="text"
@@ -942,11 +948,7 @@ return (
     <h3 className="text-lg font-semibold mb-4">Autres colis à expédier</h3>
     <div className="space-y-4">
       {otherShipments.map((shipment) => (
-        // <div 
-        //   key={shipment.id} 
-        //   className="border p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
-        //   onClick={() => handleShipmentChange(shipment)}
-        // >
+        
           <div 
   key={shipment.id} 
   className={`border p-3 rounded-lg hover:bg-gray-50 cursor-pointer 
@@ -955,7 +957,7 @@ return (
 >
           <div className="flex justify-between items-center">
             <div>
-              <p className="font-medium text-green-600 hover:underline">
+              <p className="font-bolder text-green-600 hover:underline capitalize ">
                 {shipment.objectName}
               </p>
               <p className="text-sm text-gray-500">

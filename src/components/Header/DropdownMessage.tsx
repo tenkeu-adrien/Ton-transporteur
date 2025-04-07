@@ -3,6 +3,7 @@ import {useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "@/components/ClickOutside";
+import { NotificationBadge } from "../NotificationBadge";
 
 const DropdownMessage = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -10,6 +11,8 @@ const DropdownMessage = () => {
 
 
   return (
+
+<>
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <li className="relative">
         <Link
@@ -206,6 +209,7 @@ const DropdownMessage = () => {
         {/* <!-- Dropdown End --> */}
       </li>
     </ClickOutside>
+    </>
   );
 };
 

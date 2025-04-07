@@ -8,7 +8,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Image from 'next/image';
 import { auth, db, storage } from '../../../lib/firebaseConfig';
-import { collection, addDoc } from "firebase/firestore";
+import { collection,  getDocs, where, query, runTransaction, doc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { toast } from 'react-toastify';
 import { FaSpinner } from 'react-icons/fa';
@@ -70,14 +70,12 @@ export default function ExpeditionSystem() {
 
  useEffect(()=>{
   if (!user) {
-    toast.info("vous n'avez pas connecter fait le ou creer un compte")
     router.replace('/auth/signin')
 }
  } ,[user,router])
   const [step, setStep] = useState(1);
-  const [showSizeModal, setShowSizeModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {userData, loading, error  ,logout} = useContext(AuthContext);
+  const {logout} = useContext(AuthContext);
 
   const nextStep = async () => {
     const fieldsToValidate = {
@@ -111,6 +109,26 @@ export default function ExpeditionSystem() {
     const updatedImages = currentImages.filter((_, i) => i !== index);
     setValue('images', updatedImages);
   };
+  const generateUniqueReference = async () => {
+    const baseRef = 10000; // Commence par 100 suivi de 4 chiffres
+    let reference = baseRef + Math.floor(Math.random() * 9000); // Génère 10000 à 19999
+    
+    // Vérifier l'unicité dans la base de données
+    const shipmentsRef = collection(db, "shipments");
+    const q = query(shipmentsRef, where("reference", "==", reference));
+    const querySnapshot = await getDocs(q);
+    
+    // Si la référence existe déjà, on en génère une nouvelle
+    while (!querySnapshot.empty) {
+      reference = baseRef + Math.floor(Math.random() * 9000);
+      const newQuery = query(shipmentsRef, where("reference", "==", reference));
+      const newSnapshot = await getDocs(newQuery);
+      if (newSnapshot.empty) break;
+    }
+    
+    return reference;
+  };
+
 
   const onSubmitData = async (data) => {
   
@@ -119,24 +137,36 @@ console.log("data de l'envoie" ,data)
     toast.success("Traitement en cours...");
     try {
       // Compresser les images
-      const compressedImages = await Promise.all(
-        data.images.map(async (image) => compressImage(image))
-      );
+      // Générer la référence unique en premier
+    const reference = await generateUniqueReference();
+      // const compressedImages = await Promise.all(
+      //   data.images.map(async (image) => compressImage(image))
+      // );
   
       // Télécharger les images en parallèle
-      const imageUrls = await Promise.all(
-        compressedImages.map(async (image) => {
-          const storageRef = ref(storage, `images/${image.name}`);
-          await uploadBytes(storageRef, image);
-          return getDownloadURL(storageRef);
-        })
-      );
-  
+      // const imageUrls = await Promise.all(
+      //   compressedImages.map(async (image) => {
+      //     const storageRef = ref(storage, `images/${image.name}`);
+      //     await uploadBytes(storageRef, image);
+      //     return getDownloadURL(storageRef);
+      //   })
+      // );
+      const uploadPromises = data.images.map(async (image) => {
+        const compressedImage = await compressImage(image);
+        const storageRef = ref(storage, `images/${compressedImage.name}_${Date.now()}`);
+        await uploadBytes(storageRef, compressedImage);
+        return getDownloadURL(storageRef);
+      });
+
+      const imageUrls = await Promise.all(uploadPromises);
       // Préparer les données pour Firestore
       const expeditionData = {
         ...data,
         expediteurId: user?.uid,
         status: "En attente",
+        reference,
+        enlevement:false,
+        dechargement:false,
         images: imageUrls,
         createdAt: new Date(),
         departure: {
@@ -149,21 +179,29 @@ console.log("data de l'envoie" ,data)
         },
       };
   
-      // Enregistrer dans Firestore
-      const docRef = await addDoc(collection(db, "shipments"), expeditionData);
-      expeditionData.id = docRef.id;
+      await runTransaction(db, async (transaction) => {
+        const docRef = doc(collection(db, "shipments"));
+        transaction.set(docRef, expeditionData);
+        expeditionData.id = docRef.id;
+      });
   
       // Rediriger l'utilisateur
       toast.success("Colis ajouté avec succès");
       setIsSubmitting(false)
       router.push("/mes-colis");
     } catch (error) {
-      console.error("Error: ", error);
+      // console.error("Error: ", error);
       toast.error("Une erreur s'est produite");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+
+
+
+
+
   const [departure, setDeparture] = useState<any>(null);
   const [destination, setDestination] = useState<any>(null);
 

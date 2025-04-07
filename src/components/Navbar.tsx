@@ -3,130 +3,232 @@ import React, { useEffect, useState} from 'react';
 import Link from 'next/link';
 import { Menu, Transition } from '@headlessui/react';
 import { FaChevronDown } from 'react-icons/fa';
-import { useRouter } from 'next/navigation';
 
+
+import { FaBars, FaTimes,  } from "react-icons/fa";
 const Navbar = ({ user, logout }) => {
 
 const [isClient, setIsClient] = useState(false);
+const [isOpen, setIsOpen] = useState(false);
 
 useEffect(() => {
   setIsClient(true);
 }, []);
 
 // if (!isClient) return null; // Empêche le rendu côté serveur
+if (!isClient) {
+  return (
+    <nav className="bg-white shadow-md sticky top-0 z-50 h-16">
+      {/* Juste un placeholder avec la bonne hauteur */}
+    </nav>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   const categories = [
     {
-      name: 'Commerçant',
+      name: 'Catégories d\'objets',
       options: [
-        { label: 'Option 1 pour Commerçant', href: '/blog/commercant-option1' },
-        { label: 'Option 2 pour Commerçant', href: '/blog/commercant-option2' },
-        { label: 'Option 3 pour Commerçant', href: '/blog/commercant-option3' },
+        { label: 'Transport meubles', href: '/start' },
+        { label: 'Transport matériel high-tech', href: '/start' },
+        { label: 'Transport matériel de bricolage', href: '/start' },
       ],
     },
     {
       name: 'Particulier',
       options: [
-        { label: 'Option 1 pour Particulier', href: '/blog/particulier-option1' },
-        { label: 'Option 2 pour Particulier', href: '/blog/particulier-option2' },
-        { label: 'Option 3 pour Particulier', href: '/blog/particulier-option3' },
+        { label: 'Expédier ou recevoir un colis', href: '/start' },
+        { label: 'Comment ça marche ?', href: '/start' },
+        { label: 'Devis déménagement', href: '/start' },
       ],
     },
     {
-      name: 'Transporteur',
+      name: 'Services de Déménagement',
       options: [
-        { label: 'Option 1 pour Transporteur', href: '/blog/transporteur-option1' },
-        { label: 'Option 2 pour Transporteur', href: '/blog/transporteur-option2' },
-        { label: 'Option 3 pour Transporteur', href: '/blog/transporteur-option3' },
-      ],
-    },
-    {
-      name: 'Déménagement',
-      options: [
-        { label: 'Option 1 pour Déménagement', href: '/blog/demenagement-option1' },
-        { label: 'Option 2 pour Déménagement', href: '/blog/demenagement-option2' },
-        { label: 'Option 3 pour Déménagement', href: '/blog/demenagement-option3' },
-      ],
-    },
+        { label: 'Devis déménagement', href: '/start' },
+        { label: 'Préparation et emballage', href: '/start' },
+        { label: 'Transport et livraison', href: '/start' },
+      ]
+    }
   ];
 
   return (
-    <nav className="bg-white shadow-md  sticky top-0 bg-white shadow-md z-50">
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <div className='flex gap-4'>
-        <a href="/" className="text-2xl font-bold text-green-600 mr-4">
-          Ton-Transporteur
-        </a>
+  
 
-        <div className="space-x-6 flex items-center">
-          {categories.map((category) => (
-            <Menu as="div" key={category.name} className="relative">
-              <Menu.Button className="text-gray-700 hover:text-green-600 focus:outline-none flex items-center gap-2">
-                {category.name} <FaChevronDown className="ml-1 w-2" />
-              </Menu.Button>
-              <Transition
-                enter="transition ease-out duration-100"
-                enterFrom="transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="transform opacity-100 scale-100"
-                leaveTo="transform opacity-0 scale-95"
-              >
-                <Menu.Items className="absolute left-0 mt-2 w-56 origin-top-right bg-white shadow-lg rounded-md focus:outline-none z-50">
-                  <div className="p-2">
-                    <h3 className="text-sm font-bold text-green-600">{category.name}</h3>
-                    <div className="space-y-1">
-                      {category.options.map((option) => (
-                        <Menu.Item key={option.label}>
-                          {({ active }) => (
-                            <Link
-                              href={option.href}
-                              className={`${
-                                active ? 'bg-gray-100 text-green-600' : 'text-gray-700'
-                              } block px-4 py-2 rounded-md`}
-                            >
-                              {option.label}
-                            </Link>
-                          )}
-                        </Menu.Item>
-                      ))}
-                    </div>
+
+
+    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+      {/* Logo */}
+      <div className="flex items-center gap-4">
+        <Link href="/" className="text-2xl font-bold text-green-600">
+          Ton-Transporteur
+        </Link>
+      </div>
+
+      {/* Desktop Menu */}
+      <div className="hidden lg:flex space-x-6">
+        {categories.map((category) => (
+          <Menu as="div" key={category.name} className="relative">
+            <Menu.Button className="text-gray-700 hover:text-green-600 flex items-center gap-2">
+              {category.name} <FaChevronDown className="w-3" />
+            </Menu.Button>
+            <Transition
+              enter="transition ease-out duration-100"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
+            >
+              <Menu.Items className="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-md z-50">
+                <div className="p-2">
+                  <h3 className="text-sm font-bold text-green-600">{category.name}</h3>
+                  <div className="space-y-1">
+                    {category.options.map((option) => (
+                      <Menu.Item key={option.label}>
+                        {({ active }) => (
+                          <Link
+                            href={option.href}
+                            className={`${
+                              active ? "bg-gray-100 text-green-600" : "text-gray-700"
+                            } block px-4 py-2 rounded-md`}
+                          >
+                            {option.label}
+                          </Link>
+                        )}
+                      </Menu.Item>
+                    ))}
                   </div>
-                </Menu.Items>
-              </Transition>
-            </Menu>
+                </div>
+              </Menu.Items>
+            </Transition>
+          </Menu>
+        ))}
+      </div>
+
+      {/* Auth Buttons - Solution clé pour l'hydratation */}
+      <div className="hidden md:flex space-x-3 items-center">
+        {user ? (
+      
+          <>
+            <button
+              onClick={logout}
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+            >
+              Déconnexion
+            </button>
+            <Link href="/Dashboard" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+              Dashboard
+            </Link>
+          </>
+
+        ) : (
+          <>
+          <Link href="/auth/signin" className="text-gray-700 hover:text-green-600">
+            Connexion
+          </Link>
+          <Link href="/auth/signup" className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">
+            Inscription
+          </Link>
+        </>
+        )}
+      </div>
+
+      {/* Mobile Menu Button */}
+      <button
+        className="md:hidden text-green-600"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label="Menu mobile"
+      >
+        {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+      </button>
+    </div>
+
+    {/* Mobile Menu */}
+    {isOpen && (
+      <div className="md:hidden bg-white shadow-md absolute top-16 left-0 w-full py-4 z-50">
+        <div className="container mx-auto px-6 space-y-4">
+          {categories.map((category) => (
+            <div key={category.name} className="border-b border-gray-100 pb-2">
+              <h3 className="text-green-600 font-medium">{category.name}</h3>
+              <div className="mt-2 space-y-2 pl-4">
+                {category.options.map((option) => (
+                  <Link
+                    key={option.label}
+                    href={option.href}
+                    className="block text-gray-700 hover:text-green-600 py-1"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {option.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ))}
-        </div>
-        </div>
-        <div className="space-x-3">
-          {!user && (
-            <>
-              <Link href="/auth/signin" className="text-gray-700 hover:text-green-600">
-                Connexion
-              </Link>
-              <Link href="/auth/signup" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
-                Inscription
-              </Link>
-            </>
-          )}
-          {user && (
-            <>
-              <Link
-                href="#"
-                onClick={() => logout()}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-              >
-                Déconnexion
-              </Link>
-              <Link href="/Dashboard" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
-                Dashboard
-              </Link>
-            </>
-          )}
+
+          {/* Auth Buttons Mobile */}
+          <div className="pt-4 space-y-2">
+            {!user ? (
+              <>
+                <Link 
+                  href="/auth/signin" 
+                  className="block text-gray-700 hover:text-green-600 py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Connexion
+                </Link>
+                <Link 
+                  href="/auth/signup" 
+                  className="block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Inscription
+                </Link>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    logout();
+                    setIsOpen(false);
+                  }}
+                  className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+                >
+                  Déconnexion
+                </button>
+                <Link 
+                  href="/Dashboard" 
+                  className="block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-center"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Dashboard
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
-    </nav>
+    )}
+  </nav>
   );
-};
+}
+
 
 export default Navbar;
