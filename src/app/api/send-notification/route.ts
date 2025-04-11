@@ -151,7 +151,7 @@ export async function POST(request: Request) {
 
   try {
     const { userId, title, body, data } = await request.json();
-    console.log("Données reçues:", { userId, title, body, data });
+    // console.log("Données reçues:", { userId, title, body, data });
 
     // Validation des données renforcée
     if (!userId) {
@@ -226,9 +226,9 @@ export async function POST(request: Request) {
         await db.collection("users").doc(userId).update({
           fcmTokens: admin.firestore.FieldValue.arrayRemove(token)
         });
-        console.log(`Token supprimé pour l'utilisateur: ${userId}`);
+        // console.log(`Token supprimé pour l'utilisateur: ${userId}`);
       } catch (error) {
-        console.error("Erreur lors de la suppression du token:", error);
+        // console.error("Erreur lors de la suppression du token:", error);
       }
     };
 

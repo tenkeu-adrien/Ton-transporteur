@@ -7,7 +7,20 @@ import { FaRegComments } from "react-icons/fa";
 const ShipmentCard = ({ shipment, handleClick, handleCancelShipment }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [cancelReason, setCancelReason] = useState('');
-  
+    function getStatusColor(status: string) {
+      switch (status) {
+        case "En attente":
+          return "bg-yellow-500"; // Jaune pour les envois en attente
+        // case "Accepter":
+        //   return "bg-blue-500"; // Bleu pour les envois en cours
+        case "Accepter":
+          return "bg-green-500"; // Vert pour les envois livrés
+        case "Annuler":
+          return "bg-red-500"; // Rouge pour les envois annulés
+        default:
+          return "bg-gray-500"; // Gris pour les statuts inconnus
+      }
+    }
     return (
       <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 hover:scale-105 transform transition-transform cursor-pointer">
         {/* Contenu de la carte */}

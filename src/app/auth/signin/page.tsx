@@ -46,7 +46,6 @@ const onSubmit = async (data) => {
   setIsSubmitting(true);
   try {
     const response = await loginUser(data.email, data.password); // Connexion
- console.log("data" ,data)
     if (response.success && response.user) {
       const user = response.user; // Utilise l'objet `user` du résultat
 

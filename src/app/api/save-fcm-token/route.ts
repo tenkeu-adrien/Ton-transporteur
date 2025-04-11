@@ -135,12 +135,12 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log(`Attempting to save FCM token for user: ${userId}`);
+    // console.log(`Attempting to save FCM token for user: ${userId}`);
     
     // Utilisation de la fonction avec retry
     await updateUserTokenWithRetry(userId, token);
     
-    console.log(`Successfully saved FCM token for user: ${userId}`);
+    // console.log(`Successfully saved FCM token for user: ${userId}`);
     
     return NextResponse.json(
       { 

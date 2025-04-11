@@ -12,11 +12,16 @@ export async function POST(req: Request) {
     let mail = "devagencyweb@gmail.com";
 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "mail.ton-transporteur.fr", // Serveur LWS
+      port: 465, // Port SSL
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      tls: {
+        rejectUnauthorized: false
+      }
     });
 
     const getEmailContent = () => {
@@ -78,7 +83,7 @@ export async function POST(req: Request) {
 
                   <div style="text-align: center; margin: 20px 0;">
                     <a href="${process.env.NEXT_PUBLIC_BASE_URL}/mes-colis" 
-                       style="display: inline-block; background-color: #f44336; color: #ffffff; padding: 12px 20px; 
+                       style="display: inline-block; background-color:rgb(54, 244, 63); color: #ffffff; padding: 12px 20px; 
                               border-radius: 5px; text-decoration: none; font-weight: bold;">
                       Voir d'autres offres
                     </a>
@@ -124,7 +129,7 @@ export async function POST(req: Request) {
     const emailContent = getEmailContent();
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: '"Ton Transporteur" <contact@ton-transporteur.fr>',
       to: email,
       subject: emailContent.subject,
       html: emailContent.html,

@@ -108,7 +108,7 @@ function playNotificationSound() {
 
 // Gestion des messages en arrière-plan
 messaging.onBackgroundMessage((payload) => {
-  console.log('Received background message ', payload);
+  // console.log('Received background message ', payload);
 
   notificationCount = parseInt(payload.data?.count || notificationCount + 1);
 

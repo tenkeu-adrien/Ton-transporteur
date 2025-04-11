@@ -28,14 +28,15 @@ export default function ColisDetailsPage() {
         const id = Array.isArray(params.id) ? params.id[0] : params.id;
   
         if (!id) {
-          throw new Error("ID du colis non trouvé dans l'URL");
+          // throw new Error("ID du colis non trouvé dans l'URL");
         }
   
         const docRef = doc(db, "shipments", id);
         const docSnap = await getDoc(docRef);
   
         if (!docSnap.exists()) {
-          throw new Error("Colis non trouvé");
+          // throw new Error("Colis non trouvé");
+      
         }
   
         const shipmentData = docSnap.data();
@@ -48,10 +49,10 @@ export default function ColisDetailsPage() {
         if (expediteurSnap.exists()) {
           expediteurData = expediteurSnap.data();
         } else {
-          console.warn("Expéditeur non trouvé");
+          // console.warn("Expéditeur non trouvé");
         }
   
-        console.log("shipment" ,shipment)
+        // console.log("shipment" ,shipment)
         // Formatage des données du colis avec les informations de l'expéditeur
         const formattedShipment = {
           id: docSnap.id,
@@ -70,7 +71,7 @@ export default function ColisDetailsPage() {
         setShipment(formattedShipment);
       } catch (err) {
         setError(err.message);
-        console.error("Erreur lors de la récupération des données:", err);
+        // console.error("Erreur lors de la récupération des données:", err);
       } finally {
         setLoading(false);
       }

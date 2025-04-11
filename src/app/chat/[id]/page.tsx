@@ -90,23 +90,23 @@ export default function ChatRoom({ params}) {
   const [chatPartner, setChatPartner] = useState(null);
 const [isUploading, setIsUploading] = useState(false);
  const router =useRouter()
-const [user ,setUser] = useState(null)
+// const [user ,setUser] = useState(null)
 // const [isvalid ,setValid] =useState(false)
 const [isModalOpen, setIsModalOpen] = useState(false);
 const [cancelReason, setCancelReason] = useState("");
 const [currentShipment, setCurrentShipment] = useState(null);
   const [otherShipments, setOtherShipments] = useState([]);
   const [transporteur, setTransporteur] = useState(null);
-const {userData} = useContext(AuthContext)
+const {userData ,user} = useContext(AuthContext)
   const [isOfferAccepted, setIsOfferAccepted] = useState(false);
   const messagesEndRef = useRef(null);
 // const typingTimeoutRef = useRef(null);
 
 // const [isTyping, setIsTyping] = useState(false);
 
-// console.log("messages" , messages)
-console.log("currentShipment" , currentShipment)
-console.log("otherShipment" ,otherShipments)
+// // console.log("messages" , messages)
+// console.log("currentShipment" , currentShipment)
+// console.log("otherShipment" ,otherShipments)
 // console.log("user" ,user)
 // console.log("chatPartner user" ,chatPartner)
 const uid = auth?.currentUser?.uid;
@@ -114,45 +114,41 @@ const uid = auth?.currentUser?.uid;
 
 
 
-  const getUserData = async (uid) => {
-    try {
-      // Crée une référence au document de l'utilisateur dans la collection 'users'
-      const userRef = doc(db, 'users', uid);
+  // const getUserData = async (uid) => {
+  //   try {
+  //     // Crée une référence au document de l'utilisateur dans la collection 'users'
+  //     const userRef = doc(db, 'users', uid);
       
-      // Récupère le document
-      const userSnap = await getDoc(userRef);
+  //     // Récupère le document
+  //     const userSnap = await getDoc(userRef);
       
-      if (userSnap.exists()) {
-        // Retourne les données si l'utilisateur existe
-        const userData = userSnap.data();
-        // console.log('Données utilisateur:', userData);
-        return userData;
-      } else {
-        console.log('Aucun utilisateur trouvé avec cet UID');
-        return null;
-      }
-    } catch (error) {
-      console.error('Erreur lors de la récupération des données:', error);
-      throw error;
-    }
-  };
+  //     if (userSnap.exists()) {
+  //       // Retourne les données si l'utilisateur existe
+  //       const userData = userSnap.data();
+  //       // console.log('Données utilisateur:', userData);
+  //       return userData;
+  //     } else {
+  //       console.log('Aucun utilisateur trouvé avec cet UID');
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     console.error('Erreur lors de la récupération des données:', error);
+  //     throw error;
+  //   }
+  // };
 
- 
-
-
-
-  useEffect(()=>{
-    const fetchUser = async () => {
-      if (!uid) return;
+  // useEffect(()=>{
+  //   const fetchUser = async () => {
+  //     if (!uid) return;
       
-      const userData = await getUserData(uid);
-      if (userData) {
-        // Utilise les données ici
-        setUser(userData)
-      }
-    };
-  fetchUser()
-  } ,[uid])
+  //     const userData = await getUserData(uid);
+  //     if (userData) {
+  //       // Utilise les données ici
+  //       setUser(userData)
+  //     }
+  //   };
+  // fetchUser()
+  // } ,[uid])
   
 
 
@@ -178,6 +174,7 @@ const uid = auth?.currentUser?.uid;
   }, []);
 
     const sendEmailNotification = async (shipmentId: string, type: string) => 
+
     {
   
     try {
@@ -192,7 +189,7 @@ const uid = auth?.currentUser?.uid;
           shipment: { objectName: currentShipment.objectName ,id:currentShipment.id },
           type,
           chatId: shipmentId,
-          user:{firstName:user?.firstName  , lastName:user?.lastName}
+          user:{firstName:userData?.firstName  , lastName:userData?.lastName}
         }),
       });
   
@@ -245,7 +242,7 @@ return {
 const sendPushNotification =  async (shipmentId: string, type: string ) => {
  let maxRetries = 3 ;  let retryDelay = 1000
     const shipment = currentShipment || otherShipments.find(s => s.id === shipmentId);
-    console.log("nous sommes dans les notifications")
+    // console.log("nous sommes dans les notifications")
     if (!shipment){
       console.log("probleme avec le shipment")
       return null
@@ -386,7 +383,8 @@ let lastError;
       const newStatus = "Accepter";
       
       // D'abord mettre à jour le statut de l'expédition
-      await updateShipmentStatus(shipmentId, newStatus, user.uid);
+      let userr ={id:user?.uid ,...userData}
+      await updateShipmentStatus(shipmentId, newStatus, userr);
       
       // Ensuite effectuer les autres opérations
       await Promise.all([
@@ -483,7 +481,7 @@ const sendMessage = async () => {
     timestamp: serverTimestamp(),
     isRead: false,
     users: [uid, receiverId],
-    userInfo: user ,
+    userInfo: userData ,
     pending:true 
   };
 
@@ -737,8 +735,8 @@ const handleCancelShipment =  async () => {
   const receiverId = isUserExpediteur ? transporteur.id : currentShipment.expediteurId;
  let newStatus="Annuler"
  let shipmentId =currentShipment?.id
- let user = uid
-  await updateShipmentStatus(shipmentId ,newStatus,cancelReason, user)
+ let userr = {id:user?.uid ,...userData}
+  await updateShipmentStatus(shipmentId ,newStatus,cancelReason ,userr)
 
   if (receiverId !== uid) {
     // Email (gestion d'erreur indépendante)
@@ -967,7 +965,7 @@ const handleImageUpload = async (e) => {
         {/* Conteneur des boutons - Modifié pour mobile */}
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full">
           {/* Bouton Accepter l'offre (uniquement transporteur) */}
-          {currentShipment.status === "En attente" && user?.role === "transporteur" && (
+          {currentShipment.status === "En attente" && userData?.role === "transporteur" && (
             <button
               onClick={() => handleAcceptShipment(currentShipment.id)}
               className="w-full flex items-center justify-center gap-2 bg-green-500 text-white py-2 px-3 rounded-lg text-sm hover:bg-green-600 transition-colors"
@@ -1001,7 +999,7 @@ const handleImageUpload = async (e) => {
           <div className="bg-white p-5 rounded-lg shadow-lg w-11/12 sm:w-80">
             <h3 className="text-lg font-semibold mb-3">Pourquoi annuler l'offre ?</h3>
             <div className="space-y-2">
-              {user?.role === "transporteur" ? (
+              {userData?.role === "transporteur" ? (
                 <>
                   <label className="flex items-center space-x-2">
                     <input
@@ -1145,7 +1143,7 @@ const handleImageUpload = async (e) => {
                     {(currentShipment.status === "Accepter" && isOfferAccepted) && (
                       <div className="flex items-center bg-green-100 text-green-800 p-2 mb-3 rounded-t-lg">
                         <FaCheckCircle className="mr-2 text-green-500" />
-                        <span className="text-sm font-medium">Cette offre a été acceptée</span>
+                        <span className="text-sm font-medium">Cette Offre a été acceptée</span>
                       </div>
                     )}
                     <div className="space-y-1">
@@ -1183,8 +1181,8 @@ const handleImageUpload = async (e) => {
                 <div className="size-8">
                   <Avatar
                     size={8}
-                    src={user?.photoURL}
-                    name={user?.firstName}
+                    src={userData?.photoURL}
+                    name={`${userData?.firstName} ${userData?.lastName}`}
                   />
                 </div>
               )}
@@ -1301,7 +1299,7 @@ const handleImageUpload = async (e) => {
               </p>
               <p className="text-xs sm:text-sm">Prix: {shipment.price}€</p>
             </div>
-            {shipment?.status === 'En attente' && user?.role === "transporteur" && (
+            {shipment?.status === 'En attente' && userData?.role === "transporteur" && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();

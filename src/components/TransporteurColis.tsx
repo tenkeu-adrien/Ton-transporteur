@@ -8,7 +8,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import Link from "next/link";
 import { FaChevronLeft, FaChevronRight, FaMapMarkerAlt, FaRegComments, FaSpinner } from "react-icons/fa";
 import { FaBox, FaMoneyBillWave, FaCalendarAlt, FaInfoCircle } from "react-icons/fa"; // Importez les icônes nécessaires
-import { addDoc, collection, doc, getDocs, query, serverTimestamp, setDoc, where } from "firebase/firestore";
+import { addDoc, collection,  getDocs, query, serverTimestamp, where } from "firebase/firestore";
 import { auth, db } from "../../lib/firebaseConfig";
 import { toast } from "react-toastify";
 import { FaUser, FaUserCircle, FaEnvelope, FaPhone } from "react-icons/fa";
@@ -29,7 +29,7 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
   const [currentPage, setCurrentPage] = useState(1); // État pour la page actuelle
   const { user, logout ,userData} = useContext(AuthContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const cardsPerPage = 5; // Nombre de cartes par page
+  const cardsPerPage = 5; // Nombre de cartes par pagea
 
   // Calculer les cartes à afficher pour la page actuelle
   const indexOfLastCard = currentPage * cardsPerPage;
@@ -38,7 +38,8 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
 
   const currentUser = auth.currentUser
  
-
+// console.log("currentShipment",otherShipments)
+// console.log("shipment" ,shipment)
   const router = useRouter();
   useEffect(() => {
     if (!loading && !user) {
@@ -46,13 +47,7 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
     }
   }, [user, loading, router]);
 
-  if (loading) {
-    return <Loader />; // Affiche un message de chargement pendant la vérification
-  }
-
-  if (!user) {
-    return null; // Ne rend rien si l'utilisateur n'est pas connecté (la redirection se fait dans useEffect)
-  }
+  
   
 
 
@@ -78,54 +73,75 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
   // };
 
  
-  // useEffect(() => {
-  //   const fetchOtherShipments = async () => {
-  //     try {
-  //       const shipmentsRef = collection(db, "shipments");
-  //       const q = query(
-  //         shipmentsRef,
-  //         where("price", ">", 0)
-  //       );
-  //       const querySnapshot = await getDocs(q);
-  //       const shipmentsData = querySnapshot.docs
-  //         .map(doc => ({ id: doc.id, ...doc.data() }))
-  //         .filter(s => s.id !== shipment.id);
+  useEffect(() => {
+    // if (!shipment?.id || !userData?.id || !userData?.role) return;
   
-  //       setOtherShipments(shipmentsData);
-  //     } catch (error) {
-  //       console.error("Erreur lors de la récupération des autres shipments :", error);
-  //     }
-  //   };
+    const fetchOtherShipments = async () => {
+      try {
+        const shipmentsRef = collection(db, "shipments");
   
-  //   fetchOtherShipments();
-  // }, [shipment?.id]);
+        // Appliquer la condition si l'utilisateur est un expéditeur
+        const q = userData?.role === "expediteur"
+          ? query(
+              shipmentsRef,
+              where("price", ">", 0),
+              where("expediteurId", "==", shipment?.expediteurId)
+            )
+          : query(
+              shipmentsRef,
+              where("price", ">", 0)
+            );
+            // console.log("requete" ,q)
+        const querySnapshot = await getDocs(q);
+        const shipmentsData = querySnapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .filter(s => s.id !== shipment?.id);
+  
+        setOtherShipments(shipmentsData);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des autres shipments :", error);
+      }
+    };
+  
+    fetchOtherShipments();
+  }, [shipment?.id, userData?.id, userData?.role]);
+  
+
+
+  
 
  const handleClick =()=>{
  return router.push(`/chat/${shipment.id}`)
  }
 
 
+ if (loading) {
+  return <Loader />; // Affiche un message de chargement pendant la vérification
+}
 
+if (!user) {
+  return null; // Ne rend rien si l'utilisateur n'est pas connecté (la redirection se fait dans useEffect)
+}
 
 
   // Afficher un indicateur de chargement si `loading` est true
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <FaSpinner className="animate-spin text-4xl text-green-600" />
-        <span className="ml-3 text-lg">Chargement en cours...</span>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-64">
+  //       <FaSpinner className="animate-spin text-4xl text-green-600" />
+  //       <span className="ml-3 text-lg">Chargement en cours...</span>
+  //     </div>
+  //   );
+  // }
 
-  // Afficher un message d'erreur si `error` est présent
-  if (error) {
-    return (
-      <div className="text-center text-red-600 p-6">
-        <p>Erreur : {error}</p>
-      </div>
-    );
-  }
+  // // Afficher un message d'erreur si `error` est présent
+  // if (error) {
+  //   return (
+  //     <div className="text-center text-red-600 p-6">
+  //       <p>Erreur : {error}</p>
+  //     </div>
+  //   );
+  // }
 
   // Fonction pour soumettre l'offre
   const handleSubmitOffer = async () => {
@@ -268,7 +284,7 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
                 <Image
                   key={index}
                   src={image}
-                  alt={`Image ${index + 1}`}
+                  alt={`Image ${shipment.objectName}`}
                   className="w-full h-32 object-cover rounded-lg"
                   width={20}
                   height={32}
@@ -597,102 +613,106 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
 
 
         <div className="bg-white dark:bg-dark-700 rounded-lg shadow-lg overflow-hidden mt-8">
-      <div className="p-4 sm:p-5">
-        <h2 className="text-xl font-semibold text-gray-700 dark:text-dark-100 mb-4">
-          Autres Shipments Disponibles
-        </h2>
-        <div className="space-y-4">
-          {/* Afficher les cartes de la page actuelle */}
-          {currentCards.map((otherShipment) => (
-            <Link
-              key={otherShipment.id}
-              href={`/colis/${otherShipment.id}`} // Redirection vers la page de détails
-              className="block"
-            >
-              <div className="flex items-start p-3 bg-gray-50 dark:bg-dark-600 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                {/* Image du colis (plus petite) */}
-                {otherShipment.images && otherShipment.images.length > 0 && (
-                  <Image
-                    src={otherShipment.images[0]} // Afficher la première image
-                    alt={`Image de ${otherShipment.objectName}`}
-                    className="w-20 h-20 object-cover rounded-lg mr-4"
-                    width={20} // Taille réduite
-                    height={20}
-                  />
-                )}
 
-                {/* Informations du colis */}
-                <div className="flex-1">
-                  {/* Nom du colis */}
-                  <div className="flex items-center space-x-2 mb-1">
-                    <FaBox className="text-green-600 dark:text-green-300" />
-                    <p className="text-sm font-medium text-gray-700 dark:text-dark-100">
-                      {otherShipment.objectName}
-                    </p>
-                  </div>
+   <div className="p-4 sm:p-5">
+  <h2 className="text-xl font-semibold text-gray-700 dark:text-dark-100 mb-4">
+    Autres Shipments Disponibles
+  </h2>
+  <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2"> {/* Ajout de max-height et overflow */}
+    {/* Afficher les cartes de la page actuelle */}
+    {currentCards.map((otherShipment) => (
+      <Link
+        key={otherShipment.id}
+        href={`/colis/${otherShipment.id}`}
+        className="block"
+      >
+        <div className="flex items-start p-3 bg-gray-50 dark:bg-dark-600 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+          {/* Image du colis (plus petite) */}
+          {otherShipment.images && otherShipment.images.length > 0 && (
+            <Image
+              src={otherShipment.images[0]}
+              alt={`Image de ${otherShipment.objectName}`}
+              className="w-20 h-20 object-cover rounded-lg mr-4"
+              width={20}
+              height={20}
+            />
+          )}
 
-                  {/* Prix proposé */}
-                  <div className="flex items-center space-x-2 mb-1">
-                    <FaMoneyBillWave className="text-blue-600 dark:text-blue-300" />
-                    <p className="text-sm text-gray-600 dark:text-dark-300">
-                      {otherShipment.price} €
-                    </p>
-                  </div>
+          {/* Informations du colis */}
+          <div className="flex-1">
+            {/* Nom du colis */}
+            <div className="flex items-center space-x-2 mb-1">
+              <FaBox className="text-green-600 dark:text-green-300" />
+              <p className="text-sm font-medium text-gray-700 dark:text-dark-100">
+                {otherShipment.objectName}
+              </p>
+            </div>
 
-                  {/* Adresse de départ */}
-                  <div className="flex items-center space-x-2 mb-1">
-                    <FaMapMarkerAlt className="text-purple-600 dark:text-purple-300" />
-                    <p className="text-sm text-gray-600 dark:text-dark-300">
-                      Départ : {otherShipment.pickupAddress}
-                    </p>
-                  </div>
+            {/* Prix proposé */}
+            <div className="flex items-center space-x-2 mb-1">
+              <FaMoneyBillWave className="text-blue-600 dark:text-blue-300" />
+              <p className="text-sm text-gray-600 dark:text-dark-300">
+                {otherShipment.price} €
+              </p>
+            </div>
 
-                  {/* Adresse d'arrivée */}
-                  <div className="flex items-center space-x-2">
-                    <FaMapMarkerAlt className="text-yellow-600 dark:text-yellow-300" />
-                    <p className="text-sm text-gray-600 dark:text-dark-300">
-                      Arrivée : {otherShipment.deliveryAddress}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
+            {/* Adresse de départ */}
+            <div className="flex items-center space-x-2 mb-1">
+              <FaMapMarkerAlt className="text-purple-600 dark:text-purple-300" />
+              <p className="text-sm text-gray-600 dark:text-dark-300">
+                Départ : {otherShipment.pickupAddress}
+              </p>
+            </div>
 
-          {currentCards.length <= 0 &&   <div className="bg-white p-4 m-4 rounded-lg shadow text-center">
-                  <FiPackage className="text-green-600 text-4xl mx-auto" />
-                  <p className="text-gray-500 mt-2">Aucun autre colis actif trouvé</p>
-                </div>}
+            {/* Adresse d'arrivée */}
+            <div className="flex items-center space-x-2">
+              <FaMapMarkerAlt className="text-yellow-600 dark:text-yellow-300" />
+              <p className="text-sm text-gray-600 dark:text-dark-300">
+                Arrivée : {otherShipment.deliveryAddress}
+              </p>
+            </div>
+          </div>
         </div>
+      </Link>
+    ))}
 
-        {/* Pagination */}
-        <div className="flex justify-between items-center mt-6">
-          {/* Bouton Précédent */}
-          <button
-            onClick={() => paginate(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-dark-600 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <FaChevronLeft className="text-gray-700 dark:text-dark-100" />
-            <span className="text-sm text-gray-700 dark:text-dark-100">Précédent</span>
-          </button>
-
-          {/* Numéro de page */}
-          <span className="text-sm text-gray-700 dark:text-dark-100">
-            Page {currentPage} sur {Math.ceil(otherShipments.length / cardsPerPage)}
-          </span>
-
-          {/* Bouton Suivant */}
-          <button
-            onClick={() => paginate(currentPage + 1)}
-            disabled={currentPage === Math.ceil(otherShipments.length / cardsPerPage)}
-            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-dark-600 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span className="text-sm text-gray-700 dark:text-dark-100">Suivant</span>
-            <FaChevronRight className="text-gray-700 dark:text-dark-100" />
-          </button>
-        </div>
+    {currentCards.length <= 0 && (
+      <div className="bg-white p-4 m-4 rounded-lg shadow text-center">
+        <FiPackage className="text-green-600 text-4xl mx-auto" />
+        <p className="text-gray-500 mt-2">Aucun autre colis actif trouvé</p>
       </div>
+    )}
+  </div>
+
+  {/* Pagination */}
+  <div className="flex justify-between items-center mt-6">
+    {/* Bouton Précédent */}
+    <button
+      onClick={() => paginate(currentPage - 1)}
+      disabled={currentPage === 1}
+      className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-dark-600 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <FaChevronLeft className="text-gray-700 dark:text-dark-100" />
+      <span className="text-sm text-gray-700 dark:text-dark-100">Précédent</span>
+    </button>
+
+    {/* Numéro de page */}
+    <span className="text-sm text-gray-700 dark:text-dark-100">
+      Page {currentPage} sur {Math.ceil(otherShipments.length / cardsPerPage)}
+    </span>
+
+    {/* Bouton Suivant */}
+    <button
+      onClick={() => paginate(currentPage + 1)}
+      disabled={currentPage === Math.ceil(otherShipments.length / cardsPerPage)}
+      className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-dark-600 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <span className="text-sm text-gray-700 dark:text-dark-100">Suivant</span>
+      <FaChevronRight className="text-gray-700 dark:text-dark-100" />
+    </button>
+  </div>
+</div>
+
     </div>
       </div>
       

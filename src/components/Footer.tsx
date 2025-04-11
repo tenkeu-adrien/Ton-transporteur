@@ -240,7 +240,7 @@ const Footer = () => {
                 <a href="https://www.facebook.com/profile.php?id=61574925503075" className="text-white hover:text-green-500" target="_blank" rel="noopener noreferrer">
                   <FaFacebook className="w-8 h-8" />
                 </a>
-                <a href="/start" className="text-white hover:text-green-500" rel="noopener noreferrer" target="_blank">
+                <a href="https://www.instagram.com/ton_transporteur40/?target_user_id=73796747418&ndid=63286329f69a1G24bc3e099b409aG632867c356c74G9e4&utm_source=instagram&utm_medium=email&utm_campaign=ig_suspicious_login&__bp=1" className="text-white hover:text-green-500" rel="noopener noreferrer" target="_blank">
                   <FaInstagram className="w-8 h-8" />
                 </a>
                 {/* <a href="#" onClick={()=>handleClick} className="text-white hover:text-green-500" rel="noopener noreferrer">

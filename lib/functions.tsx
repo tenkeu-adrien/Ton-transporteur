@@ -1,7 +1,7 @@
 "use client"
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc ,updateDoc} from "firebase/firestore";
-import { getApp } from "firebase/app";
+import {doc, setDoc, getDoc ,updateDoc} from "firebase/firestore";
+// import { getApp } from "firebase/app";
 import {db,auth} from './firebaseConfig'
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
@@ -164,42 +164,143 @@ export default ProtectedRoute;
  * @param cancelReason - [Optionnel] Raison de l'annulation
  * @returns Promise<void>
  */
+// export const updateShipmentStatus = async (
+//   shipmentId: string,
+//   newStatus: string,
+//   cancelReason?: string,
+//   user?:string,
+// ): Promise<void> => {
+//   try {
+//     const shipmentRef = doc(db, "shipments", shipmentId);
+    
+//     const updateData: {
+//       status: string;
+//       updatedAt: Date;
+//       cancelReason?: string;
+//       cancelledBy?: string;
+//       user?:string
+//     } = {
+//       status: newStatus,
+//       updatedAt: new Date(),
+//     };
+
+//     // Si c'est une annulation, ajoute la raison
+//     if (newStatus === "Annuler" && cancelReason) {
+//       updateData.cancelReason = cancelReason;
+//       updateData.cancelledBy = user; // ou "transporteur" selon votre logique
+//     }
+// // console.log("newStatus" ,newStatus , 'shipmentId',shipmentId)
+//     await updateDoc(shipmentRef, updateData);
+    
+
+    
+//     // console.log(`Statut du shipment ${shipmentId} mis à jour à: ${newStatus}`);
+//     return null
+//   } catch (error) {
+//     console.error("Erreur lors de la mise à jour du statut:", error);
+//     throw new Error("Échec de la mise à jour du statut");
+//   }
+// };
+
+
 export const updateShipmentStatus = async (
   shipmentId: string,
   newStatus: string,
   cancelReason?: string,
-  user?:string,
+  userr?: { id: string; firstName: string; lastName: string; email: string },
+  recipientEmail?: string
 ): Promise<void> => {
+
+   console.log("donnees que je recois" ,userr , newStatus ,shipmentId)
   try {
     const shipmentRef = doc(db, "shipments", shipmentId);
     
+    // Récupérer le document avant la mise à jour pour obtenir le nom du colis
+    const shipmentSnapshot = await getDoc(shipmentRef);
+    
+    if (!shipmentSnapshot.exists()) {
+      // throw new Error("Shipment non trouvé");
+      
+    }
+
+    const shipmentData = shipmentSnapshot.data();
+    const shipmentName = shipmentData.objectName; // Supposons que le champ s'appelle 'objectName'
+
     const updateData: {
       status: string;
       updatedAt: Date;
       cancelReason?: string;
       cancelledBy?: string;
-      user?:string
     } = {
       status: newStatus,
       updatedAt: new Date(),
     };
 
-    // Si c'est une annulation, ajoute la raison
     if (newStatus === "Annuler" && cancelReason) {
       updateData.cancelReason = cancelReason;
-      updateData.cancelledBy = user; // ou "transporteur" selon votre logique
+      updateData.cancelledBy = userr?.id;
     }
-// console.log("newStatus" ,newStatus , 'shipmentId',shipmentId)
+
+    // Mise à jour du document Firestore
     await updateDoc(shipmentRef, updateData);
-    
-    // console.log(`Statut du shipment ${shipmentId} mis à jour à: ${newStatus}`);
-    return null
+
+    // Envoi de l'email si on a toutes les infos nécessaires
+    if (recipientEmail && userr && shipmentName) {
+      let emailType = "";
+      
+      switch(newStatus) {
+        case "Annuler":
+          emailType = "Annuler";
+          break;
+        case "Accepté":
+          emailType = "acceptance";
+          break;
+        case "Livré":
+          emailType = "delivery";
+          break;
+        default:
+          return;
+      }
+      try {
+        const response = await fetch("/api/send-mail", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: recipientEmail,
+            shipment: { 
+              objectName: shipmentName,
+              id: shipmentId 
+            },
+            type: emailType,
+            chatId: shipmentId,
+            user: {
+              firstName: userr.firstName,
+              lastName: userr.lastName
+            }
+          }),
+        });
+
+        if (!response.ok) {
+          console.error("Erreur lors de l'envoi de l'email");
+        }else {
+          return null
+        }
+      } catch (emailError) {
+        console.error("Erreur lors de l'envoi de l'email:", emailError);
+      }finally{
+        return null
+      }
+    }else{
+      return null
+    }
+
   } catch (error) {
     console.error("Erreur lors de la mise à jour du statut:", error);
     throw new Error("Échec de la mise à jour du statut");
   }
 };
-
 export function playNotificationSound() {
   try {
     const audio = new Audio('/sound/notification.mp3');

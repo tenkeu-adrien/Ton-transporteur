@@ -2,17 +2,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaCalendarAlt, FaChevronLeft, FaChevronRight, FaHashtag, FaMapMarkerAlt, FaRegComments, FaSpinner } from "react-icons/fa";
 import { FaMoneyBillWave } from "react-icons/fa6";
-import { getShipmentsByExpediteur } from "../../lib/firebaseUtils";
-import { MdInfoOutline } from "react-icons/md";
 import { auth, db } from "../../lib/firebaseConfig";
 import { updateShipmentStatus } from "../../lib/functions";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, getDocs, limit, onSnapshot, query, where } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Loader from "./Loader";
 import { FiPackage } from "react-icons/fi";
+import { AuthContext } from "../../context/AuthContext";
+import { toast } from "react-toastify";
 const ShipmentCard = ({ shipment, handleClick, handleCancelShipment }) => {
   // Déplacer les états de la modale dans un composant séparé
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -277,46 +277,54 @@ const ShipmentsList = () => {
   const [filterStatus, setFilterStatus] = useState("Tous");
   const [isLoading, setIsLoading] = useState(true);
   const [shipments, setShipments] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedShipment, setSelectedShipment] = useState(null);
-  const [user, setUser] = useState(null);
+ const [transporteur  ,setTransporteur] = useState(null)
+  // const [user, setUser] = useState(null);
   const router =useRouter()
   const [currentPage, setCurrentPage] = useState(1);
+const {user ,userData} = useContext(AuthContext)
+ useEffect( () => {
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Annuler":
-        return "bg-red-500";
-      case "En attente":
-        return "bg-yellow-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
-
+    const fetchTransporteur = async () => {
+      const q = query(
+        collection(db, "users"),
+        where("role", "==", "transporteur"), // Filtre par rôle
+        limit(1) // Vous n'en avez qu'un
+      );
+      
+      const snapshot = await getDocs(q);
+      if (!snapshot.empty) {
+        const doc = snapshot.docs[0];
+        setTransporteur({ id: doc.id, ...doc.data() });
+        // setChatPartner({ id: doc.id, ...doc.data() })
+      }
+    };
+  
+    fetchTransporteur();
+  }, []);
   // const [isModalOpen, setIsModalOpen] = useState(false);
-  const [cancelReason, setCancelReason] = useState("");
+  // const [cancelReason, setCancelReason] = useState("");
 
   const handleCancelShipment =  async (shipmentId, reason) => {
     // Implémentez votre logique d'annulation ici
     // Mettez à jour le statut du shipment dans votre state
     let newStatus = "Annuler"
     let cancelReason=reason
-   await   updateShipmentStatus(shipmentId ,newStatus,cancelReason,user?.uid)
-    
+    let recipientEmail =transporteur?.email
+    let userr = { ...userData, id: user?.uid };
+   await   updateShipmentStatus(shipmentId ,newStatus,cancelReason , userr,recipientEmail)
+   toast.info("Offre Annuler")
   };
   const handleClick =(shipmentId)=>{
-
     router.push(`/chat/${shipmentId}`)
    }
 
 
-   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-    });
-    return () => unsubscribe();
-  }, []);
+  //  useEffect(() => {
+  //   const unsubscribe = auth.onAuthStateChanged((user) => {
+  //     setUser(user);
+  //   });
+  //   return () => unsubscribe();
+  // }, []);
 
   useEffect(() => {
     if (!user) {
@@ -343,7 +351,7 @@ const ShipmentsList = () => {
         setShipments(shipmentsData);
         setIsLoading(false);
       }, (error) => {
-        console.error("Erreur lors du chargement des expéditions :", error);
+        // console.error("Erreur lors du chargement des expéditions :", error);
         setIsLoading(false);
       });
     
@@ -364,7 +372,7 @@ const filteredShipments =
     // Calculer les cartes à afficher pour la page actuelle
     const indexOfLastCard = currentPage * cardsPerPage;
     const indexOfFirstCard = indexOfLastCard - cardsPerPage;
-    const currentCards = shipments.slice(indexOfFirstCard, indexOfLastCard);
+    const currentCards = filteredShipments.slice(indexOfFirstCard, indexOfLastCard);
     const totalPages = Math.ceil(filteredShipments.length / cardsPerPage);
     // Fonction pour changer de page
     const paginate = (pageNumber) => setCurrentPage(pageNumber);

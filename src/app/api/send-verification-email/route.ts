@@ -64,15 +64,21 @@ export async function POST(req: Request) {
 
   // Création du transporteur en utilisant Gmail
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "mail.ton-transporteur.fr", // Serveur LWS
+      port: 465, // Port SSL
+      secure: true,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    
+      tls: {
+        rejectUnauthorized: false
+      }
   });
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,  // L'expéditeur doit être ton adresse Gmail
+    from:'"Ton Transporteur" <contact@ton-transporteur.fr>',  // L'expéditeur doit être ton adresse Gmail
     to: to,                      // Le destinataire
     subject: subject,      // Le sujet de l'email
     html: `

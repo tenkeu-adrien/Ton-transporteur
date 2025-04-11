@@ -42,7 +42,7 @@ export default function Register() {
    const [countries, setCountries] = useState([]);
 const {setUser}  = useContext(AuthContext)
 const [selectedCountry, setSelectedCountry] = useState(null);
-const [timeLeft, setTimeLeft] = useState(90); // 5 minutes en secondes 300
+const [timeLeft, setTimeLeft] = useState(300); // 5 minutes en secondes 300
 const [timerActive, setTimerActive] = useState(true);
    const {
     register,
@@ -205,16 +205,16 @@ const handleKeyDown = (index, e) => {
         email: data.email,
         phoneNumber: data.phoneNumber,
         profile: data.profile,
-        role: data.role,
+        role: data.role ?? "expediteur", 
         verificationCode: code,
         isVerified: false,
         createdAt: serverTimestamp(),
       });
 
       // Envoyer l'email de vérification
-      await sendVerificationEmail(data.email, code);
-      
+     ;
       toast.success("Compte créé ! Veuillez vérifier votre email pour le code de vérification.");
+      await sendVerificationEmail(data.email, code)
 setEmail(data.email)
       
     } catch (error) {
