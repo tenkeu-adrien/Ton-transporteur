@@ -368,8 +368,8 @@ const filteredShipments =
     const totalPages = Math.ceil(filteredShipments.length / cardsPerPage);
     // Fonction pour changer de page
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
-    console.log("shipments car" ,currentCards)
-console.log("shipments" , shipments)
+//     console.log("shipments car" ,currentCards)
+// console.log("shipments" , shipments)
     
 
   return (

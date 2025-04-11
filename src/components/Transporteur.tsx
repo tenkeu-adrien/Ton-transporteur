@@ -14,23 +14,23 @@ import { FiPackage } from "react-icons/fi";
 const Transporteur = ({ data, isLoading }) => {
   const [filterStatus, setFilterStatus] = useState("Tous");
   const [selectedShipment, setSelectedShipment] = useState(null);
-  const { user, logout ,loading  ,userData} = useContext(AuthContext);
+  const { user,loading  ,userData} = useContext(AuthContext);
 
   const [currentPage, setCurrentPage] = useState(1); // État pour la pagination
   const router =useRouter()
   const cardsPerPage = 5; // Nombre de cartes par page
 
-  console.log("userData" ,userData)
+  // console.log("userData" ,userData)
   // Calculer les cartes à afficher pour la page actuelle
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
   const currentCards = data.slice(indexOfFirstCard, indexOfLastCard);
 
   useEffect(() => {
-    if (userData?.role != "transporteur") {
-      router.push('/mes-colis'); // Redirige vers la page d'accueil si l'utilisateur n'est pas connecté
+    if (userData?.role !== "transporteur") {
+      router.back(); // Redirige vers la page d'accueil si l'utilisateur n'est pas connecté
     }
-  }, [user, loading, router]);
+  }, [user]);
 
   if (loading) {
     return <Loader />; // Affiche un message de chargement pendant la vérification
@@ -60,9 +60,9 @@ const Transporteur = ({ data, isLoading }) => {
     : currentCards.filter((shipment) => shipment.status === filterStatus);
 
 
-    const handleViewDetails = (id) => {
-      router.push(`/colis/${id}`); // Navigue vers la page de détails du colis
-    };
+    // const handleViewDetails = (id) => {
+    //   router.push(`/colis/${id}`); // Navigue vers la page de détails du colis
+    // };
     // const { user, userData, loading, error  ,logout} = useContext(AuthContext);
     const message="chargement"
     const handleClick =(shipmentId)=>{
@@ -242,7 +242,7 @@ const Transporteur = ({ data, isLoading }) => {
       <p className="text-sm text-gray-500">Expéditeur</p>
     </div>
   </div>
-  <button
+  {shipment.status !== "Annuler" && <button
     onClick={(e) =>{
       e.preventDefault() ;
       e.stopPropagation() ;
@@ -252,7 +252,8 @@ const Transporteur = ({ data, isLoading }) => {
     <FaRegComments className="w-4 h-4" />
     <span>Discuter</span>
     <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
-  </button>
+  </button> }
+  
 </div>
 
 

@@ -27,7 +27,7 @@ const ECommerce: React.FC = () => {
 
 
 
-  console.log("user" ,user?.uid ,"stats" ,stats ,"userData" ,userData?.role)
+  // console.log("user" ,user?.uid ,"stats" ,stats ,"userData" ,userData?.role)
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -71,7 +71,7 @@ const ECommerce: React.FC = () => {
   
         setStats(newStats);
       } catch (error) {
-        console.error("Erreur lors de la récupération des statistiques:", error);
+        // console.error("Erreur lors de la récupération des statistiques:", error);
       } finally {
         setLoading(false);
       }
@@ -90,8 +90,6 @@ const ECommerce: React.FC = () => {
   }
   return (
     <>
-      
-
 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
       <CardDataStats
         title="Total colis"

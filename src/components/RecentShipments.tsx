@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../lib/firebaseConfig";
 
 const RecentShipments = () => {
@@ -88,17 +88,44 @@ const RecentShipments = () => {
     arrivalDate: "16/12"
   }];
   const [shipments, setShipments] = useState([]);
+  // useEffect(() => {
+  //   const fetchShipments = async () => {
+  //     try {
+  //       const querySnapshot = await getDocs(collection(db, "shipments"));
+  //       const firebaseShipments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+  //       // On complète avec les statiques si moins de 6
+  //       const finalShipments = firebaseShipments.length >= 6
+  //         ? firebaseShipments.slice(0, 6)
+  //         : [...firebaseShipments, ...staticShipments.slice(0, 6 - firebaseShipments.length)];
+
+  //       setShipments(finalShipments);
+  //     } catch (error) {
+  //       console.error("Erreur lors de la récupération des données :", error);
+  //       // En cas d'erreur, fallback vers données statiques
+  //       setShipments(staticShipments);
+  //     }
+  //   };
+
+  //   fetchShipments();
+  // }, []);
+
+
   useEffect(() => {
     const fetchShipments = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "shipments"));
+        const q = query(
+          collection(db, "shipments"),
+          where("price", "!=", 0)
+        );
+        const querySnapshot = await getDocs(q);
         const firebaseShipments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
+  
         // On complète avec les statiques si moins de 6
         const finalShipments = firebaseShipments.length >= 6
           ? firebaseShipments.slice(0, 6)
           : [...firebaseShipments, ...staticShipments.slice(0, 6 - firebaseShipments.length)];
-
+  
         setShipments(finalShipments);
       } catch (error) {
         console.error("Erreur lors de la récupération des données :", error);
@@ -106,7 +133,7 @@ const RecentShipments = () => {
         setShipments(staticShipments);
       }
     };
-
+  
     fetchShipments();
   }, []);
 

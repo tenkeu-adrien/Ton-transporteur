@@ -32,7 +32,7 @@ const handleStart =()=>{
   return (
     <>
       <Head>
-  <title>Ton Transporteur - Service de Livraison Fiable et Écologique</title>
+  <title>Tton Transporteur - Service de Livraison Fiable et Écologique</title>
   <meta name="description" content="Avec Ton Transporteur, bénéficiez d&apos;un service de livraison fiable et écologique. Suivez vos colis en temps réel et améliorez l&apos;efficacité de vos opérations logistiques." />
 </Head>
 
@@ -141,7 +141,7 @@ const handleStart =()=>{
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 className="text-xl font-semibold mb-4">3. Suivez votre colis</h3>
-            <p>Suivez en temps réel la livraison de votre colis jusqu&aposà sa destination.</p>
+            <p>Suivez en temps réel la livraison de votre colis jusqu&apos;à sa destination.</p>
           </div>
         </div>
       </div>

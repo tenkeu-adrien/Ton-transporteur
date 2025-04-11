@@ -197,8 +197,8 @@ export async function POST(request: Request) {
           TTL: "86400", // 24h de durée de vie
         },
         notification: {
-          icon: `${BASE_URL}/images/signin1.png`,
-          badge: `${BASE_URL}/images/signin2.png`,
+          icon: `${BASE_URL}/images/logo/logo.png`,
+          badge: `${BASE_URL}/images/logo/logo.png`,
           vibrate: [200, 100, 200, 100, 200],
           requireInteraction: true,
           sound: `${BASE_URL}sound/notification.mp3`,
@@ -211,7 +211,7 @@ export async function POST(request: Request) {
           ],
         },
         fcmOptions: {
-          link: `${BASE_URL}${data?.shipmetId ? `/shipment/${data.shipmetId}` : ""}`,
+          link: `${BASE_URL}${data?.shipmetId ? `/chat/${data.shipmetId}` : ""}`,
         },
       },
       data: {
@@ -234,9 +234,9 @@ export async function POST(request: Request) {
 
     // Envoi de la notification
     try {
-      await admin.messaging().send(message);
+   let result =   await admin.messaging().send(message);
       return NextResponse.json(
-        { success: true, message: "Notification envoyée avec succès" },
+        { success: true, message: "Notification envoyée avec succès" ,result},
         { status: 200 }
       );
     } catch (error: any) {

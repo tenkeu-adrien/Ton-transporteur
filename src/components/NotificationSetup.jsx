@@ -1,9 +1,8 @@
 'use client'
 import { useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { getFcmToken } from '../../lib/firebaseNotifications';
+import { getFcmToken, handleNotificationClick, setupMessageListener } from '../../lib/firebaseNotifications';
 import { AuthContext } from '../../context/AuthContext';
-import { subscribeToMessages } from '../../lib/firebaseConfig';
 
 export default function NotificationSetup() {
   const { user } = useContext(AuthContext);
@@ -11,21 +10,25 @@ export default function NotificationSetup() {
   useEffect(() => {
     const setupNotifications = async () => {
       if (!user?.uid) return;
+      
       try {
         const token = await getFcmToken();
+        if (!token) return;
+
         const response = await fetch('/api/save-fcm-token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token, userId: user?.uid }),
+          body: JSON.stringify({ token, userId: user.uid }),
         });
-        //  console.log("response de  /api/save-fcm " ,response)
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          // throw new Error(errorData.error || "Erreur lors de l'enregistrement");
+          return null
+        }
+
         // toast.success('Notifications activées!');
-        const data = await response.json();
-      if (!response.ok) {
-        return {error:data.error}
-      }else{
-        return data
-      }
+        return null
       } catch (error) {
         console.error('Erreur:', error);
         toast.error(`Erreur: ${error.message}`);
@@ -36,44 +39,24 @@ export default function NotificationSetup() {
   }, [user]);
 
 
-  // useEffect(() => {
-  //   const unsubscribe = onMessageListener()
-  //     .then((payload) => {
-  //       const { title, body } = payload.notification;
-        
-  //       // Afficher une notification native si l'application est active
-  //       if (document.visibilityState === 'visible') {
-  //         new Notification(title, {
-  //           body,
-  //           icon: '/icon.png',
-  //         });
-  //       }
-  //     })
-  //     .catch((err) => console.log('failed: ', err));
   
-  //   return () => unsubscribe;
-  // }, []);
-
   useEffect(() => {
-    const unsubscribe = subscribeToMessages((payload) => {
-      const { title, body } = payload.notification;
-  
-      if (document.visibilityState === 'visible') {
-        new Notification(title, {
-          body,
+    if (!user?.uid) return;
+
+    const unsubscribe = setupMessageListener((payload) => {
+      if (Notification.permission === "granted" && document.visibilityState === 'visible') {
+        new Notification(payload.notification?.title || "Nouvelle notification", {
+          body: payload.notification?.body,
           icon: '/icon.png',
-        });
+          data: payload.data
+        }).onclick = () => handleNotificationClick(payload);
       }
-  
-      // ici tu peux aussi gérer l'ajout du message à l'état du chat si tu veux
     });
-  
+
     return () => {
-      unsubscribe(); // on nettoie proprement à la destruction du composant
+      if (unsubscribe) unsubscribe();
     };
-  }, []);
+  }, [user]);
+
   return null;
 }
-
-
-

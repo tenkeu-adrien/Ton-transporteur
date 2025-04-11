@@ -57,7 +57,7 @@ export const firebaseConfig = {
 };
 
 // Initialisation Firebase
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
 // Services Firebase
 const auth = getAuth(app);

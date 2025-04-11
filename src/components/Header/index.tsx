@@ -1,5 +1,5 @@
 import Link from "next/link";
-import DropdownMessage from "./DropdownMessage";
+// import DropdownMessage from "./DropdownMessage";
 import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 

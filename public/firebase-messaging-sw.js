@@ -1,57 +1,4 @@
-// importScripts("https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js");
-// importScripts("https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js");
 
-
-
-// importScripts("https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js");
-// importScripts("https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging-compat.js");
-
-
-
-
-// console.log("Service Worker Loaded");
-
-// self.addEventListener("install", (event) => {
-//   console.log("Service Worker Installed");
-// });
-
-// self.addEventListener("activate", (event) => {
-//   console.log("Service Worker Activated");
-// });
-
-
-
-// const firebaseConfig = {
-//     apiKey: 
-//     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-//     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-//     storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-//     messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-//     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-//   };
-
-
-
-
-
-
-// firebase.initializeApp({
-//   apiKey: "VOTRE_API_KEY",
-//   authDomain: "VOTRE_PROJET.firebaseapp.com",
-//   projectId: "VOTRE_PROJECT_ID",
-//   storageBucket: "VOTRE_PROJECT.appspot.com",
-//   messagingSenderId: "VOTRE_SENDER_ID",
-//   appId: "VOTRE_APP_ID",
-// });
-
-// const messaging = firebase.messaging();
-
-// messaging.onBackgroundMessage((payload) => {
-//   self.registration.showNotification(payload.notification.title, {
-//     body: payload.notification.body,
-//     icon: "/firebase-logo.png",
-//   });
-// });
 
 
 importScripts("https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js");
@@ -72,10 +19,92 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
+// let notificationCount = 0;
+
+
+// console.log("Firebase messaging service worker loaded");
+
+// // Gestion des messages en arrière-plan
+// messaging.onBackgroundMessage((payload) => {
+//   console.log('Received background message ', payload);
+
+//   notificationCount = parseInt(payload.data?.count || notificationCount + 1);
+
+//   self.clients.matchAll().then(clients => {
+//     clients.forEach(client => {
+//       client.postMessage({
+//         type: 'NOTIFICATION_COUNT',
+//         count: notificationCount
+//       });
+//     });
+//   });
+
+//   const notificationTitle = payload.notification?.title || 'Nouveau message';
+//   const notificationOptions = {
+//     body: payload.notification?.body,
+//     icon: payload.notification?.icon || '/images/signin2.png',
+//     vibrate: [200, 100, 200],
+//     data: payload.data,
+//       sound: '/sound/notification.mp3', // Son personnalisé
+//     tag: 'new-notification'
+//   };
+
+//   return self.registration.showNotification(notificationTitle, notificationOptions);
+
+  
+// });
+// self.addEventListener('notificationclick', (event) => {
+//   event.notification.close();
+//   const urlToOpen = event.notification.data?.url || `/chat/${data.shipmentId}`;
+  
+//   // Réinitialiser le compteur quand on clique
+//   notificationCount = 0;
+  
+//   event.waitUntil(
+//     clients.openWindow(urlToOpen).then(windowClient => {
+//       windowClient.postMessage({
+//         type: 'RESET_NOTIFICATION_COUNT'
+//       });
+//     })
+//   );
+// });
+
+// // Gestion des messages entre le SW et les clients
+// self.addEventListener('message', (event) => {
+//   if (event.data.type === 'GET_NOTIFICATION_COUNT') {
+//     event.ports[0].postMessage({
+//       type: 'NOTIFICATION_COUNT',
+//       count: notificationCount
+//     });
+//   }
+// });
+function playNotificationSound() {
+  try {
+    const audio = new Audio('/sound/notification');
+    audio.play().catch(e => {
+      console.error('Erreur de lecture du son:', e);
+      // Fallback pour les navigateurs mobiles
+      if (typeof window.navigator.vibrate === 'function') {
+        window.navigator.vibrate([200, 100, 200]);
+      }
+    });
+  } catch (error) {
+    console.error('Erreur lors de la création de l\'audio:', error);
+  }
+}
+
 let notificationCount = 0;
 
-
-console.log("Firebase messaging service worker loaded");
+// Fonction pour jouer le son dans le service worker
+function playNotificationSound() {
+  clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'PLAY_NOTIFICATION_SOUND'
+      });
+    });
+  });
+}
 
 // Gestion des messages en arrière-plan
 messaging.onBackgroundMessage((payload) => {
@@ -83,6 +112,7 @@ messaging.onBackgroundMessage((payload) => {
 
   notificationCount = parseInt(payload.data?.count || notificationCount + 1);
 
+  // Mise à jour des clients ouverts
   self.clients.matchAll().then(clients => {
     clients.forEach(client => {
       client.postMessage({
@@ -98,33 +128,37 @@ messaging.onBackgroundMessage((payload) => {
     icon: payload.notification?.icon || '/images/signin2.png',
     vibrate: [200, 100, 200],
     data: payload.data,
-      sound: '/sound/notification.mp3', // Son personnalisé
+    sound:"sound/notification",
     tag: 'new-notification'
   };
-  console.log("notificationTitle message " ,notificationTitle)
+
+  // Jouer le son
+  playNotificationSound();
 
   return self.registration.showNotification(notificationTitle, notificationOptions);
-
-  
 });
 
 
+// messaging.onBackgroundMessage((payload) => {
+//   console.log("[SW] Notification BG:", payload);
 
-// self.addEventListener('notificationclick', (event) => {
-//   event.notification.close();
-//   const urlToOpen = event.notification.data?.url || '/';
-  
-//   event.waitUntil(
-//     clients.openWindow(urlToOpen)
-//   );
+//   const { title, body } = payload.notification || {};
+//   const notificationOptions = {
+//     body,
+//     icon: "/images/signin1.png",
+//     vibrate: [200, 100, 200],
+//     tag: "new-notification",
+//   };
+
+//   self.registration.showNotification(title || "Notification", notificationOptions);
 // });
 
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const urlToOpen = event.notification.data?.url || '/';
+  const urlToOpen = event.notification.data?.url || `/chat/${event.notification.data?.shipmentId}`;
   
-  // Réinitialiser le compteur quand on clique
+  // Réinitialiser le compteur
   notificationCount = 0;
   
   event.waitUntil(
@@ -138,20 +172,18 @@ self.addEventListener('notificationclick', (event) => {
 
 // Gestion des messages entre le SW et les clients
 self.addEventListener('message', (event) => {
-  if (event.data.type === 'GET_NOTIFICATION_COUNT') {
-    event.ports[0].postMessage({
-      type: 'NOTIFICATION_COUNT',
-      count: notificationCount
-    });
+  switch(event.data.type) {
+    case 'GET_NOTIFICATION_COUNT':
+      event.ports[0].postMessage({
+        type: 'NOTIFICATION_COUNT',
+        count: notificationCount
+      });
+      break;
+      
+    case 'PLAY_NOTIFICATION_SOUND':
+      // Jouer le son dans le client
+      const audio = new Audio('/sound/notification');
+      audio.play().catch(e => console.error('Erreur lecture son:', e));
+      break;
   }
 });
-
-
-// self.addEventListener('message', (event) => {
-//   if (event.data.type === 'GET_NOTIFICATION_COUNT') {
-//     event.ports[0].postMessage({
-//       type: 'NOTIFICATION_COUNT',
-//       count: notificationCount
-//     });
-//   }
-// });

@@ -292,7 +292,6 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
   const handleEnlevement = async (id) => {
     // action Firebase pour marquer comme enlevé
       await updateDoc(doc(db, "shipments", id), { enlevement: true })
-    console.log("Enlèvement effectué pour :", id);
   };
 
   const handleDechargement = async (id) => {
@@ -315,8 +314,9 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
       // Appeler la fonction appropriée selon l'action
       if (currentAction === 'enlevement') {
         // email, shipment, action, transporterInfo
-        
+        setActionConfirmed(true);
         await handleEnlevement(currentShipment.id); 
+
         const response =   await fetch('/api/send-notif', {
           method: 'POST',
           headers: {
@@ -331,7 +331,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
         });
         if (!response.ok) {
           const errorData = await response.text(); // Lire d'abord comme texte
-          console.error('Server responded with:', errorData);
+          // console.error('Server responded with:', errorData);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
@@ -339,9 +339,9 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
         
         // Passage des updates supplémentaires
       } else {
-
-        await handleDechargement(currentShipment.id); 
         setActionConfirmed(true);
+        await handleDechargement(currentShipment.id); 
+      
         const response =   await fetch('/api/send-notif', {
           method: 'POST',
           headers: {
@@ -356,7 +356,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
         });
         if (!response.ok) {
           const errorData = await response.text(); // Lire d'abord comme texte
-          console.error('Server responded with:', errorData);
+          // console.error('Server responded with:', errorData);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         // Passage des updates supplémentaires
@@ -378,13 +378,13 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
       // Fermer automatiquement après 3 secondes
       setTimeout(() => {
         closeModal();
-      }, 1000);
+      }, 1);
     } catch (error) {
       setNotification({
         type: 'error',
         message: 'Erreur lors de la confirmation'
       });
-      console.error("Erreur:", error);
+      // console.error("Erreur:", error);
     }
   };
 
@@ -416,7 +416,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
   };
   const [shipmentss, setShipmentss] = useState([]);
 
-  console.log("shipments " ,shipmentss)
+  // console.log("shipments " ,shipmentss)
   useEffect(() => {
     const q = query(
       collection(db, "shipments"),
@@ -446,7 +446,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
     setNotification(null);
   };
 
-
+// console.log("currentUser" ,currentUser)
 
   useEffect(() => {
     const fetchShipments = async () => {
@@ -610,7 +610,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
 
         return () => unsubscribe();
       } catch (error) {
-        console.error("Erreur lors de la récupération des utilisateurs :", error);
+        // console.error("Erreur lors de la récupération des utilisateurs :", error);
       }
     };
 
@@ -627,70 +627,41 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
  
 
   return (
-    <div className="col-span-12 rounded-sm border border-stroke bg-white py-6 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4 space-x-4   mt-12">
-      {/* Filtres booléens */}
-<div className="flex gap-4 items-center mb-6 ml-4">
-  <label className="flex items-center space-x-2 text-sm">
-    <input
-      type="checkbox"
-      checked={showEnlevement}
-      onChange={() => setShowEnlevement(!showEnlevement)}
-      className="rounded border-gray-300 focus:ring-green-500"
-    />
-    <span className="text-xl">Afficher les enlèvements</span>
-  </label>
+    
 
-  <label className="flex items-center space-x-2 text-sm">
-    <input
-      type="checkbox"
-      checked={showDechargement}
-      onChange={() => setShowDechargement(!showDechargement)}
-      className="rounded border-gray-300 focus:ring-green-500"
-    />
-    <span className="text-xl">Afficher les déchargements</span>
-  </label>
-</div>
 
-  <h4 className="mb-6 px-7.5 text-xl font-semibold text-black dark:text-white">
+<div className="col-span-12 rounded-sm border border-stroke bg-white py-6 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4 mt-12 px-4 sm:px-6">
+  <h4 className="mb-6 text-xl font-semibold text-black dark:text-white text-center sm:text-left">
     {currentUser?.role === "expediteur" ? "Mes Colis" : "Mes Transports"}
   </h4>
   
   {loading ? (
-    <div className="flex justify-center items-center h-64">
+    <div className="flex flex-col justify-center items-center h-64">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-      <span className="ml-4 text-gray-600">Chargement en cours...</span>
+      <span className="mt-4 text-gray-600">Chargement en cours...</span>
     </div>
   ) : error ? (
-    <div className="p-4 bg-red-100 text-red-700 rounded">{error}</div>
+    <div className="p-4 bg-red-100 text-red-700 rounded text-center">{error}</div>
   ) : (
     <div className="space-y-6">
-      {/* Section Shipments pour les expéditeurs - 3 par ligne sur grand écran */}
+      {/* Section Shipments pour les expéditeurs */}
       {currentUser?.role === "expediteur" && (
         <div>
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-green-600 mb-2 flex items-center justify-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-green-600 mb-2 flex flex-col sm:flex-row items-center justify-center gap-2">
               <FiPackage className="text-green-500" /> 
               Vos Colis Actifs
             </h1>
-            <p className="text-gray-500">Gérez vos envois et discussions</p>
+            <p className="text-gray-500 text-sm sm:text-base">Gérez vos envois et discussions</p>
           </div>
 
-          
-          {shipments.length === 0 ?(
-  <div className="p-6 bg-gray-100 text-gray-700 rounded-lg text-center flex flex-col items-center space-y-3">
-    <FiPackage className="text-green-600 text-4xl" />
-    <p>Aucun colis actif trouvé.</p>
-  </div>
-
-
-
-          // {shipments.length === 0 ? (
-          //   <div className="p-4 bg-gray-100 text-gray-700 rounded-lg text-center">
-          //     Aucun colis actif trouvé.
-          //   </div>
-
+          {shipments.length === 0 ? (
+            <div className="p-6 bg-gray-100 text-gray-700 rounded-lg text-center flex flex-col items-center space-y-3">
+              <FiPackage className="text-green-600 text-4xl" />
+              <p>Aucun colis actif trouvé.</p>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {shipments.map((shipment) => (
                 <div
                   key={shipment.id}
@@ -701,7 +672,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
                     <div className="p-2 bg-green-50 rounded-full">
                       <FiBox className="text-green-600 text-lg" />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <span className="font-medium text-gray-800 capitalize line-clamp-1">
                         {shipment.objectName}
                       </span>
@@ -718,7 +689,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
                   </div>
                   
                   <div className="flex justify-between items-center">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-600 truncate max-w-[70%]">
                       {shipment.pickupAddress && (
                         <span className="line-clamp-1">
                           <FaMapMarkerAlt className="inline mr-1 text-red-400" />
@@ -742,54 +713,73 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
         </div>
       )}
 
-      {/* Section Transporteurs - 2 par ligne sur grand écran */}
+      {/* Section Transporteurs */}
       {currentUser?.role === "transporteur" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredShipments.map((shipment) => (
-            <div 
-              key={shipment.id}
-              className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:border-green-200 transition-all duration-300 h-full"
-            >
-              <div className="p-6 h-full flex flex-col">
-                <div className="flex items-start">
-                  <div className="bg-green-50 p-3 rounded-lg mr-4">
-                    <FaBoxOpen className="text-green-600 text-2xl" />
-                  </div>
-                  
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-                      <span className="mr-2 line-clamp-1">{shipment.objectName || "Colis sans nom"}</span>
-                      {shipment.status =="Accepter" && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs mr-2 font-medium bg-green-100 text-green-800 ml-2">
-                          <MdDoneAll className="mr-1" /> Accepter
-                            {shipment.enlevement && <span className="inline-flex items-center mr-2 px-2 py-0.5 rounded text-sm font-medium bg-green-100 text-green-800 ml-2">
-                          <MdDoneAll className="mr-1" /> Enlèvement effectué
+        <div>
+          {/* Filtres uniquement pour les transporteurs */}
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-6">
+            <label className="flex items-center space-x-2 text-sm w-full sm:w-auto">
+              <input
+                type="checkbox"
+                checked={showEnlevement}
+                onChange={() => setShowEnlevement(!showEnlevement)}
+                className="rounded border-gray-300 focus:ring-green-500 h-5 w-5"
+              />
+              <span className="text-base sm:text-xl">Afficher les enlèvements</span>
+            </label>
 
-                        </span> }
-                        {shipment.dechargement && <span className="inline-flex items-center px-2 py-0.5 rounded text-sm font-medium bg-green-100 text-green-800 ml-2">
-                          <MdDoneAll className="mr-1" /> Déchargement effectué
+            <label className="flex items-center space-x-2 text-sm w-full sm:w-auto">
+              <input
+                type="checkbox"
+                checked={showDechargement}
+                onChange={() => setShowDechargement(!showDechargement)}
+                className="rounded border-gray-300 focus:ring-green-500 h-5 w-5"
+              />
+              <span className="text-base sm:text-xl">Afficher les déchargements</span>
+            </label>
+          </div>
 
-                        </span> }
-                          
-                        </span>
-                      // ) : shipment.enlevementEffectue ? (
-                      //   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 ml-2">
-                      //     <MdDirectionsBike className="mr-1" /> En cours
-                      //   </span>
-                      // ) : (
-                      //   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 ml-2">
-                      //     En attente
-                      //   </span>
-                      )}
-                    </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredShipments.map((shipment) => (
+              <div 
+                key={shipment.id}
+                className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:border-green-200 transition-all duration-300 h-full"
+              >
+                <div className="p-4 sm:p-6 h-full flex flex-col">
+                  <div className="flex flex-col sm:flex-row items-start">
+                    <div className="bg-green-50 p-3 rounded-lg mb-3 sm:mb-0 sm:mr-4">
+                      <FaBoxOpen className="text-green-600 text-2xl" />
+                    </div>
                     
-                    <div className="mt-3 grid grid-cols-1 gap-3">
-                      <div className="flex items-start">
-                        <FaCalendarAlt className="text-green-500 mt-1 mr-2 flex-shrink-0" />
-                        <div>
-                          <p className="text-sm text-gray-500">Date de départ</p>
-                          <p className="font-medium text-sm">
-                          {shipment.pickupDate && shipment.pickupDate.toDate
+                    <div className="flex-1 w-full">
+                      <h3 className="text-lg font-semibold text-gray-800 flex flex-col sm:flex-row sm:items-center">
+                        <span className="mr-2 line-clamp-1 mb-1 sm:mb-0">{shipment.objectName || "Colis sans nom"}</span>
+                        {shipment.status === "Accepter" && (
+                          <div className="flex flex-wrap gap-1 mt-1 sm:mt-0">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                              <MdDoneAll className="mr-1" /> Accepter
+                            </span>
+                            {shipment.enlevement && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                <MdDoneAll className="mr-1" /> Enlèvement
+                              </span>
+                            )}
+                            {shipment.dechargement && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                <MdDoneAll className="mr-1" /> Déchargement
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </h3>
+                      
+                      <div className="mt-3 grid grid-cols-1 gap-3">
+                        <div className="flex items-start">
+                          <FaCalendarAlt className="text-green-500 mt-1 mr-2 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-gray-500">Date de départ</p>
+                            <p className="font-medium text-sm truncate">
+                              {shipment.pickupDate && shipment.pickupDate.toDate
                                 ? shipment.pickupDate.toDate().toLocaleString("fr-FR", {
                                     weekday: "long",
                                     day: "numeric",
@@ -797,17 +787,16 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
                                     year: "numeric",
                                   })
                                 : "Date invalide"}
-                            
-                          </p>
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="flex items-start">
-                        <FaCalendarAlt className="text-green-500 mt-1 mr-2 flex-shrink-0" />
-                        <div>
-                          <p className="text-sm text-gray-500">Date de livraison</p>
-                          <p className="font-medium text-sm">
-                          {shipment.deliveryDate && shipment.deliveryDate.toDate
+                        
+                        <div className="flex items-start">
+                          <FaCalendarAlt className="text-green-500 mt-1 mr-2 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-gray-500">Date de livraison</p>
+                            <p className="font-medium text-sm truncate">
+                              {shipment.deliveryDate && shipment.deliveryDate.toDate
                                 ? shipment.deliveryDate.toDate().toLocaleString("fr-FR", {
                                     weekday: "long",
                                     day: "numeric",
@@ -816,54 +805,50 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
                                   })
                                 : "Date invalide"}
                             </p>
-                          
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start">
+                          <FaMapMarkerAlt className="text-red-500 mt-1 mr-2 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-gray-500">Adresse de départ</p>
+                            <p className="font-medium text-sm line-clamp-1">
+                              {shipment.pickupAddress}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start">
+                          <FaMapMarkerAlt className="text-green-500 mt-1 mr-2 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-gray-500">Adresse de livraison</p>
+                            <p className="font-medium text-sm line-clamp-1">
+                              {shipment.deliveryAddress}
+                            </p>
+                          </div>
                         </div>
                       </div>
                       
-                      <div className="flex items-start">
-                        <FaMapMarkerAlt className="text-red-500 mt-1 mr-2 flex-shrink-0" />
-                        <div>
-                          <p className="text-sm text-gray-500">Adresse de départ</p>
-                          <p className="font-medium text-sm line-clamp-1">
-                            {shipment.pickupAddress}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start">
-                        <FaMapMarkerAlt className="text-green-500 mt-1 mr-2 flex-shrink-0" />
-                        <div>
-                          <p className="text-sm text-gray-500">Adresse de livraison</p>
-                          <p className="font-medium text-sm line-clamp-1">
-                            {shipment.deliveryAddress}
-                          </p>
-                        </div>
-                      </div>
+                      {/* Notification des dates atteintes */}
+                      {checkDueDates(shipment)}
                     </div>
-                    
-                    {/* Notification des dates atteintes */}
-                    {checkDueDates(shipment)}
                   </div>
-                </div>
-                
-                <div className="mt-auto pt-4">
-                  {/* {(!shipment.enlevement || !shipment.dechargement) && ( */}
-                    <div className="flex flex-col sm:flex-row justify-between gap-2">
-                      {/* {shipment.enlevement && ( */}
-                        <button
-                          onClick={() => openModal('enlevement', shipment)}
-                          className={`inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 
-                            focus:ring-green-500 flex-1 ${shipment.enlevement ? 'opacity-50 cursor-not-allowed' : ''} `}
-                          disabled={shipment.enlevement}
-                       >
-                          <FaTruck className="mr-2" />
-                          <span className="text-xs sm:text-sm">Enlèvement effectué</span>
-                        </button>
-                      {/* )} */}
+                  
+                  <div className="mt-auto pt-4">
+                    <div className="flex flex-col gap-2">
+                      <button
+                        onClick={() => openModal('enlevement', shipment)}
+                        className={`inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 
+                          focus:ring-green-500 ${shipment.enlevement ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={shipment.enlevement}
+                      >
+                        <FaTruck className="mr-2" />
+                        <span className="text-xs sm:text-sm">Enlèvement effectué</span>
+                      </button>
                       
                       <button
                         onClick={() => openModal('dechargement', shipment)}
-                        className={`inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 flex-1 ${
+                        className={`inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
                           !shipment.enlevement || shipment.dechargement ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                         disabled={!shipment.enlevement || shipment.dechargement}
@@ -872,92 +857,87 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
                         <span className="text-xs sm:text-sm">Déchargement effectué</span>
                       </button>
                     </div>
-                  {/* )} */}
-                </div>
-              </div>
-            </div>
-          ))}
-
-          
-        </div>
-      )}
-
-{filteredShipments.length === 0 && (
-  <div className="p-6 bg-gray-100 text-gray-700 rounded-lgflex justify-center items-center h-64text-center flex flex-col items-center space-y-3">
-    <FiPackage className="text-green-600 text-4xl" />
-    <p>Aucun colis actif trouvé.</p>
-  </div>
-)}
-    </div>
-  )}
-      
-
-
-
-
-
-{showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            {!actionConfirmed ? (
-              <>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  {currentAction === 'enlevement' 
-                    ? "Confirmer l'enlèvement du colis ?" 
-                    : "Confirmer le déchargement du colis ?"}
-                </h3>
-                
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <FaEnvelope className="h-5 w-5 text-yellow-400" />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-yellow-700">
-                        Un email sera envoyé au client pour notification
-                      </p>
-                    </div>
                   </div>
                 </div>
-                
-                <div className="flex justify-end space-x-3 mt-6">
-                  <button
-                    onClick={closeModal}
-                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    onClick={confirmAction}
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                  >
-                    Confirmer
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="text-center">
-                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                  <FaCheck className="h-6 w-6 text-green-600" />
-                </div>
-                <h3 className="mt-3 text-lg font-medium text-gray-900">
-                  {currentAction === 'enlevement' 
-                    ? "Enlèvement confirmé !" 
-                    : "Déchargement confirmé !"}
-                </h3>
-                <div className="mt-2 px-7 py-3">
-                  <p className="text-sm text-gray-500">
-                    {currentAction === 'enlevement'
-                      ? "Le client a été notifié par email."
-                      : "La livraison est maintenant complète."}
-                  </p>
-                </div>
               </div>
-            )}
+            ))}
           </div>
         </div>
       )}
+
+      { ( currentUser?.role === "transporteur" && filteredShipments.length === 0 ) && (
+        <div className="p-6 bg-gray-100 text-gray-700 rounded-lg text-center flex flex-col items-center space-y-3">
+          <FiPackage className="text-green-600 text-4xl" />
+          <p>Aucun colis actif trouvé.</p>
+        </div>
+      )}
     </div>
+  )}
+
+  {/* Modal de confirmation */}
+  {showModal && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        {!actionConfirmed ? (
+          <>
+            <h3 className="text-lg font-medium text-gray-900 mb-4 ml-2">
+              {currentAction === 'enlevement' 
+                ? "Confirmer l'enlèvement du colis ?" 
+                : "Confirmer le déchargement du colis ?"}
+            </h3>
+            
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <FaEnvelope className="h-5 w-5 text-yellow-400" />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-yellow-700">
+                    Un email sera envoyé au client pour notification
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 mb-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={confirmAction}
+                className="px-4 py-2 mb-2     border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
+                Confirmer
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="text-center">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+              <FaCheck className="h-6 w-6 text-green-600" />
+            </div>
+            <h3 className="mt-3 text-lg font-medium text-gray-900">
+              {currentAction === 'enlevement' 
+                ? "Enlèvement confirmé !" 
+                : "Déchargement confirmé !"}
+            </h3>
+            <div className="mt-2 px-7 py-3">
+              <p className="text-sm text-gray-500">
+                {currentAction === 'enlevement'
+                  ? "Le client a été notifié par email."
+                  : "La livraison est maintenant complète."}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+</div>
+
   );
 };
 

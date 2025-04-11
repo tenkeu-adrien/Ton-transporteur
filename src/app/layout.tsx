@@ -9,6 +9,7 @@ import { log } from "console";
 // import { useRouter } from "next/navigation";
 import { AuthProvider } from "../../context/AuthContext";
 import { ToastContainer } from "react-toastify";
+import NotificationSetup from "@/components/NotificationSetup";
 
 export default function RootLayout({
   children,
@@ -22,6 +23,7 @@ export default function RootLayout({
     <html lang="en">
     <body suppressHydrationWarning={true}>
       <ToastContainer />
+            
       <AuthProvider>
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
           {children}

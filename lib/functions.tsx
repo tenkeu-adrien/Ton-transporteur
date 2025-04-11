@@ -189,12 +189,28 @@ export const updateShipmentStatus = async (
       updateData.cancelReason = cancelReason;
       updateData.cancelledBy = user; // ou "transporteur" selon votre logique
     }
-console.log(newStatus , user ,shipmentId)
+// console.log("newStatus" ,newStatus , 'shipmentId',shipmentId)
     await updateDoc(shipmentRef, updateData);
     
-    console.log(`Statut du shipment ${shipmentId} mis à jour à: ${newStatus}`);
+    // console.log(`Statut du shipment ${shipmentId} mis à jour à: ${newStatus}`);
+    return null
   } catch (error) {
     console.error("Erreur lors de la mise à jour du statut:", error);
     throw new Error("Échec de la mise à jour du statut");
   }
 };
+
+export function playNotificationSound() {
+  try {
+    const audio = new Audio('/sound/notification.mp3');
+    audio.play().catch(e => {
+      console.error('Erreur de lecture du son:', e);
+      // Fallback pour les navigateurs mobiles
+      if (typeof window.navigator.vibrate === 'function') {
+        window.navigator.vibrate([200, 100, 200]);
+      }
+    });
+  } catch (error) {
+    console.error('Erreur lors de la création de l\'audio:', error);
+  }
+}
