@@ -377,8 +377,8 @@ const formatOptionLabel = ({ label, flag }) => (
       </div>
 
       {/* Mot de Passe et Confirmation du Mot de Passe sur une ligne */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
+      <div className="flex gap-4 items-start">
+        <div className='flex-1'>
           <label className="block text-sm font-medium text-gray-700">Mot de Passe :</label>
           <input
             type="password"
@@ -387,14 +387,14 @@ const formatOptionLabel = ({ label, flag }) => (
             {...register("password")}
           />
           {errors.password && (
-            <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+            <p className="mb-1 text-sm text-red-600">{errors.password.message}</p>
           )}
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Confirmation du Mot de Passe :</label>
+        <div className='flex-1'>
+          <label className="block text-sm font-medium text-gray-700">Confirmation de :</label>
           <input
             type="password"
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+            className="mb-1  w-full p-2 border border-gray-300 rounded-md shadow-sm"
             placeholder="******"
             {...register("confirmPassword")}
           />
