@@ -24,9 +24,9 @@ const AboutPage = () => {
           <span className="text-white text-3xl">Accueil</span>
         </span>
       </a>
-                <h1 className="text-4xl font-bold mb-6">Bienvenue chez Ton Transporteur</h1>
+                <h1 className="text-4xl font-bold mb-6">Bienvenue chez Ton-Transporteur</h1>
                 <p className="text-xl mb-8">
-                  Depuis 2023, nous révolutionnons la livraison de colis en France avec un mélange unique 
+                  Depuis 2023, nous révolutionnons la Livraison de colis en France et partout en Europe – une solution adaptée à vos besoins avec un mélange unique 
                   d'expertise humaine et de technologie innovante. Votre satisfaction, notre moteur.
                 </p>
                 <div className="flex flex-wrap gap-4">
@@ -42,7 +42,7 @@ const AboutPage = () => {
               </div>
               <div className="relative h-80 md:h-96">
                 <Image 
-                  src="/about-hero.jpg" // Image d'équipe ou de camion
+                  src="/images/about-hero.jpg" // Image d'équipe ou de camion
                   alt="Équipe Ton Transporteur en action"
                   layout="fill"
                   objectFit="cover"
@@ -86,7 +86,7 @@ const AboutPage = () => {
               </div>
               <div className="relative h-64 md:h-full">
                 <Image 
-                  src="/transport-presentation.jpg" // Image de véhicules ou entrepôt
+                  src="/images/transport-presentation.jpg" // Image de véhicules ou entrepôt
                   alt="Flotte de véhicules Ton Transporteur"
                   layout="fill"
                   objectFit="cover"
@@ -107,7 +107,7 @@ const AboutPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
               <div className="relative h-64 md:h-full">
                 <Image 
-                  src="/tech-team.jpg" // Image d'équipe technique
+                  src="/images/tech-team.jpg" // Image d'équipe technique
                   alt="Équipe technique Ton Transporteur"
                   layout="fill"
                   objectFit="cover"

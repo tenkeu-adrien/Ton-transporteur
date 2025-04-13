@@ -17,6 +17,7 @@ import RecentShipments from "@/components/RecentShipments";
 import AddressForm from "@/components/AddressForm";
 import Footer from "@/components/Footer";
 import { ChatButton } from "@/components/ChatButton";
+import { PopularPackages } from "@/components/ShipementColis";
 
 export default function Home() {
 
@@ -91,12 +92,13 @@ const handleStart =()=>{
             Pourquoi choisir Ton-transporteur ?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Économique</h3>
-              <p className="text-gray-600">
-                Faites des économies en partageant les frais de transport.
-              </p>
-            </div>
+          <div className="text-center">
+  <h3 className="text-xl font-semibold text-gray-800 mb-4">Transparent & Économique</h3>
+  <p className="text-gray-600">
+    Chez nous, <span className="font-semibold text-green-600">aucun frais caché</span> - 
+    vous ne payez <span className="font-semibold">que les frais de transport</span>.
+  </p>
+</div>
             <div className="text-center">
               <h3 className="text-xl font-semibold text-gray-800 mb-4">Écologique</h3>
               <p className="text-gray-600">
@@ -109,6 +111,7 @@ const handleStart =()=>{
                 Rejoignez une communauté de particuliers de confiance.
               </p>
             </div>
+            
           </div>
         </div>
       </section>
@@ -136,7 +139,7 @@ const handleStart =()=>{
             <p>Décrivez votre colis, fixez un prix et choisissez une date de livraison.</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
-            <h3 className="text-xl font-semibold mb-4">2. Trouvez un transporteur</h3>
+            <h3 className="text-xl font-semibold mb-4">2. Trouvez un transporteur sans commission – Vous ne payez que les frais de transport ! </h3>
             <p>Recevez des propositions du transporteurs fiables et sélectionnez celui qui vous convient.</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
@@ -146,26 +149,37 @@ const handleStart =()=>{
         </div>
       </div>
 
-      {/* Section : Annonces publiées */}
-      {/* <div className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-8">Annonces récentes</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {shipments.slice(0, 3).map((shipment) => (
-            <div key={shipment.id} className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-2">{shipment.description}</h2>
-              <p className="text-gray-700 mb-2">Poids : {shipment.weight} kg</p>
-              <p className="text-gray-700 mb-2">De : {shipment.pickupAddress}</p>
-              <p className="text-gray-700 mb-2">À : {shipment.deliveryAddress}</p>
-              <p className="text-gray-700">Statut : {shipment.status}</p>
-            </div>
-          ))}
-        </div>
-        <div className="text-center mt-8">
-          <Link href="/shipments" className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700">
-            Voir toutes les annonces
-          </Link>
-        </div>
-      </div> */}
+
+<PopularPackages/>
+
+
+      <div className="bg-gradient-to-r from-green-600 to-emerald-700 py-16 text-white text-center rounded-xl shadow-lg mx-4 my-8 relative overflow-hidden">
+  {/* Illustration côté droit (remplacer par votre image) */}
+  <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-[url('/images/delivery-truck.png')] bg-contain bg-no-repeat bg-right hidden md:block"></div>
+  
+  <div className="relative z-10 max-w-2xl mx-auto px-4">
+    <h1 className="text-4xl md:text-5xl font-bold mb-4 drop-shadow-md">
+      Ton-Transporteur propose une assurance pour tous vos envois
+    </h1>
+    <p className="text-lg md:text-xl mb-8 opacity-90">
+      Un pépin peut arriver à tout moment sur la route. Avec Ton-Transporteur, vos colis voyagent toujours assurés !
+    </p>
+    <div className="flex flex-col sm:flex-row justify-center gap-4">
+      <Link 
+        href="/start" 
+        className="bg-white text-green-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all shadow-md hover:scale-105"
+      >
+        Souscrire maintenant
+      </Link>
+      <Link 
+        href="/auth/signin" 
+        className="bg-transparent border-2 border-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-green-600 transition-all"
+      >
+        Se connecter
+      </Link>
+    </div>
+  </div>
+</div>
           <RecentShipments />
       {/* Section : Comment envoyer un colis ? */}
       <div className="bg-gray-600 py-16 text-white">
@@ -192,10 +206,87 @@ const handleStart =()=>{
         </div>
       </div>
 
+      <div className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8 rounded-2xl">
+  <div className="max-w-7xl mx-auto text-center">
+    <h2 className="text-3xl font-bold  mb-12">Ce que disent nos clients</h2>
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      {/* Témoignage 1 - Brocanteuse */}
+      <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+        <div className="flex justify-center mb-4">
+          <div className="bg-green-100 p-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+          </div>
+        </div>
+        <p className="text-gray-600 italic mb-4">
+          "Grâce à Ton-Transporteur, j'envoie mes antiquités sans payer de commission. Je ne paie que le transporteur !"
+        </p>
+        <p className="font-semibold text-green-700">Marie L.</p>
+        <p className="text-sm text-gray-500">Brocanteuse</p>
+      </div>
+
+      {/* Témoignage 2 - Voyageur régulier */}
+      <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+        <div className="flex justify-center mb-4">
+          <div className="bg-blue-100 p-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+          </div>
+        </div>
+        <p className="text-gray-600 italic mb-4">
+          "Je voyage souvent, et Ton-Transporteur m'évite les frais d'agence. Directement en contact avec le chauffeur !"
+        </p>
+        <p className="font-semibold text-green-700">Thomas P.</p>
+        <p className="text-sm text-gray-500">Voyageur régulier</p>
+      </div>
+
+      {/* Témoignage 3 - Responsable logistique */}
+      <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+        <div className="flex justify-center mb-4">
+          <div className="bg-purple-100 p-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+        </div>
+        <p className="text-gray-600 italic mb-4">
+          "Un gain de temps et d'argent : pas de frais intermédiaires, juste des transporteurs sérieux."
+        </p>
+        <p className="font-semibold text-green-700">Sophie K.</p>
+        <p className="text-sm text-gray-500">Responsable logistique</p>
+      </div>
+
+      {/* Témoignage 4 - Déménagement */}
+      <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+        <div className="flex justify-center mb-4">
+          <div className="bg-orange-100 p-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l-7-7 7-7" />
+            </svg>
+          </div>
+        </div>
+        <p className="text-gray-600 italic mb-4">
+          "Pour mon déménagement, j'ai économisé  en contactant directement le camion via Ton-Transporteur  sans frais de commission."
+        </p>
+        <p className="font-semibold text-green-700">Luc D.</p>
+        <p className="text-sm text-gray-500">Particulier (déménagement)</p>
+      </div>
+    </div>
+
+    {/* Call-to-action */}
+    {/* <div className="mt-12 bg-green-50 inline-block px-6 py-3 rounded-full border border-green-200">
+     
+    </div> */}
+  </div>
+</div>
       {/* Section : Arguments de vente uniques */}
       <div className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-8">Pourquoi choisir notre plateforme ?</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 className="text-xl font-semibold mb-4">🚚 Transporteurs vérifiés</h3>
             <p>Nous vérifions chaque transporteur pour garantir la sécurité de vos colis.</p>
@@ -212,13 +303,19 @@ const handleStart =()=>{
             <h3 className="text-xl font-semibold mb-4">🌟 Avis vérifiés</h3>
             <p>Consultez les avis des autres utilisateurs pour choisir le meilleur transporteur.</p>
           </div>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+          <h3 className="text-xl font-semibold mb-4">🚛 0% de frais de commission</h3>
+          <p>
+          Vous ne payez que le prix du transport !
+      </p>
+          </div>
         </div>
       </div>
 
       {/* Call to Action Section */}
       <div className="bg-green-600 py-16 text-white text-center">
         <h2 className="text-3xl font-bold mb-4">Prêt à commencer ?</h2>
-        <p className="text-lg mb-8">Rejoignez notre communauté dès aujourd&aposhui.</p>
+        <p className="text-lg mb-8">Rejoignez notre communauté dès aujourd&apos;hui.</p>
         <Link href="/auth/signup" className="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100">
           S&apos;inscrire maintenant
         </Link>

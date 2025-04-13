@@ -14,7 +14,7 @@ const CGU: React.FC = () => {
         Conditions Générales d’Utilisation (CGU)
       </h1>
       <p className="text-gray-700">
-        Dernière mise à jours : <strong>[Date]</strong>
+        Dernière mise à jours : <strong>12 Avvril 2025</strong>
       </p>
 
       <section className="mt-6">

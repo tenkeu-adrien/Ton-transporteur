@@ -27,7 +27,7 @@ const ContactPage = () => {
       </a>
                 <h1 className="text-4xl font-bold mb-6">Nous sommes là pour vous aider !</h1>
                 <p className="text-xl mb-8">
-                  Chez Ton Transporteur, nous mettons un point d'honneur à vous offrir un service client exceptionnel, disponible 24h/24. 
+                  Chez Ton-Transporteur, nous mettons un point d'honneur à vous offrir un service client exceptionnel, disponible 24h/24. 
                   Que ce soit pour une question sur votre livraison, un déménagement ou un problème technique, notre équipe vous répond avec professionnalisme.
                 </p>
                 <div className="flex flex-wrap gap-4">
@@ -37,7 +37,7 @@ const ContactPage = () => {
                   </div>
                   <div className="flex items-center bg-white bg-opacity-20 rounded-lg px-4 py-2">
                     <FaEnvelope className="mr-2" />
-                    <span>contact@ton-transporteur.fr</span>
+                    <span >contact@ton-transporteur.fr</span>
                   </div>
                 </div>
               </div>
@@ -75,21 +75,24 @@ const ContactPage = () => {
                   objectFit="cover"
                   className="rounded-lg"
                 />
+                
               </div>
               <p className="mb-4">
-              Vous rencontrez une difficulté    ?   Contactez-nous à contact@ton-transporteur.fr -    Notre service client s'engage à vous répondre en moins de 4 heures,
-                disponible 24 heures sur 24, 7 jours sur 7      (sauf weekends et jours fériés)  pour répondre à toutes vos questions concernant :
+              Vous rencontrez une difficulté    ?  
+               Contactez-nous à <span className='text-xl text-green-500'>contact@ton-transporteur.fr</span>  -  Notre service client s'engage à vous répondre le plus rapidement possible.
+    Nous sommes disponibles du lundi au vendredi de 09h30 à 19h00 et le samedi de 09h30 à 16h00 (sauf jours fériés)  
+    pour répondre à toutes vos questions concernant :
               </p>  
               <ul className="list-disc pl-5 mb-6 space-y-2">
+              <li>Devis et tarifs </li>
+              <li>Les options de livraison</li>
                 <li>Le suivi de votre colis</li>
-                <li>Les tarifs et devis</li>
-                <li>Les options de livraison</li>
-                <li>Les assurances transport</li>
+                <li>Les assurances transports</li>
               </ul>
               <a  href="tel:+33757953218" className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
                 Contacter par téléphone
               </a>
-              <a ></a>
+              {/* <a ></a> */}
             </div>
           </div>
 
@@ -110,10 +113,10 @@ const ContactPage = () => {
                 />
               </div>
               <p className="mb-4">
-                Vous rencontrez un problème avec notre service ? Signalez-le au contact@ton-transporteur.fr  nous nous engageons à :
+                Vous rencontrez un problème avec notre service ? Signalez-le au  <span className='text-xl text-green-500'>contact@ton-transporteur.fr</span>   nous nous engageons à :
               </p>
               <ul className="list-disc pl-5 mb-6 space-y-2">
-                <li>Vous répondre dans les 24 heures</li>
+                <li>Vous répondre dans les plus brefs delais</li>
                 <li>Trouver une solution adaptée</li>
                 <li>Vous tenir informé à chaque étape</li>
                 <li>Améliorer notre service grâce à votre feedback</li>

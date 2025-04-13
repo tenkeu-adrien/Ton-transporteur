@@ -157,7 +157,7 @@ const Footer = () => {
             {/* Première partie : Titre et description */}
             <div>
               <h2 className="text-2xl font-bold text-green-500">Ton-Transporteur</h2>
-              <p className="mt-4 text-sm">Votre partenaire fiable pour l&apos;expédition de colis. Rapide, sécurisé et économique.</p>
+              <p className="mt-4 text-sm">Votre partenaire logistique fiable : expéditions rapides, sécurisées et sans commission. Vous ne payez que les frais de transport !</p>
               <div className="flex items-center gap-2 mt-4">
                 <a href="/cgu" className="text-green-500 hover:underline">CGU</a>
                 <a href="/politique-confidentialite" className="text-green-500 hover:underline">Politique de Confidentialité</a>
