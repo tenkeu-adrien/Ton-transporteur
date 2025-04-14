@@ -334,7 +334,6 @@ const {user ,userData} = useContext(AuthContext)
 
     const fetchShipments = () => {
       setIsLoading(true);
-    
       // Requête pour récupérer les shipments en temps réel (sauf ceux annulés)
       const q = query(
         collection(db, "shipments"),

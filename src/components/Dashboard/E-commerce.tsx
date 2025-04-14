@@ -91,41 +91,41 @@ const ECommerce: React.FC = () => {
   return (
     <>
 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-      <CardDataStats
-        title="Total colis"
-        total={stats.total.toString()}
-        rate={((stats.total - stats.cancelled) / stats.total * 100).toFixed(1) + "%"}
-        levelUp
-      >
-        <FaBox className="fill-green-500 dark:fill-white" size={22} />
-      </CardDataStats>
+<CardDataStats
+  title="Total colis"
+  total={stats.total.toString()}
+  rate={stats.total > 0 ? `${((stats.total - stats.cancelled) / stats.total * 100).toFixed(1)}%` : "0%"}
+  levelUp
+>
+  <FaBox className="fill-green-500 dark:fill-white" size={22} />
+</CardDataStats>
 
-      <CardDataStats
-        title="Total colis livrés"
-        total={stats.delivered.toString()}
-        rate={((stats.delivered / stats.total) * 100).toFixed(1) + "%"}
-        levelUp
-      >
-        <FaCheckCircle className="fill-green-500 dark:fill-white" size={22} />
-      </CardDataStats>
+<CardDataStats
+  title="Total colis livrés"
+  total={stats.delivered.toString()}
+  rate={stats.total > 0 ? `${((stats.delivered / stats.total) * 100).toFixed(1)}%` : "0%"}
+  levelUp
+>
+  <FaCheckCircle className="fill-green-500 dark:fill-white" size={22} />
+</CardDataStats>
 
-      <CardDataStats
-        title="Total colis en attente"
-        total={stats.pending.toString()}
-        rate={((stats.pending / stats.total) * 100).toFixed(1) + "%"}
-        levelUp={stats.pending < stats.total / 2}
-      >
-        <FaClock className="fill-green-500 dark:fill-white" size={22} />
-      </CardDataStats>
+<CardDataStats
+  title="Total colis en attente"
+  total={stats.pending.toString()}
+  rate={stats.total > 0 ? `${((stats.pending / stats.total) * 100).toFixed(1)}%` : "0%"}
+  levelUp={stats.pending < stats.total / 2}
+>
+  <FaClock className="fill-green-500 dark:fill-white" size={22} />
+</CardDataStats>
 
-      <CardDataStats
-        title="Total colis annulés"
-        total={stats.cancelled.toString()}
-        rate={((stats.cancelled / stats.total) * 100).toFixed(1) + "%"}
-        levelDown
-      >
-        <FaTimesCircle className="fill-green-500 dark:fill-white" size={22} />
-      </CardDataStats>
+<CardDataStats
+  title="Total colis annulés"
+  total={stats.cancelled.toString()}
+  rate={stats.total > 0 ? `${((stats.cancelled / stats.total) * 100).toFixed(1)}%` : "0%"}
+  levelDown
+>
+  <FaTimesCircle className="fill-green-500 dark:fill-white" size={22} />
+</CardDataStats>
     </div>
 
       {/* <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5"> */}

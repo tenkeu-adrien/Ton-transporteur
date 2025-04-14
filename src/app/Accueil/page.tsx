@@ -210,7 +210,7 @@ const handleStart =()=>{
   <div className="max-w-7xl mx-auto text-center">
     <h2 className="text-3xl font-bold  mb-12">Ce que disent nos clients</h2>
     
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       {/* Témoignage 1 - Brocanteuse */}
       <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
         <div className="flex justify-center mb-4">
@@ -221,7 +221,7 @@ const handleStart =()=>{
           </div>
         </div>
         <p className="text-gray-600 italic mb-4">
-          "Grâce à Ton-Transporteur, j'envoie mes antiquités sans payer de commission. Je ne paie que le transporteur !"
+          "Grâce à Ton-Transporteur, j'envoie mes antiquités sans payer de commission. Je ne paie que le prix du transport ! Je trouve cela super économique"
         </p>
         <p className="font-semibold text-green-700">Marie L.</p>
         <p className="text-sm text-gray-500">Brocanteuse</p>
@@ -237,7 +237,7 @@ const handleStart =()=>{
           </div>
         </div>
         <p className="text-gray-600 italic mb-4">
-          "Je voyage souvent, et Ton-Transporteur m'évite les frais d'agence. Directement en contact avec le chauffeur !"
+          "Je suis un voyageur régulier, et Ton-Transporteur m'évite de payer des frais de commission en plus pour toutes les livraisons de mes colis.s"
         </p>
         <p className="font-semibold text-green-700">Thomas P.</p>
         <p className="text-sm text-gray-500">Voyageur régulier</p>
@@ -262,20 +262,43 @@ const handleStart =()=>{
       {/* Témoignage 4 - Déménagement */}
       <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
         <div className="flex justify-center mb-4">
-          <div className="bg-orange-100 p-3 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l-7-7 7-7" />
-            </svg>
-          </div>
+        <div className="bg-green-100 p-3 rounded-full">
+        <img 
+  src="/images/moving-truck.png" 
+  alt="Camion de déménagement"
+  className="h-8 w-8 object-contain   filter brightness-0 saturate-100 invert-55 sepia-30 saturate-1496 hue-rotate-349 brightness-102 contrast-101"
+/>
+</div>
+
         </div>
         <p className="text-gray-600 italic mb-4">
-          "Pour mon déménagement, j'ai économisé  en contactant directement le camion via Ton-Transporteur  sans frais de commission."
+          "Pour mon déménagement, j'ai économisé beaucoup d'argent car Ton-Transporteur te met directement en relation avec un chauffeur disponible"
         </p>
         <p className="font-semibold text-green-700">Luc D.</p>
         <p className="text-sm text-gray-500">Particulier (déménagement)</p>
       </div>
+
+
+
+      <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+        <div className="flex justify-center mb-4">
+        <div className="bg-orange-100 p-3 rounded-full">
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17H3a1 1 0 01-1-1V6a1 1 0 011-1h13a1 1 0 011 1v3h3.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1a3 3 0 01-6 0H9a3 3 0 01-6 0zM17 17a3 3 0 006 0" />
+  </svg>
+</div>
+
+        </div>
+        <p className="text-gray-600 italic mb-4">
+        "Je suis responsable logistique et je dois gérer une centaine d’expéditions. Avec Ton-Transporteur, je gère toutes mes livraisons de manière simple et automatisée."
+        </p>
+        <p className="font-semibold text-green-700">Martin L.</p>
+        <p className="text-sm text-gray-500">Responsable logistique</p>
+      </div>
     </div>
+
+
+  
 
     {/* Call-to-action */}
     {/* <div className="mt-12 bg-green-50 inline-block px-6 py-3 rounded-full border border-green-200">

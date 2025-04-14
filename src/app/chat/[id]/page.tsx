@@ -742,14 +742,14 @@ const handleCancelShipment =  async () => {
     // Email (gestion d'erreur indépendante)
     if (chatPartner?.email) {
       sendEmailNotification(currentShipment.id, "Annuler")
-        .then(email => console.log("Email envoyé:", email))
-        .catch(emailError => console.error("Erreur email:", emailError));
+        .then(email => console.log(""))
+        .catch(emailError => console.log(""));
     }
 
     // Push notification (gestion d'erreur indépendante)
     sendPushNotification(currentShipment.id, "Annuler")
-      .then(result => console.log("Notification push:", result))
-      .catch(pushError => console.error("Erreur push:", pushError));
+      .then(result => console.log(""))
+      .catch(pushError => console.error(""));
   }
   setIsModalOpen(false);
   toast.info("Offre Annuler")

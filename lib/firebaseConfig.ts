@@ -75,14 +75,20 @@ if (typeof window !== "undefined") {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/firebase-messaging-sw.js')
         .then(registration => {
-          console.log('Service Worker registered with scope:', registration.scope);
+          // console.log('Service Worker registered with scope:', registration.scope);
+          console.log('');
+
         })
         .catch(error => {
-          console.error('Service Worker registration failed:', error);
+          console.error('');
+          // console.error('Service Worker registration failed:', error);
+
         });
     }
   } catch (err) {
-    console.error('Messaging initialization error:', err);
+    // console.error('Messaging initialization error:', err);
+    console.error('');
+
   }
 }
 
@@ -91,7 +97,7 @@ if (typeof window !== "undefined") {
  */
 export const getAndSendFCMToken = async (userId) => {
   if (!messaging) {
-    console.warn('Messaging not available');
+    // console.warn('Messaging not available');
     return null;
   }
 
@@ -101,18 +107,18 @@ export const getAndSendFCMToken = async (userId) => {
     });
 
     if (token) {
-      console.log('FCM Token:', token);
+      // console.log('FCM Token:', token);
       
       // Envoi du token au backend
       await sendTokenToBackend(token, userId);
       
       return token;
     } else {
-      console.log('No registration token available. Request permission first.');
+      // console.log('No registration token available. Request permission first.');
       return null;
     }
   } catch (error) {
-    console.error('An error occurred while retrieving token:', error);
+    // console.error('An error occurred while retrieving token:', error);
     return null;
   }
 };
@@ -134,10 +140,11 @@ const sendTokenToBackend = async (token, userId) => {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to save token');
+      // throw new Error('Failed to save token');
+      return null
     }
 
-    console.log('Token saved successfully');
+    // console.log('Token saved successfully');
   } catch (error) {
     console.error('Error sending token to backend:', error);
   }

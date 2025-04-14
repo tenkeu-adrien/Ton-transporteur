@@ -4,31 +4,30 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { createUser } from '../../../../lib/functions';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '../../../../context/AuthContext';
 import Select from "react-select";
 import "country-flag-icons/3x2/flags.css"; 
 import { FaSpinner } from 'react-icons/fa';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword} from 'firebase/auth'
 import {auth} from '../../../../lib/firebaseConfig'
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
-import { sendEmailVerification } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../../lib/firebaseConfig';
 import Image from 'next/image';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 const schema = z.object({
   profile: z.string().min(1, "Veuillez sélectionner un profil"),
-  role: z.string().min(1, "Veuillez sélectionner un rôle"),
+  // role: z.string().min(1, "Veuillez sélectionner un rôle"),
   lastName: z.string().min(1, "Le nom est obligatoire"),
   firstName: z.string().min(1, "Le prénom est obligatoire"),
   email: z.string().min(1, "L'email est obligatoire").email("Adresse email invalide"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
   confirmPassword: z.string().min(6, "La confirmation du mot de passe est obligatoire"),
-  phoneNumber: z.string().min(1, "Le numéro de téléphone est obligatoire"),
+  phoneNumber: z.string().min(6, "Le numéro de téléphone est obligatoire"),
   terms: z.boolean().refine((val) => val === true, {
     message: "Vous devez accepter les conditions d'utilisation",
   }),
@@ -43,7 +42,7 @@ export default function Register() {
 const {setUser}  = useContext(AuthContext)
 const [selectedCountry, setSelectedCountry] = useState(null);
 const [timeLeft, setTimeLeft] = useState(300); // 5 minutes en secondes 300
-const [timerActive, setTimerActive] = useState(true);
+const [timerActive, setTimerActive] = useState(false);
    const {
     register,
     handleSubmit,
@@ -54,24 +53,29 @@ const [timerActive, setTimerActive] = useState(true);
   });
   const router =useRouter()
 
-  useEffect(() => {
-    if (!timerActive || timeLeft <= 0) return;
+  // useEffect(() => {
+  //   if (!timerActive || timeLeft <= 0) return;
+  //   const timer = setInterval(() => {
+  //     setTimeLeft((prev) => {
+  //       if (prev <= 1) {
+  //         setTimerActive(false);
+  //         clearInterval(timer);
+  //         return 0;
+  //       }
+  //       return prev - 1;
+  //     });
+  //   }, 1000);
   
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          setTimerActive(false);
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+  //   return () => clearInterval(timer);
+  // }, [timerActive, timeLeft]);
+
+
+
+
   
-    return () => clearInterval(timer);
-  }, [timerActive, timeLeft]);
   
   const formatTime = (seconds: number) => {
+    console.log("seconde" ,seconds)
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
@@ -80,10 +84,13 @@ const [timerActive, setTimerActive] = useState(true);
   const { user,logout} = useContext(AuthContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
+  const [verifier, setVerifier] = useState(false)
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [generatedCode, setGeneratedCode] = useState("");
   const [verificationDigits, setVerificationDigits] = useState(['', '', '', '']);
+  const [showExpiredModal, setShowExpiredModal] = useState(false);
   const [email ,setEmail] =useState("null")
+
 const digitRefs = [
   useRef(null),
   useRef(null),
@@ -91,12 +98,70 @@ const digitRefs = [
   useRef(null)
 ];
 
+
+useEffect(() => {
+  if (user) {
+    router.back(); // Redirige vers la page d'accueil si l'utilisateur n'est pas connecté
+  }
+}, [user,  router]);
+
+useEffect(() => {
+  let interval;
+  
+  if (timerActive && timeLeft > 0) {
+    interval = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setTimerActive(false);
+          if (isCodeSent) {
+            setShowExpiredModal(true);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
+
+  return () => clearInterval(interval);
+}, [timerActive, timeLeft, isCodeSent]);
+
+
+
+
+
+
+
+
   useEffect(() => {
     if (selectedCountry) {
       setValue("phoneNumber", `${selectedCountry.phoneCode} `);
     }
   }, [selectedCountry, setValue]); // Met à jour quand le pays change
   
+
+  useEffect(() => {
+    let interval;
+    if (timerActive && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft(prevTime => {
+          if (prevTime <= 1) {
+            clearInterval(interval);
+            setTimerActive(false);
+            // Ne montrer la modale que si l'utilisateur est en train de vérifier
+            if (isCodeSent) {
+              setShowExpiredModal(true);
+            }
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+  
+    return () => clearInterval(interval);
+  }, [timerActive, timeLeft, isCodeSent]);
 
 
   // const onSubmit = async (data) => {
@@ -179,6 +244,9 @@ const handleKeyDown = (index, e) => {
         }
   
         setIsCodeSent(true);
+        setTimeLeft(300); // 5 minutes
+    setTimerActive(true);
+    setShowExpiredModal(false);
       } catch (error) {
         console.error("Erreur:", error);
         toast.error("Erreur lors de l'envoi de l'email de vérification");
@@ -224,15 +292,41 @@ setEmail(data.email)
       setIsSubmitting(false);
     }
   };
+
+
   // Fonction pour vérifier le code
+  // const verifyCode = async () => {
+  //     setVerifier(true)
+  //   if (verificationCode === generatedCode) {
+  //     try {
+  //       // Mettre à jour le statut de vérification dans Firestore
+  //       await setDoc(doc(db, "users", auth.currentUser.uid), {
+  //         isVerified: true
+  //       }, { merge: true });
+
+  //       toast.success("Compte vérifié avec succès !");
+  //       router.push("/Dashboard");
+  //     } catch (error) {
+  //       console.error("Erreur lors de la vérification:", error);
+  //       toast.error("Erreur lors de la vérification du compte");
+  //     }
+  //   } else {
+  //     toast.error("Code de vérification incorrect");
+  //   }
+  // };
   const verifyCode = async () => {
+    if (timeLeft === 0) {
+      toast.error("Le code a expiré. Veuillez demander un nouveau code.");
+      return;
+    }
+  
+    setVerifier(true);
     if (verificationCode === generatedCode) {
       try {
-        // Mettre à jour le statut de vérification dans Firestore
         await setDoc(doc(db, "users", auth.currentUser.uid), {
           isVerified: true
         }, { merge: true });
-
+  
         toast.success("Compte vérifié avec succès !");
         router.push("/Dashboard");
       } catch (error) {
@@ -242,9 +336,8 @@ setEmail(data.email)
     } else {
       toast.error("Code de vérification incorrect");
     }
+    setVerifier(false);
   };
-
-
 
 
 useEffect(() => {
@@ -296,6 +389,21 @@ const formatOptionLabel = ({ label, flag }) => (
   </div>
 );
 
+const handleResendCode = async () => {
+  const newCode = generateVerificationCode();
+  setGeneratedCode(newCode);
+  await sendVerificationEmail(email, newCode);
+  setVerificationDigits(['', '', '', '']); // Réinitialiser les champs de code
+  setTimeLeft(300); // Réinitialiser à 5 minutes
+  setTimerActive(true);
+  setShowExpiredModal(false);
+  
+  // Remettre le focus sur le premier champ
+  if (digitRefs[0].current) {
+    digitRefs[0].current.focus();
+  }
+};
+
   return (
 
 <>
@@ -315,15 +423,7 @@ const formatOptionLabel = ({ label, flag }) => (
               </Link>
             </div>
         <div className='flex justify-center relative bg-none'>
-      {/* <Image
-                      src="/images/signupp.png" // Remplacez par le chemin de votre image
-                      alt="image qui illustre le login"
-                      // layout="fill"
-                      // objectFit="cover"
-                      width={200}
-                      height={200}
-                      className="rounded-lg shadow-lg"
-                    />  */}
+     
       </div> 
       <div className='mt-3  mb-3'>
       <p className='mb-2 mt-3'>Saisissez vos informations personnelles pour créer votre compte.</p>
@@ -391,7 +491,7 @@ const formatOptionLabel = ({ label, flag }) => (
           )}
         </div>
         <div className='flex-1'>
-          <label className="block text-sm font-medium text-gray-700">Confirmation de :</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Confirmation de mot de passe:</label>
           <input
             type="password"
             className="mb-1  w-full p-2 border border-gray-300 rounded-md shadow-sm"
@@ -416,11 +516,7 @@ const formatOptionLabel = ({ label, flag }) => (
           styles={customStyles}
           className="mt-1 block w-[200px]"
         />
-        {/* {selectedCountry && (
-          <div className="flex items-center gap-2">
-            <img src={selectedCountry.flag} alt={`Drapeau de ${selectedCountry.label}`} className="w-6 h-4" />
-          </div>
-        )} */}
+       
       <input
   type="tel"
   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
@@ -440,7 +536,7 @@ const formatOptionLabel = ({ label, flag }) => (
  {/* Choix du profil et rôle sur une ligne */}
  <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">Profil de l&aposutilisateur :</label>
+                <label className="block text-sm font-medium text-gray-700 mb-3">Profil de l&apos;utilisateur :</label>
                 <div className="mt-1 flex space-x-4">
                   <label className="inline-flex items-center">
                     <input
@@ -465,23 +561,7 @@ const formatOptionLabel = ({ label, flag }) => (
                   <p className="mt-1 text-sm text-red-600">{errors.profile.message}</p>
                 )}
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">Rôle :</label>
-                <div className="mt-1 flex space-x-4">
-                  <label className="inline-flex items-center">
-                    <input
-                      type="radio"
-                      value="expediteur"
-                      {...register("role")}
-                      className="form-radio h-4 w-4 text-green-600"
-                    />
-                    <span className="ml-2">Expéditeur</span>
-                  </label>
-                </div>
-                {errors.role && (
-                  <p className="mt- text-sm text-red-600">{errors.role.message}</p>
-                )}
-              </div>
+              
             </div>
 
 
@@ -556,42 +636,77 @@ const formatOptionLabel = ({ label, flag }) => (
           ))}
         </div>
         <div className="space-y-4">
-          <button
-            onClick={verifyCode}
-            disabled={verificationDigits.some(digit => digit === '') || timeLeft === 0}
-            className="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-          >
-            Vérifier le code
-          </button>
+        <button
+  onClick={verifyCode}
+  disabled={verificationDigits.some(digit => digit === '') || timeLeft === 0 || verifier}
+  className="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+>
+  Vérifier le code
+</button>
           
           <div className="flex justify-between items-center">
             <p className="text-sm text-gray-500">
               Vous n&apos;avez pas reçu le code ? 
-              <button 
-                onClick={() => {
-                  const newCode = generateVerificationCode();
-                  setGeneratedCode(newCode);
-                  sendVerificationEmail(email, newCode);
-                  setTimeLeft(300);
-                  setTimerActive(true);
-                }}
-                className="text-green-600 hover:text-green-700 ml-1 font-medium"
-                disabled={timeLeft > 0}
-              >
-                Renvoyer
-              </button>
+          
+<button 
+  onClick={handleResendCode}
+  className={`ml-1 font-medium ${
+    timeLeft > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600 hover:text-green-700'
+  }`}
+  disabled={timeLeft > 0} // Permettre de renvoyer après 2 minutes
+>
+  Renvoyer
+</button>
             </p>
-            <button
+            {/* <button
               onClick={() => router.push('/Accueil')}
               className="text-gray-500 hover:text-gray-700 font-medium"
             >
               Annuler
-            </button>
+            </button> */}
           </div>
         </div>
 
         <div className="mt-4 text-sm text-gray-500">
           Le code expirera dans <span className="font-medium">{formatTime(timeLeft)}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{showExpiredModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4 relative">
+      <button
+        onClick={() => setShowExpiredModal(false)}
+        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      
+      <div className="flex items-start">
+        <div className="flex-shrink-0">
+          <svg className="h-6 w-6 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div className="ml-3">
+          <h3 className="text-lg font-medium text-gray-900">Temps écoulé</h3>
+          <div className="mt-2 text-sm text-gray-500">
+            <p>Le temps pour entrer le code a expiré. Veuillez demander un nouveau code.</p>
+          </div>
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={() => setShowExpiredModal(false)}
+              className="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-500 text-sm font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            >
+              Compris
+            </button>
+          </div>
         </div>
       </div>
     </div>

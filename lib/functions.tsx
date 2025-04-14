@@ -211,7 +211,7 @@ export const updateShipmentStatus = async (
   recipientEmail?: string
 ): Promise<void> => {
 
-   console.log("donnees que je recois" ,userr , newStatus ,shipmentId)
+  //  console.log("donnees que je recois" ,userr , newStatus ,shipmentId)
   try {
     const shipmentRef = doc(db, "shipments", shipmentId);
     
@@ -297,21 +297,21 @@ export const updateShipmentStatus = async (
     }
 
   } catch (error) {
-    console.error("Erreur lors de la mise à jour du statut:", error);
-    throw new Error("Échec de la mise à jour du statut");
+    // console.error("Erreur lors de la mise à jour du statut:", error);
+    // throw new Error("Échec de la mise à jour du statut");
   }
 };
 export function playNotificationSound() {
   try {
     const audio = new Audio('/sound/notification.mp3');
     audio.play().catch(e => {
-      console.error('Erreur de lecture du son:', e);
+      // console.error('Erreur de lecture du son:', e);
       // Fallback pour les navigateurs mobiles
       if (typeof window.navigator.vibrate === 'function') {
         window.navigator.vibrate([200, 100, 200]);
       }
     });
   } catch (error) {
-    console.error('Erreur lors de la création de l\'audio:', error);
+    // console.error('Erreur lors de la création de l\'audio:', error);
   }
 }

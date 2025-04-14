@@ -27,6 +27,14 @@ export default function AuthPage() {
 const router = useRouter()
  const [isSubmitting, setIsSubmitting] = useState(false);
  const { user, logout ,setUser } = useContext(AuthContext);
+
+
+
+ useEffect(() => {
+   if (user) {
+     router.back(); // Redirige vers la page d'accueil si l'utilisateur n'est pas connecté
+   }
+ }, [user,  router]);
 // Mise à jour du contexte avec l'utilisateur
      // Rediriger l'utilisateur
 const [showPassword, setShowPassword] = useState(false); // Gérer l'état de visibilité du mot de passe

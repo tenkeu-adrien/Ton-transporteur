@@ -297,7 +297,8 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
   const handleDechargement = async (id) => {
     // action Firebase pour marquer comme déchargé
      await updateDoc(doc(db, "shipments", id), { dechargement: true })
-    console.log("Déchargement effectué pour :", id);
+    // console.log("Déchargement effectué pour :", id);
+    return null
   };
 
 
@@ -332,7 +333,8 @@ const ChatCard: React.FC<ChatCardProps> = ({ message }) => {
         if (!response.ok) {
           const errorData = await response.text(); // Lire d'abord comme texte
           // console.error('Server responded with:', errorData);
-          throw new Error(`HTTP error! status: ${response.status}`);
+          // throw new Error(`HTTP error! status: ${response.status}`);
+          return null
         }
 
 
