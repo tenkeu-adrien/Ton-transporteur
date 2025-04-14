@@ -135,20 +135,20 @@ const handleFacebookLogin = async () => {
   }
 };
 
-useEffect(() => {
-  // Écouter les changements d'état d'authentification
-  const unsubscribe = onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // console.log("Utilisateur connecté:", user);
-      router.push("/Dashboard"); // Rediriger vers le tableau de bord
-    } else {
-      console.log("Aucun utilisateur connecté");
-    }
-  });
+// useEffect(() => {
+//   // Écouter les changements d'état d'authentification
+//   const unsubscribe = onAuthStateChanged(auth, (user) => {
+//     if (user) {
+//       // console.log("Utilisateur connecté:", user);
+//       router.push("/Dashboard"); // Rediriger vers le tableau de bord
+//     } else {
+//       console.log("Aucun utilisateur connecté");
+//     }
+//   });
 
-  // Nettoyer l'écouteur lors du démontage du composant
-  return () => unsubscribe();
-}, [user,router]);
+//   // Nettoyer l'écouteur lors du démontage du composant
+//   return () => unsubscribe();
+// }, [user,router]);
   return (
 
     <>

@@ -99,11 +99,11 @@ const digitRefs = [
 ];
 
 
-useEffect(() => {
-  if (user) {
-    router.back(); // Redirige vers la page d'accueil si l'utilisateur n'est pas connecté
-  }
-}, [user,  router]);
+// useEffect(() => {
+//   if (user) {
+//     router.back(); // Redirige vers la page d'accueil si l'utilisateur n'est pas connecté
+//   }
+// }, [user,  router]);
 
 useEffect(() => {
   let interval;
