@@ -68,11 +68,11 @@ export default function ExpeditionSystem() {
    const router =useRouter()
   const user = auth.currentUser
 
- useEffect(()=>{
-  if (!user) {
-    router.replace('/auth/signin')
-}
- } ,[user,router])
+//  useEffect(()=>{
+//   if (!user) {
+//     router.replace('/auth/signin')
+// }
+//  } ,[user,router])
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {logout} = useContext(AuthContext);

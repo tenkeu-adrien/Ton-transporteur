@@ -221,10 +221,9 @@ const handleStart =()=>{
           </div>
         </div>
         <p className="text-gray-600 italic mb-4">
-          "Grâce à Ton-Transporteur, j'envoie mes antiquités sans payer de commission. Je ne paie que le prix du transport ! Je trouve cela super économique"
+          "Ravi de cette premiere experience  avec Ton-transporteur appli tres bien fait efficase . facile pour les validations de livraion . aucun frais de commission a payer pour ta mise en relation avec un transporteur . je recommande !"
         </p>
         <p className="font-semibold text-green-700">Marie L.</p>
-        <p className="text-sm text-gray-500">Brocanteuse</p>
       </div>
 
       {/* Témoignage 2 - Voyageur régulier */}
@@ -237,10 +236,9 @@ const handleStart =()=>{
           </div>
         </div>
         <p className="text-gray-600 italic mb-4">
-          "Je suis un voyageur régulier, et Ton-Transporteur m'évite de payer des frais de commission en plus pour toutes les livraisons de mes colis.s"
+          "Je suis un voyageur régulier, j'habite Amsderdam depuis plusieurs annee et je  rentre souvent a Amiens . J'ai enregister mon traject pour recevoir des propositions de livraison de colis pour des particuliers "
         </p>
         <p className="font-semibold text-green-700">Thomas P.</p>
-        <p className="text-sm text-gray-500">Voyageur régulier</p>
       </div>
 
       {/* Témoignage 3 - Responsable logistique */}
@@ -256,7 +254,6 @@ const handleStart =()=>{
           "Un gain de temps et d'argent : pas de frais intermédiaires, juste des transporteurs sérieux."
         </p>
         <p className="font-semibold text-green-700">Sophie K.</p>
-        <p className="text-sm text-gray-500">Responsable logistique</p>
       </div>
 
       {/* Témoignage 4 - Déménagement */}
@@ -272,10 +269,9 @@ const handleStart =()=>{
 
         </div>
         <p className="text-gray-600 italic mb-4">
-          "Pour mon déménagement, j'ai économisé beaucoup d'argent car Ton-Transporteur te met directement en relation avec un chauffeur disponible"
+          "Premiere et bonne experience avec ton-transporteur Pour mon déménagement,  je recommande deja mon entourage pour des besoins de livraion j'ai reussir a trouver un chauffeur alors que  ce n'etait pas gagner ,  demenagement realiser a la perfection je pense donc que tout le monde peut l'utiliser !"
         </p>
         <p className="font-semibold text-green-700">Luc D.</p>
-        <p className="text-sm text-gray-500">Particulier (déménagement)</p>
       </div>
 
 
@@ -293,7 +289,6 @@ const handleStart =()=>{
         "Je suis responsable logistique et je dois gérer une centaine d’expéditions. Avec Ton-Transporteur, je gère toutes mes livraisons de manière simple et automatisée."
         </p>
         <p className="font-semibold text-green-700">Martin L.</p>
-        <p className="text-sm text-gray-500">Responsable logistique</p>
       </div>
     </div>
 
