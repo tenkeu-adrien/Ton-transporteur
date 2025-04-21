@@ -1,30 +1,28 @@
 "use client"
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-// import {  useSearchParams } from 'next/navigation';
 import { toast } from "react-toastify";
 import {useContext, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { db, auth,  app } from "../../../../lib/firebaseConfig";
-import { collection, query, where, onSnapshot, addDoc, serverTimestamp, updateDoc, doc, getDoc, getDocs, limit, orderBy} from "firebase/firestore";
-// import { AuthContext } from "../../../../context/AuthContext";
+import { collection, query, where, onSnapshot, addDoc, serverTimestamp, updateDoc,  doc, getDoc, getDocs, limit, orderBy, writeBatch, arrayUnion} from "firebase/firestore";
 import clsx from "clsx";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
+
 import { getMessaging, isSupported, onMessage } from "firebase/messaging";
 
 import { Avatar } from "@/components/Avartar";
-import { FaBox, FaCalendarCheck, FaCalendarAlt,FaMapMarkerAlt, FaMoneyBillWave, FaSortNumericUp, FaSpinner, FaWeightHanging, FaRulerCombined, FaTruckPickup, FaImage, FaTimes, FaCheck, FaHashtag } from "react-icons/fa";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { AiOutlineArrowLeft } from "react-icons/ai";
+import { FaBox, FaCalendarCheck, FaCalendarAlt,FaMapMarkerAlt, FaMoneyBillWave, FaSortNumericUp, FaSpinner, FaWeightHanging, FaRulerCombined, FaTruckPickup, FaImage, FaTimes, FaCheck, FaHashtag, FaFile, FaPaperclip, FaDownload, FaCheckDouble, FaTimesCircle } from "react-icons/fa";
+import {  documentId } from "firebase/firestore";
+
 import Link from "next/link";
 import { FaCheckCircle } from 'react-icons/fa';
 import Image from "next/image";
 import { updateShipmentStatus } from "../../../../lib/functions";
-import { MdCancel, MdMessage } from "react-icons/md";
+import { MdMessage } from "react-icons/md";
 import { useRef, useCallback } from 'react';
 import { FiPackage } from "react-icons/fi";
 import { AuthContext } from "../../../../context/AuthContext";
-// Ajoutez aussi l'interface Message
+import {debounce} from "lodash"
+import { IoMdArrowBack } from "react-icons/io";
 interface Message {
   id: string;
   message: string;
@@ -36,16 +34,11 @@ interface Message {
   shipmentId:string,
   senderName: string;
   avatar?: string;
+  users?:string[];
+  pending?:Boolean;
+  userInfo?:string
+  readBy?: string[]; 
 }
-interface PageProps {
-  params: {
-    id: string;
-    shipmentid:string // Explicitly type as string
-  };
-}
-
-
-// Ajoutez cette interface
 interface Shipment {
   id: string;
   expediteurId: string;
@@ -62,95 +55,267 @@ interface Shipment {
   status: 'En attente' | 'accepted' | 'completed';
   find:any
 }
-const useMessageObserver = (onIntersect) => {
-  const observer = useRef(null);
+const useReadMessages = (currentUserId: string) => {
+  const [readQueue, setReadQueue] = useState<Set<string>>(new Set());
 
-  return useCallback(node => {
-    if (observer.current) observer.current.disconnect();
+  const processReadQueue = useCallback(
+    debounce(async () => {
+      if (readQueue.size === 0) return;
+      
+      const batch = writeBatch(db);
+      const docsToCheck = Array.from(readQueue);
+      
+      // Vérifier l'existence des documents
+      const q = query(
+        collection(db, "messages"),
+        where(documentId(), "in", docsToCheck)
+      );
+      const querySnapshot = await getDocs(q);
+      
+      const existingDocs = querySnapshot.docs;
+      const existingIds = existingDocs.map(doc => doc.id);
+      const nonExistingIds = docsToCheck.filter(id => !existingIds.includes(id));
 
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        onIntersect();
+      if (nonExistingIds.length > 0) {
+        console.warn("Documents non trouvés:", nonExistingIds);
+        // Retirer les IDs non existants de la queue
+        setReadQueue(prev => {
+          const newSet = new Set(prev);
+          nonExistingIds.forEach(id => newSet.delete(id));
+          return newSet;
+        });
       }
-    });
 
-    if (node) observer.current.observe(node);
+      existingDocs.forEach(doc => {
+        batch.update(doc.ref, {
+          isRead: true,
+          readBy: arrayUnion(currentUserId),
+          readAt: serverTimestamp()
+        });
+      });
+
+      try {
+        if (existingDocs.length > 0) {
+          await batch.commit();
+        }
+        setReadQueue(prev => {
+          const newSet = new Set(prev);
+          existingDocs.forEach(doc => newSet.delete(doc.id));
+          return newSet;
+        });
+      } catch (error) {
+        console.error("Erreur lors du marquage des messages:", error);
+        // Vous pourriez implémenter une logique de réessai ici
+      }
+    }, 1000),
+    [readQueue, currentUserId]
+  );
+
+  useEffect(() => {
+    if (readQueue.size > 0) {
+      processReadQueue();
+    }
+    
+    return () => {
+      processReadQueue.flush();
+    };
+  }, [readQueue, processReadQueue]);
+
+  return useCallback((messageId: string) => {
+    setReadQueue(prev => new Set([...prev, messageId]));
+  }, []);
+};
+const useMessageObserver = (onIntersect: (messageId: string) => void) => {
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const observedMessages = useRef(new Set<string>());
+
+  return useCallback((node: HTMLElement | null, messageId: string) => {
+    if (!node || observedMessages.current.has(messageId)) return;
+
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            onIntersect(messageId);
+            observedMessages.current.add(messageId);
+            observerRef.current?.unobserve(node);
+          }
+        });
+      },
+      { threshold: 0.5 } // Le message doit être visible à 50% pour être marqué comme lu
+    );
+
+    observerRef.current.observe(node);
   }, [onIntersect]);
 };
-      // const shipmentsRef = collection(db, "shipments");
 export default function ChatRoom({ params}) {
-  // ... autres états
-  // const searchParams = useSearchParams();
-  // const sh = searchParams.get('shs') ;
-  // const shipmentId = searchParams.get('shipmentId'); // Ajout pour le cas d'initialisation par le transporteur
+ 
   const { id: shipmentId } = useParams(); // id est maintenant expediteurId
   
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [chatPartner, setChatPartner] = useState(null);
+  const [previewFiles, setPreviewFiles] = useState([]);
+  const [error ,setTypeFileError] = useState(null)
 const [isUploading, setIsUploading] = useState(false);
  const router =useRouter()
-// const [user ,setUser] = useState(null)
-// const [isvalid ,setValid] =useState(false)
+ const [lastMessageReadStatus, setLastMessageReadStatus] = useState<{[key: string]: boolean}>({});
+
+
+
+
+
+
 const [isModalOpen, setIsModalOpen] = useState(false);
 const [cancelReason, setCancelReason] = useState("");
 const [currentShipment, setCurrentShipment] = useState(null);
   const [otherShipments, setOtherShipments] = useState([]);
   const [transporteur, setTransporteur] = useState(null);
 const {userData ,user} = useContext(AuthContext)
-  const [isOfferAccepted, setIsOfferAccepted] = useState(false);
+  const [isNewOfferModalOpen, setIsNewOfferModalOpen] = useState(false);
+const [newOfferPrice, setNewOfferPrice] = useState('');
+
+const [transporteurOfferModal, setTransporteurOfferModal] = useState(null);
+const [newOfferModal, setNewOfferModal] = useState(null);
+const [acceptedOffers, setAcceptedOffers] = useState({});
+const [pendingAcceptance, setPendingAcceptance] = useState({});
+let isCurrentMessage = null
   const messagesEndRef = useRef(null);
-// const typingTimeoutRef = useRef(null);
 
-// const [isTyping, setIsTyping] = useState(false);
-
-// // console.log("messages" , messages)
-// console.log("currentShipment" , currentShipment)
-// console.log("otherShipment" ,otherShipments)
-// console.log("user" ,user)
-// console.log("chatPartner user" ,chatPartner)
-const uid = auth?.currentUser?.uid;
+  const markMessageRead = useReadMessages(user?.uid);
+  const messageObserver = useMessageObserver((messageId) => {
+    if (!user?.uid) return;
+    markMessageRead(messageId);
+  });
 
 
-
-
-  // const getUserData = async (uid) => {
-  //   try {
-  //     // Crée une référence au document de l'utilisateur dans la collection 'users'
-  //     const userRef = doc(db, 'users', uid);
-      
-  //     // Récupère le document
-  //     const userSnap = await getDoc(userRef);
-      
-  //     if (userSnap.exists()) {
-  //       // Retourne les données si l'utilisateur existe
-  //       const userData = userSnap.data();
-  //       // console.log('Données utilisateur:', userData);
-  //       return userData;
-  //     } else {
-  //       console.log('Aucun utilisateur trouvé avec cet UID');
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error('Erreur lors de la récupération des données:', error);
-  //     throw error;
-  //   }
-  // };
-
-  // useEffect(()=>{
-  //   const fetchUser = async () => {
-  //     if (!uid) return;
-      
-  //     const userData = await getUserData(uid);
-  //     if (userData) {
-  //       // Utilise les données ici
-  //       setUser(userData)
-  //     }
-  //   };
-  // fetchUser()
-  // } ,[uid])
   
 
+  const handleTransporteurOfferAcceptance = (msg) => {
+    setTransporteurOfferModal({
+      msgId: msg.id,
+      shipment:msg?.offerDetails,
+      transporteurName: `${transporteur?.firstName} ${transporteur?.lastName}`
+    });
+    setAcceptedOffers(prev => ({ ...prev, [msg.id]: true }));
+  };
+  
+  const handleAcceptTransporteurOffer = async (msgId) => {
+    try {
+      await updateDoc(doc(db, "messages", msgId), {
+        "offerDetails.status": "Accepter"
+      });
+      
+      await updateDoc(doc(db, "shipments", currentShipment.id), {
+        status: "Accepter",
+        price: transporteurOfferModal?.shipment?.price
+      });
+  
+      // Envoyer les notifications
+      await Promise.all([
+        sendEmailNotification(currentShipment.id, "acceptance"),
+        sendPushNotification(currentShipment.id, "acceptance")
+      ]);
+      setTransporteurOfferModal(null);
+      return null
+    } catch (error) {
+      console.error("Erreur:", error);
+      setAcceptedOffers(prev => ({ ...prev, [msgId]: false }));
+    }
+  };
+  
+  const handleNewOfferAcceptance = (msg) => {
+    setNewOfferModal({
+      msgId: msg.id,
+      price: msg.price
+    });
+    setPendingAcceptance(prev => ({ ...prev, [msg.id]: true }));
+  };
+  
+  const handleAcceptNewOffer = async (msgId, newPrice) => {
+    try {
+      // Mettre à jour le message
+      await updateDoc(doc(db, "messages", msgId), {
+        accepted: true
+      });
+  
+      // Mettre à jour le shipment avec le nouveau prix
+      await updateDoc(doc(db, "shipments", currentShipment.id), {
+        price: newPrice,
+        status: "Accepter"
+      });
+  
+      // Envoyer les notifications
+      await Promise.all([
+        sendEmailNotification(currentShipment.id, "new_offer"),
+        sendPushNotification(currentShipment.id, "new_offer")
+      ]);
+  
+      // Mettre à jour l'état local
+      setPendingAcceptance(prev => ({ ...prev, [msgId]: false }));
+  return null
+    } catch (error) {
+      console.error("Erreur:", error);
+      setPendingAcceptance(prev => ({ ...prev, [msgId]: false }));
+    }
+  };
+
+
+
+
+
+
+
+
+
+
+const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const files = e.target.files;
+  if (!files) return;
+
+  const fileArray = Array.from(files) as File[]; // Type assertion ici
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ];
+
+  const validFiles = fileArray.filter(file => allowedTypes.includes(file.type));
+
+  if (validFiles.length !== fileArray.length) {
+    setTypeFileError('Types de fichiers autorisés: JPG, PNG, GIF, PDF, DOC/DOCX');
+  } else {
+    setTypeFileError(''); // Réinitialiser l'erreur si tout est valide
+  }
+
+  setPreviewFiles(prev => [...prev, ...validFiles.slice(0, 5)]);
+};
+
+const uid = auth?.currentUser?.uid;
+
+ const isUserExpediteur = uid === currentShipment?.expediteurId;
+ const receiverId = isUserExpediteur ? transporteur?.id : currentShipment?.expediteurId;
+
+
+  const removeFile = (index) => {
+    const newFiles = [...previewFiles];
+    newFiles.splice(index, 1);
+    setPreviewFiles(newFiles);
+  };
+
+  const updateMessageReadStatus = useCallback((messageId: string) => {
+    setLastMessageReadStatus(prev => ({
+      ...prev,
+      [messageId]: true
+    }));
+  }, []);
 
 
   useEffect( () => {
@@ -174,7 +339,6 @@ const uid = auth?.currentUser?.uid;
   }, []);
 
     const sendEmailNotification = async (shipmentId: string, type: string) => 
-
     {
   
     try {
@@ -186,7 +350,7 @@ const uid = auth?.currentUser?.uid;
         },
         body: JSON.stringify({
           email: chatPartner?.email ?? transporteur?.email, // Utilisation de l'email récupéré
-          shipment: { objectName: currentShipment.objectName ,id:currentShipment.id },
+          shipment: { objectName: currentShipment.objectName ,id:currentShipment.id  ,price:currentShipment.price},
           type,
           chatId: shipmentId,
           user:{firstName:userData?.firstName  , lastName:userData?.lastName}
@@ -207,36 +371,26 @@ return {
   };
   
 
-  const markMessageAsRead = async (messageId) => {
-    if (!messageId) return;
-    
-    try {
-      await updateDoc(doc(db, "messages", messageId), {
-        isRead: true
-      });
-    } catch (error) {
-      console.error("Erreur lors du marquage du message:", error);
-    }
-  };
 
   const getNotificationTitle = (type) => {
     switch(type) {
       case "acceptance":
         return "Offre de transport acceptée";
+        case "new_offer":
+          return "Nouvelle offre de transport";
       case "Annuler":
         return "Offre annulée";
       default:
         return "Nouveau message";
     }
   };
-  // Hook personnalisé pour observer les messages
-  const messageObserver = useMessageObserver((messageId) => {
-    markMessageAsRead(messageId);
-  });
+  
 
   // Fonction pour faire défiler vers le dernier message
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+   const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior });
+    }, 100);
   };
 
 const sendPushNotification =  async (shipmentId: string, type: string ) => {
@@ -244,7 +398,7 @@ const sendPushNotification =  async (shipmentId: string, type: string ) => {
     const shipment = currentShipment || otherShipments.find(s => s.id === shipmentId);
     // console.log("nous sommes dans les notifications")
     if (!shipment){
-      console.log("probleme avec le shipment")
+      // console.log("probleme avec le shipment")
       return null
     } 
     
@@ -272,7 +426,7 @@ let lastError;
         });
   
         if (response.ok) {
-          console.log('Notification envoyée avec succès');
+          // console.log('Notification envoyée avec succès');
           return true;
         }
   
@@ -292,63 +446,81 @@ let lastError;
       // Délai exponentiel entre les tentatives
       if (attempt < maxRetries) {
         const delay = retryDelay * Math.pow(2, attempt - 1);
-        console.warn(`Tentative ${attempt} échouée. Nouvel essai dans ${delay}ms...`);
+        // console.warn(`Tentative ${attempt} échouée. Nouvel essai dans ${delay}ms...`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
   };
 
-  // useEffect(() => {
-  //   const setupMessaging = async () => {
-  //     try {
-  //       // Vérifie si le navigateur supporte Firebase Messaging
-  //       const supported = await isSupported();
-  //       if (!supported) {
-  //         console.warn('Ce navigateur ne supporte pas Firebase Messaging');
-  //         return;
-  //       }
-  //       const messaging = getMessaging(app);
-        
-  //       onMessage(messaging, (payload) => {
-  //         console.log('Message reçu:', payload);
-  //         // Afficher une notification ou mettre à jour l'état
-  //       });
-  //     } catch (error) {
-  //       console.error('Erreur de configuration Firebase Messaging:', error);
-  //     }
-  //   };
+// Gestion améliorée des messages entrants
+useEffect(() => {
+  if (!currentShipment || !uid) return;
 
-  //   setupMessaging();
-  // }, []);
+  const messagesRef = collection(db, "messages");
+  const q = query(
+    messagesRef,
+    where("shipmentId", "==", currentShipment.id),
+    where("users", "array-contains", uid),
+    orderBy("timestamp", "asc")
+  );
+
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const newMessages: Message[] = [];
+    let partnerId = null;
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data() as Message;
+      newMessages.push({ id: doc.id, ...data });
+
+      // Trouver l'ID du partenaire
+      const otherUser = data.users?.find(userId => userId !== uid);
+      if (otherUser) partnerId = otherUser;
+    });
+
+    // Mettre à jour les messages en conservant les pending messages
+    setMessages(prev => {
+      const pendingMessages = prev.filter(msg => msg.pending);
+      return [...pendingMessages, ...newMessages];
+    });
+
+    // Mettre à jour le statut de lecture pour les messages envoyés
+    newMessages.forEach(msg => {
+      if (msg.sender === uid && msg.isRead && !lastMessageReadStatus[msg.id]) {
+        updateMessageReadStatus(msg.id);
+      }
+    });
+
+    // Récupérer les infos du partenaire
+    if (partnerId) {
+      getDoc(doc(db, "users", partnerId)).then(partnerDoc => {
+        if (partnerDoc.exists()) {
+          setChatPartner({ id: partnerDoc.id, ...partnerDoc.data() });
+        }
+      });
+    }
+
+    scrollToBottom();
+  });
+
+  return unsubscribe;
+}, [currentShipment?.id, uid]);
 
 
   useEffect(() => {
     const setupMessaging = async () => {
       try {
-        // Vérifie si le navigateur supporte Firebase Messaging
         const supported = await isSupported();
         if (!supported) {
-          console.log("navigateur pas supporter")
-          console.warn('Ce navigateur ne supporte pas Firebase Messaging');
-          return;
+          return null;
         }
         
-        // Demander la permission pour les notifications
-        // const permission = await Notification.requestPermission();
-        // if (permission !== 'granted') {
-        //   console.warn('Permission pour les notifications refusée');
-        //   return;
-        // }
+       
   
         const messaging = getMessaging(app);
         
         onMessage(messaging, (payload) => {
-          console.log('Message reçu:', payload);
-          
-          // Extraire les données de la notification
           const { title, body, icon } = payload.notification || {};
           
-          // Afficher la notification système
           if (title && body) {
             new Notification(title, {
               body,
@@ -357,27 +529,34 @@ let lastError;
           }
         });
       } catch (error) {
-        console.error('Erreur de configuration Firebase Messaging:', error);
+        return null
       }
     };
   
     setupMessaging();
   }, []);
 
+  const downloadFile = (url: string, fileName: string) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  // Fonction pour formater la taille du fichier
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i]);
+  };
+  
 
 
 
-  // Fonction pour accepter une offre
-  // const handleAcceptShipment = async (shipmentId: string) => {
-  //   try {
-  //     let newStatus="Accepter"
-  //     await updateShipmentStatus(shipmentId,newStatus ,user.uid)
-  //    await   sendEmailNotification(shipmentId, "acceptance");
-  //     await sendPushNotification(shipmentId, "acceptance");
-  //   } catch (error) {
-  //     throw error
-  //   }
-  // };
   const handleAcceptShipment = async (shipmentId: string) => {
     try {
       const newStatus = "Accepter";
@@ -400,122 +579,91 @@ let lastError;
 
  
 
+const trackLastSentMessage = useCallback((messageId: string) => {
+  setLastMessageReadStatus(prev => ({
+    ...prev,
+    [messageId]: false // Initialement non lu
+  }));
+}, []);
 
-// const handleTyping = () => {
-//   setIsTyping(true);
-//   if (typingTimeoutRef.current) {
-//     clearTimeout(typingTimeoutRef.current);
-//   }
-//   typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000);
-// };
-
-  useEffect(() => {
-    
-    if (!currentShipment || !uid) return;
-  
-    const fetchMessagesAndPartner = async () => {
-      const messagesRef = collection(db, "messages");
-      const q = query(
-        messagesRef,
-        where("shipmentId", "==", currentShipment.id),
-        where("users", "array-contains", uid),
-        // orderBy("timestamp", "asc") // Ajouter l'ordre explicite
-      );
-  
-      const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-        const messages = [];
-        let partnerId = null;
-  
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-  
-          // Vérification que le message concerne bien l'envoi actuel
-          if (data.users && Array.isArray(data.users)) {
-            messages.push({ id: doc.id, ...data });
-  
-            // Trouver l'ID du partenaire (celui qui n'est pas l'utilisateur actuel)
-            const otherUser = data.users.find((userId) => userId !== uid);
-            if (otherUser) partnerId = otherUser;
-          }
-        });
-  
-        // Trier les messages par timestamp
-        messages.sort((a, b) => a.timestamp - b.timestamp);
-        setMessages(messages);
-   scrollToBottom();
-        // Récupérer les infos du partenaire si trouvé
-        if (partnerId) {
-          const partnerDoc = await getDoc(doc(db, "users", partnerId));
-          if (partnerDoc.exists()) {
-            setChatPartner({ id: partnerDoc.id, ...partnerDoc.data() });
-          }
-        } else {
-          setChatPartner(null); // Réinitialiser si aucun partenaire trouvé
-        }
-      });
-  
-      return unsubscribe;
-    };
-  
-    fetchMessagesAndPartner();
-  }, [uid, currentShipment?.id]); // Déclencheur : uid ou ID de l'envoi change
-  
 
 const sendMessage = async () => {
+  if ((!newMessage.trim() && previewFiles.length === 0) || !currentShipment?.id || !transporteur?.id) return;
 
-  if (!newMessage.trim() || !currentShipment?.id || !transporteur?.id) return;
-
-  // Déterminer dynamiquement sender/receiver
-  const isUserExpediteur = uid === currentShipment.expediteurId;
-  const receiverId = isUserExpediteur ? transporteur.id : currentShipment.expediteurId;
-
-  // Message temporaire
-  const tempMessage = {
-    id: Date.now().toString(),
-    message: newMessage,
-    sender: uid,
-    receiver: receiverId,
-    shipmentId: currentShipment.id,
-    expediteurId: currentShipment.expediteurId,
-    transporteurId: transporteur.id,
-    timestamp: serverTimestamp(),
-    isRead: false,
-    users: [uid, receiverId],
-    userInfo: userData ,
-    pending:true 
-  };
-
-  // Optimistic update
-  setMessages(prev => [...prev, tempMessage]);
-  setNewMessage("");
+  setIsUploading(true);
 
   try {
-    // 1. Envoi principal du message (critique)
-    const docRef = await addDoc(collection(db, "messages"), tempMessage);
+    // 1. Préparer le message optimiste avec un ID temporaire
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage: Message = {
+      id: tempId,
+      message: newMessage.trim() || (previewFiles.length > 0 ? `${previewFiles.length} fichier(s) joint(s)` : ''),
+      sender: uid,
+      receiver: receiverId,
+      shipmentId: currentShipment.id,
+      expediteurId: currentShipment.expediteurId,
+      // transporteurId: transporteur.id,
+      timestamp: serverTimestamp(),
+      isRead: false,
+      users: [uid, receiverId],
+      userInfo: userData,
+      pending: true,
+      ...(previewFiles.length > 0 && { attachments: [] }) // Placeholder pour les pièces jointes
+    };
 
-    // 2. Notifications secondaires (non critiques - exécutées en parallèle)
+    // 2. Mise à jour optimiste immédiate
+    // setMessages(prev => [...prev, optimisticMessage]);
+    setNewMessage("");
+    setPreviewFiles([]);
+    scrollToBottom('auto'); // Défilement immédiat sans animation
+
+    // 3. Traitement des fichiers si existants
+    let uploadedFiles = [];
+    if (previewFiles.length > 0) {
+      const formData = new FormData();
+      previewFiles.forEach(file => formData.append('files', file));
+
+      const response = await fetch('/api/upload-files', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Échec du téléversement des fichiers');
+      uploadedFiles = await response.json();
+    }
+
+    // 4. Préparer le message final pour Firebase
+    const finalMessage = {
+      ...optimisticMessage,
+      attachments: uploadedFiles,
+      pending: false
+    };
+
+    // 5. Envoi à Firebase
+    const docRef = await addDoc(collection(db, "messages"), finalMessage);
+
+    // 6. Mise à jour avec l'ID réel et suivi du message
+    setMessages(prev => prev.map(msg => 
+      msg.id === tempId ? { ...msg, id: docRef.id, pending: false } : msg
+    ));
+    
+    // Suivre ce message pour le statut de lecture
+    trackLastSentMessage(docRef.id);
+
+    // 7. Notifications
     if (receiverId !== uid) {
-      // Email (gestion d'erreur indépendante)
-      if (chatPartner?.email) {
-        sendEmailNotification(currentShipment.id, "Nouveau message")
-          .then(email => console.log("Email envoyé:", email))
-          .catch(emailError => console.error("Erreur email:", emailError));
-      }
-
-      setNewMessage("");
-      scrollToBottom();
-      // Push notification (gestion d'erreur indépendante)
-      sendPushNotification(currentShipment.id, "Nouveau message")
-        .then(result => console.log("Notification push:", result)
-      )
-        .catch(pushError => console.error("Erreur push:", pushError));
+      await Promise.all([
+        sendEmailNotification(currentShipment.id, "Nouveau message").catch(console.error),
+        sendPushNotification(currentShipment.id, "Nouveau message").catch(console.error)
+      ]);
     }
 
   } catch (error) {
-    console.error("Erreur d'envoi du message:", error);
+    // console.error("Erreur d'envoi:", error);
     // Rollback de l'optimistic update
-    setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id));
-    // toast.error("Échec de l'envoi du message");
+    setMessages(prev => prev.filter(msg => msg.id !== tempId));
+  } finally {
+    setIsUploading(false);
   }
 };
 
@@ -525,135 +673,6 @@ const sendMessage = async () => {
     const others = otherShipments.filter(s => s.id !== shipment.id);
     setOtherShipments([...others, currentShipment]); // Ajoute l'ancien colis actuel à la liste
   };
- // 1. Charger le shipment et l'expéditeur associé
-//  useEffect(() => {
-//   if (!shipmentId) return;
-
-//   const fetchShipmentAndExpeditor = async () => {
-//     try {
-//       const shipmentRef = doc(db, "shipments", shipmentId);
-//       const unsubscribe = onSnapshot(shipmentRef, async (shipmentDoc) => {
-//         if (!shipmentDoc.exists()) return;
-
-//         const shipmentData = { id: shipmentDoc.id, ...shipmentDoc.data() };
-//         setCurrentShipment(shipmentData);
-
-//         // Récupération des autres shipments de l'expéditeur
-//         const shipmentsRef = collection(db, "shipments");
-//         const shipmentQuery = query(shipmentsRef, where("expediteurId", "==", shipmentData.expediteurId));
-
-//         const querySnapshot = await getDocs(shipmentQuery);
-//         const filteredShipments = querySnapshot.docs
-//           .map((doc) => ({ id: doc.id, ...doc.data() }))
-//           .filter((shipment) => shipment.id !== shipmentId); // Exclure le currentShipment
-
-//         setOtherShipments(filteredShipments);
-//       });
-
-//       return () => unsubscribe();
-//     } catch (error) {
-//       console.error("Erreur lors de la récupération des données:", error);
-//     }
-//   };
-
-//   fetchShipmentAndExpeditor();
-// }, [shipmentId]);         
-
-// useEffect(() => {
-//   if (!shipmentId) return;
-
-//   const fetchShipmentAndExpeditor = async () => {
-//     try {
-//       const shipmentRef = doc(db, "shipments", shipmentId);
-//       const unsubscribe = onSnapshot(shipmentRef, async (shipmentDoc) => {
-//         if (!shipmentDoc.exists()) return;
-
-//         const shipmentData = { id: shipmentDoc.id, ...shipmentDoc.data() };
-//         setCurrentShipment(shipmentData);
-
-//         // Récupération des autres shipments de l'expéditeur
-//         const shipmentsRef = collection(db, "shipments");
-//         if(userData.role === "transporteur"){
-//           const shipmentQuery = query(
-//             shipmentsRef, 
-//             where("expediteurId", "==", shipmentData.expediteurId),
-//             where("status", "!=", "Annuler") // Nouveau filtre pour exclure les annulés
-//           );
-//         }
-        
-
-//         const querySnapshot = await getDocs(shipmentQuery);
-//         const filteredShipments = querySnapshot.docs
-//           .map((doc) => ({ id: doc.id, ...doc.data() }))
-//           .filter((shipment) => shipment.id !== shipmentId); // Exclure le currentShipment
-//         setOtherShipments(filteredShipments);
-//       });
-
-//       return () => unsubscribe();
-//     } catch (error) {
-//       console.error("Erreur lors de la récupération des données:", error);
-//     }
-//   };
-
-//   fetchShipmentAndExpeditor();
-// }, [shipmentId]);
-
-// useEffect(() => {
-//   if (!shipmentId) return;
-
-//   let unsubscribeShipment = () => {};
-//   let unsubscribeOtherShipments = () => {};
-
-//   const fetchShipmentAndExpeditor = async () => {
-//     try {
-//       // Écoute en temps réel du document shipment principal
-//       const shipmentRef = doc(db, "shipments", shipmentId);
-//       unsubscribeShipment = onSnapshot(shipmentRef, (shipmentDoc) => {
-//         if (!shipmentDoc.exists()) {
-//           // setCurrentShipment(null);
-//           // setOtherShipments([]);
-//           return null;
-//         }
-
-//         const shipmentData = { id: shipmentDoc.id, ...shipmentDoc.data() };
-        
-//         // Filtre le shipment annulé avant de mettre à jour l'état
-//         if (shipmentData.status !== "Annuler") {
-//           setCurrentShipment(shipmentData);
-//           return;
-//         }
-
-       
-
-//         // Écoute en temps réel des autres shipments du même expéditeur
-//         const shipmentsRef = collection(db, "shipments");
-//         const shipmentQuery = query(
-//           shipmentsRef, 
-//           where("expediteurId", "==", shipmentData.expediteurId),
-//           where("status", "!=", "Annuler")
-//         );
-
-//         unsubscribeOtherShipments = onSnapshot(shipmentQuery, (querySnapshot) => {
-//           const filteredShipments = querySnapshot.docs
-//             .map((doc) => ({ id: doc.id, ...doc.data() }))
-//             .filter((shipment) => shipment.id !== shipmentId);
-
-//           setOtherShipments(filteredShipments);
-//         });
-//       });
-//     } catch (error) {
-//       console.error("Erreur lors de la récupération des données:", error);
-//     }
-//   };
-
-//   fetchShipmentAndExpeditor();
-
-//   // Cleanup function pour désabonner les écouteurs
-//   return () => {
-//     unsubscribeShipment();
-//     unsubscribeOtherShipments();
-//   };
-// }, [shipmentId]);
 
 
 useEffect(() => {
@@ -676,10 +695,10 @@ useEffect(() => {
         const shipmentData = { id: shipmentDoc.id, ...shipmentDoc.data() };
         
         // Filtre le shipment annulé avant de mettre à jour l'état
-        if (shipmentData.status === "Annuler") {
-          toast.info("L'Offre a été annulée")
-          router.back()
-        }
+        // if (shipmentData.status === "Annuler") {
+        //   // toast.info("L'Offre a été annulée")
+        //   router.back()
+        // }
 
         setCurrentShipment(shipmentData);
 
@@ -753,7 +772,7 @@ const handleCancelShipment =  async () => {
   }
   setIsModalOpen(false);
   toast.info("Offre Annuler")
-  if(userData.role=="expediteur"){
+  if(userData?.role==="expediteur"){
     router.push("/mes-colis")
   }else{
     router.push("/shipments")
@@ -769,60 +788,11 @@ const handleCancelShipment =  async () => {
       messages[index + 1].sender !== message.sender
     );
   };
-  const handleOfferAcceptance = async (msg) => {
-    let shipmentId = currentShipment?.id;
-    let newStatus = "Accepter";
-  
-    try {
-      await updateDoc(doc(db, "messages", msg.id), { isRead: true });
-      await updateShipmentStatus(shipmentId, newStatus, user);
-  
-      await fetch("/api/send-mail", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: transporteur?.email,
-          shipment: { objectName: currentShipment.objectName },
-          type: "acceptance",
-          chatId: shipmentId,
-          user: { firstName: chatPartner?.firstName ?? transporteur?.firstName, lastName: chatPartner?.lastName?? transporteur?.lastName },
-        }),
-      });
-      setIsOfferAccepted(true);
-      toast.success("Offre validée avec succès!");
-      await sendPushNotification(shipmentId ,'acceptance')
-      // Mettre à jour l'état local pour afficher immédiatement l'offre acceptée
-     
-    } catch (error) {
-      toast.error("Erreur lors de la validation de l'offre");
-    }
-  };
-
+ 
   // Fonction pour déterminer si un message est le premier du groupe
   const isFirstMessageOfGroup = (message, index) => {
     return index === 0 || messages[index - 1].sender !== message.sender;
   };
-// Ajoutez cette fonction pour gérer l'upload d'images
-const handleImageUpload = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  setIsUploading(true);
-  try {
-    const storage = getStorage();
-    const storageRef = ref(storage, `chat-images/${Date.now()}_${file.name}`);
-    await uploadBytes(storageRef, file);
-    const imageUrl = await getDownloadURL(storageRef);
-
-   
-  } catch (error) {
-    // toast.error("Erreur lors de l'envoi de l'image");
-  } finally {
-    setIsUploading(false);
-  }
-};
-//  console.log("user role" ,user?.role)
-  // console.log("messages" ,messages)
   return (
     <>
 
@@ -831,501 +801,769 @@ const handleImageUpload = async (e) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div className="flex flex-col h-screen bg-gray-100">
-  {/* Header */}
-  <div className="bg-white shadow-sm p-4">
-    <div className="flex items-center justify-between mx-auto px-2 sm:max-w-4xl sm:px-0">
-      <div className="flex items-center space-x-2 sm:space-x-4">
-        <Avatar
-          size={8}
-          src={uid !== transporteur?.id ? transporteur?.photoURL : chatPartner?.photoURL}
-          name={uid !== transporteur?.id 
-            ? `${transporteur?.firstName} ${transporteur?.lastName}` 
-            : `${chatPartner?.firstName} ${chatPartner?.lastName}`}
-        />
-        <div className="max-w-[180px] sm:max-w-none">
-          <h2 className="font-semibold text-sm sm:text-base truncate">
-            {uid !== transporteur?.id 
-              ? transporteur 
-                ? `${transporteur.firstName} ${transporteur.lastName} / ${transporteur.phoneNumber}` 
-                : 'Chargement...'
-              : chatPartner 
-                ? `${chatPartner.firstName} ${chatPartner.lastName} / ${chatPartner.phoneNumber}` 
-                : 'Chargement...'}
-          </h2>
-          <p className="text-xs sm:text-sm text-gray-500">
-            {messages.some(m => !m.isRead) ? 'En ligne' : 'Hors ligne'}
-          </p>
-        </div>
-      </div>
-      <div>
-        <Link href={uid == transporteur?.id ? "/shipments" : "/mes-colis"}> 
-          <AiOutlineArrowLeft className="text-xl sm:text-2xl"/>
-        </Link>
-      </div>
-    </div>
-  </div>
-  
-  {/* Shipment Info */}
-  {currentShipment && (
-    <div className="bg-white p-2 m-2 rounded-lg shadow flex flex-col space-y-2">
-      <h3 className="text-sm font-semibold mb-2 flex items-center">
-        <FaBox className="mr-1" /> Colis à expédier
-      </h3>
-      {currentShipment.status == 'Accepter' && (
-        <div className="flex items-center text-green-500 text-xs">
-          <FaCheckCircle className="mr-1" />
-          <span>Offre acceptée</span>
-        </div>
-      )}
-
-      {/* Bloc 1: Informations de base */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 border-b pb-1">
-        <p className="flex items-center text-xs">
-          <FaBox className="mr-1" /> Objet : {currentShipment.objectName}
-        </p>
-        <p className="flex items-center text-xs">
-          <FaHashtag className="mr-1" />
-          <span className="font-medium">Référence:</span> {currentShipment?.reference ?? '11569'}
-        </p>
-        <p className="flex items-center text-xs">
-          <FaMoneyBillWave className="mr-1" /> Prix : {currentShipment.price}€
-        </p>
-        <p className="flex items-center text-xs">
-          <FaSortNumericUp className="mr-1" /> Quantité : {currentShipment.quantity}
-        </p>
-      </div>
-
-      {/* Bloc 2: Adresses */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 border-b pb-2">
-        <p className="flex items-center text-xs">
-          <FaMapMarkerAlt className="mr-1" /> Retrait : {currentShipment.pickupAddress}
-        </p>
-        <p className="flex items-center text-xs">
-          <FaMapMarkerAlt className="mr-1" /> Livraison : {currentShipment.deliveryAddress}
-        </p>
-      </div>
-
-      {/* Bloc 3: Dates */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 border-b pb-2">
-        <p className="flex items-center text-xs">
-          <FaCalendarAlt className="mr-1" /> Date retrait :{" "}
-          {currentShipment.pickupDate && currentShipment.pickupDate.toDate
-            ? currentShipment.pickupDate.toDate().toLocaleString("fr-FR", {
-                weekday: "short",
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })
-            : "Date invalide"}
-        </p>
-        <p className="flex items-center text-xs">
-          <FaCalendarCheck className="mr-1" /> Date livraison :{" "}
-          {currentShipment.pickupDate && currentShipment.pickupDate.toDate
-            ? currentShipment.pickupDate.toDate().toLocaleString("fr-FR", {
-                weekday: "short",
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })
-            : "Date invalide"}
-        </p>
-      </div>
-
-      {/* Bloc 4: Caractéristiques physiques */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-        <p className="flex items-center text-xs">
-          <FaWeightHanging className="mr-1" /> Poids : {currentShipment.weight} kg
-        </p>
-        <p className="flex items-center text-xs">
-          <FaRulerCombined className="mr-1" /> Taille : {currentShipment.size}
-        </p>
-        <p className="flex items-center text-xs">
-          <FaTruckPickup className="mr-1" /> Type retrait : {currentShipment.pickupType}
-        </p>
-      </div>
-
-      {/* Bouton d'action */}
-      <div className="w-full">
-        {/* Barre verte d'acceptation (si colis accepté) */}
-        {currentShipment.status === "Accepter" && (
-          <div className="flex items-center bg-green-100 text-green-800 p-2 mb-3 rounded-t-lg">
-            <FaCheckCircle className="mr-2 text-green-500" />
-            <span className="text-sm font-medium">Cette offre a été acceptée</span>
-          </div>
-        )}
-
-        {/* {currentShipment.status === "Annuler" && (
-          <div className="flex items-center bg-red-100 text-red-800 p-2 mb-3 rounded-t-lg">
-            <MdCancel className="mr-2 text-red-500"/>   
-            <span className="text-sm font-medium">Cette offre a été Annuler</span>
-          </div>
-        )} */}
-
-        {/* Conteneur des boutons - Modifié pour mobile */}
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full">
-          {/* Bouton Accepter l'offre (uniquement transporteur) */}
-          {currentShipment.status === "En attente" && userData?.role === "transporteur" && (
-            <button
-              onClick={() => handleAcceptShipment(currentShipment.id)}
-              className="w-full flex items-center justify-center gap-2 bg-green-500 text-white py-2 px-3 rounded-lg text-sm hover:bg-green-600 transition-colors"
-            >
-              <FaCheck className="w-4 h-4" />
-              <span>Accepter l'offre</span>
-            </button>
-          )}
-
-          {/* Bouton Annuler l'offre (visible selon conditions) */}
-          {(currentShipment.status === "En attente" || 
-            (currentShipment.status === "Accepter")) && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className={`w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm hover:bg-red-600 transition-colors ${
-                currentShipment.status === "Accepter" 
-                  ? "bg-red-500 text-white" 
-                  : "bg-red-500 text-white"
-              }`}
-            >
-              <FaTimes className="w-4 h-4" />
-              <span>Annuler l'offre</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Modale d'annulation */}
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-5 rounded-lg shadow-lg w-11/12 sm:w-80">
-            <h3 className="text-lg font-semibold mb-3">Pourquoi annuler l'offre ?</h3>
-            <div className="space-y-2">
-              {userData?.role === "transporteur" ? (
-                <>
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name="cancelReason"
-                      value="transporteur_annulation"
-                      onChange={(e) => setCancelReason(e.target.value)}
-                      className="form-radio"
-                    />
-                    <span className="text-sm sm:text-base">J'ai décidé d'annuler la livraison</span>
-                  </label>
-
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name="cancelReason"
-                      value="client_annulation"
-                      onChange={(e) => setCancelReason(e.target.value)}
-                      className="form-radio"
-                    />
-                    <span className="text-sm sm:text-base">Le client a décidé d'annuler le transport</span>
-                  </label>
-                </>
-              ) : (
-                <>
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name="cancelReason"
-                      value="client_annulation"
-                      onChange={(e) => setCancelReason(e.target.value)}
-                      className="form-radio"
-                    />
-                    <span className="text-sm sm:text-base">J'ai décidé d'annuler ma demande</span>
-                  </label>
-
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name="cancelReason"
-                      value="transporteur_annulation"
-                      onChange={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setCancelReason(e.target.value)}}
-                      className="form-radio"
-                    />
-                    <span className="text-sm sm:text-base">Le transporteur a décidé d'annuler la livraison</span>
-                  </label>
-                </>
-              )}
+        {/* Header */}
+        <div className="bg-white shadow-sm p-4">
+          <div className="flex items-center justify-between mx-auto px-2 sm:max-w-4xl sm:px-0">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Avatar
+                size={8}
+                src={uid !== transporteur?.id ? transporteur?.photoURL : chatPartner?.photoURL}
+                name={uid !== transporteur?.id 
+                  ? `${transporteur?.firstName} ${transporteur?.lastName}` 
+                  : `${chatPartner?.firstName} ${chatPartner?.lastName}`}
+              />
+              <div className="max-w-[180px] sm:max-w-none">
+                <h2 className="font-semibold text-sm sm:text-base truncate">
+                  {uid !== transporteur?.id 
+                    ? transporteur 
+                      ? `${transporteur.firstName} ${transporteur.lastName} / ${transporteur.phoneNumber}` 
+                      : 'Chargement...'
+                    : chatPartner 
+                      ? `${chatPartner.firstName} ${chatPartner.lastName} / ${chatPartner.phoneNumber}` 
+                      : 'Chargement...'}
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-500">
+                  {messages.some(m => !m.isRead) ? 'En ligne' : 'Hors ligne'}
+                </p>
+              </div>
             </div>
-
-            <div className="flex justify-end space-x-2 mt-4">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="bg-gray-300 px-3 py-1 rounded-lg text-sm"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={(e)=>{
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleCancelShipment()}}
-                className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600"
-              >
-                Confirmer
-              </button>
+            <div className="mt-6">
+              <div className="flex items-center space-x-2">
+                <Link href="#" onClick={() => router.back()}>
+                  <span className="flex items-center space-x-2">
+                    <IoMdArrowBack className="text-3xl text-green-500" />
+                    <span className="text-green-500">Retour</span>
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
-      )}
-    </div>
-  )}
 
-  {!currentShipment && <div className="bg-white p-1 m-1 rounded-sm  text-center">
-        <FiPackage className="text-green-500 text-sm mx-auto" />
-        <p className="text-gray-500 mt-2">Aucun autre colis actif trouvé</p>
-      </div>}
+        {/* Shipment Info */}
+        {currentShipment && (
+          <div className="bg-white p-2 m-2 rounded-lg shadow">
+            <h3 className="text-sm font-semibold mb-2 flex items-center">
+              <FaBox className="mr-1" /> Colis à expédier
+            </h3>
+            {currentShipment.status === 'Accepter' && (
+              <div className="flex items-center text-green-500 text-xs">
+                <FaCheckCircle className="mr-1" />
+                <span>Offre de transport acceptée</span>
+              </div>
+            )}
 
-  {/* Chat Area */}
-  <div className="flex flex-col h-full p-2 sm:p-4 bg-gray-100">
-    <div className="flex-1 overflow-y-auto space-y-3 w-full mx-auto px-2 sm:max-w-2xl sm:px-0">
-      {messages
-        .filter((msg) => msg.shipmentId === currentShipment?.id )
-        .map((msg, i) => {
-          const isLast = isLastMessageOfGroup(msg, i);
-          const isFirst = isFirstMessageOfGroup(msg, i);
-          const isSentByMe = msg.sender === uid;
-          const shouldMarkAsRead = !isSentByMe && !msg.isRead;
-          
-          return (
-            <div
-              key={msg.id}
-              ref={shouldMarkAsRead ? (node) => messageObserver(node) : null}
-              className={clsx(
-                "flex items-end gap-2",
-                isSentByMe ? "justify-end" : "justify-start",
-                msg.pending && "opacity-100"
-              )}
-            >
-              {!isSentByMe && isLast && (
-                <div className="size-8">
-                  <Avatar
-                    size={8}
-                    src={msg.avatar}
-                    name={`${chatPartner?.firstName} ${chatPartner?.lastName}`}
-                  />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 border-b pb-1">
+              <p className="flex items-center text-xs">
+                <FaBox className="mr-1" /> Objet : {currentShipment.objectName}
+              </p>
+              <p className="flex items-center text-xs">
+                <FaHashtag className="mr-1" />
+                <span className="font-medium">Référence:</span> {currentShipment?.reference ?? '11569'}
+              </p>
+              <p className="flex items-center text-xs">
+                <FaMoneyBillWave className="mr-1" /> Prix : {currentShipment.price}€
+              </p>
+              <p className="flex items-center text-xs">
+                <FaSortNumericUp className="mr-1" /> Quantité : {currentShipment.quantity}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 border-b pb-2">
+              <p className="flex items-center text-xs">
+                <FaMapMarkerAlt className="mr-1" /> Retrait : {currentShipment.pickupAddress}
+              </p>
+              <p className="flex items-center text-xs">
+                <FaMapMarkerAlt className="mr-1" /> Livraison : {currentShipment.deliveryAddress}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 border-b pb-2">
+              <p className="flex items-center text-xs">
+                <FaCalendarAlt className="mr-1" /> Date retrait :{" "}
+                {currentShipment.pickupDate?.toDate?.()?.toLocaleString("fr-FR", {
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                }) ?? "Date invalide"}
+              </p>
+              <p className="flex items-center text-xs">
+                <FaCalendarCheck className="mr-1" /> Date livraison :{" "}
+                {currentShipment.deliveryDate?.toDate?.()?.toLocaleString("fr-FR", {
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                }) ?? "Date invalide"}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <p className="flex items-center text-xs">
+                <FaWeightHanging className="mr-1" /> Poids : {currentShipment.weight} kg
+              </p>
+              <p className="flex items-center text-xs">
+                <FaRulerCombined className="mr-1" /> Taille : {currentShipment.size}
+              </p>
+              <p className="flex items-center text-xs">
+                <FaTruckPickup className="mr-1" /> Type retrait : {currentShipment.pickupType}
+              </p>
+            </div>
+
+            <div className="w-full">
+              {currentShipment.status === "Accepter" && (
+                <div className="flex items-center bg-green-100 text-green-800 p-2 mb-3 rounded-t-lg">
+                  <FaCheckCircle className="mr-2 text-green-500" />
+                  <span className="text-sm font-medium">Cette offre a été acceptée</span>
                 </div>
               )}
-              
-              <div
-                className={clsx(
-                  isSentByMe
-                    ? "bg-green-500 text-white"
-                    : "bg-gray-200 text-gray-800",
-                  isLast && !isFirst && (isSentByMe ? "rounded-tr-lg" : "rounded-tl-lg"),
-                  isFirst && !isLast && (isSentByMe ? "rounded-br-lg" : "rounded-bl-lg"),
-                  !isFirst && !isLast && (isSentByMe ? "rounded-r-lg" : "rounded-l-lg"),
-                  "p-3 max-w-[80%] sm:max-w-[70%] text-sm sm:text-base"
+
+              <div className="flex flex-col md:flex-row gap-4 mt-4">
+                {currentShipment.status === "Annuler" && (
+                  <div className="flex items-center bg-red-100 text-red-800 p-2 mb-3 rounded-t-lg md:w-2/4">
+                    <FaTimesCircle className="mr-2 text-red-500" />
+                    <span className="text-sm font-medium">Cette offre a été annulée</span>
+                  </div>
                 )}
-              >
-                {msg.type === "image" ? (
-                  <div className="relative">
-                    <Link href={msg.imageUrl} passHref legacyBehavior>
-                      <a target="_blank" rel="noopener noreferrer">
-                        <Image
-                          src={msg.imageUrl}
-                          width={100}
-                          height={100}
-                          alt="Image partagée"
-                          className="rounded-lg max-w-full cursor-pointer hover:opacity-90"
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                ) : msg.offerDetails ? (
-                  <div className="space-y-2">
-                    <div className="font-semibold text-sm sm:text-lg">📦 Nouvelle offre de transport</div>
-                    {(currentShipment.status === "Accepter" && isOfferAccepted) && (
-                      <div className="flex items-center bg-green-100 text-green-800 p-2 mb-3 rounded-t-lg">
-                        <FaCheckCircle className="mr-2 text-green-500" />
-                        <span className="text-sm font-medium">Cette Offre a été acceptée</span>
-                      </div>
-                    )}
-                    <div className="space-y-1">
-                      <p className="flex items-center text-xs sm:text-sm">
-                        <FaBox className="mr-1" /> Object : {currentShipment.objectName}
-                      </p>
-                      <p className="text-xs sm:text-sm">💰 Prix proposé: {msg.offerDetails.price}€</p>
-                      <p className="text-xs sm:text-sm">📅 Date de début: {msg.offerDetails.startDate}</p>
-                      {msg.offerDetails.endDate && (
-                        <p className="text-xs sm:text-sm">📅 Date de fin: {msg.offerDetails.endDate}</p>
-                      )}
-                      <p className="mt-2 text-xs sm:text-sm">📝 Informations supplémentaires:</p>
-                      <p className="text-xs sm:text-sm">{msg.offerDetails.additionalInfo}</p>
+                
+                {currentShipment.status === "Annuler" && (
+                  <div className="mt-4 md:mt-0 md:w-2/4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                      <label htmlFor="status-select" className="text-sm font-medium text-gray-700 sm:mb-0">
+                        Changer le statut du colis :
+                      </label>
+                      
+                      <select
+                        id="status-select"
+                        className="flex-1 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 min-w-0"
+                        defaultValue="Annuler"
+                        onChange={async (e) => {
+                          const newStatus = e.target.value;
+                          const shipmentRef = doc(db, "shipments", currentShipment.id);
+                          await updateDoc(shipmentRef, { status: newStatus });
+
+                          if (newStatus === "Accepter") {
+                            await Promise.all([
+                              sendEmailNotification(currentShipment.id, "acceptance"),
+                              sendPushNotification(currentShipment.id, "acceptance"),
+                            ]);
+                          }
+                        }}
+                      >
+                        <option value="Annuler">Annuler</option>
+                        <option value="En attente">En attente</option>
+                        <option value="Accepter">Accepter</option>
+                      </select>
                     </div>
-                    {!isSentByMe && !msg.isRead && (
-                      <div className="mt-3 flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id={`validate-${msg.id}`}
-                          onChange={() => {handleOfferAcceptance(msg)}}
-                          className="form-checkbox h-4 w-4 text-green-600"
-                        />
-                        <label htmlFor={`validate-${msg.id}`} className="text-xs sm:text-sm">
-                          Valider cette offre
-                        </label>
-                      </div>
-                    )}
                   </div>
-                ) : (
-                  <p className="text-sm sm:text-base">{msg.message}</p>
                 )}
               </div>
 
-              {isSentByMe && isLast && (
-                <div className="size-8">
-                  <Avatar
-                    size={8}
-                    src={userData?.photoURL}
-                    name={`${userData?.firstName} ${userData?.lastName}`}
-                  />
-                </div>
-              )}
-            </div>
-          );
-        })}
-      
-      <div ref={messagesEndRef} />
-    </div>
-{messages.length  <=0 && <div className=" p-4 m-4 rounded-lg shadow text-center ">
-     <MdMessage className="text-green-600 text-4xl mx-auto" />
-        <p className="text-gray-500 mt-2">Aucun  message pour le moment</p>
-      </div>}
-
-    {/* Message Input */}
-    <div className="flex gap-2 p-2 sm:p-4 bg-white w-full mx-auto">
-      <input
-        type="text"
-        value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
-        placeholder="Écrivez votre message..."
-        className="flex-1 p-2 border border-gray-300 rounded-lg text-sm sm:text-base"
-      />
-      <label className="cursor-pointer px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          className="hidden"
-        />
-        {isUploading ? (
-          <FaSpinner className="animate-spin" />
-        ) : (
-          <FaImage />
-        )}
-      </label>
-      <button
-        onClick={sendMessage}
-        disabled={isUploading}
-        className="px-3 py-2 bg-green-500 text-white rounded-lg disabled:bg-gray-300 text-sm sm:text-base"
-      >
-        Envoyer
-      </button>
-    </div>
-
-    {/* Liste des autres colis */}
-
-    {/* {otherShipments.length > 0 ? (
-      <div className="bg-white p-3 m-2 sm:m-4 rounded-lg shadow">
-        <h3 className="text-md sm:text-lg font-semibold mb-3 sm:mb-4">Autres colis à expédier</h3>
-        <div className="space-y-3">
-          {otherShipments.map((shipment) => (
-            <div 
-              key={shipment.id} 
-              className={`border p-2 sm:p-3 rounded-lg hover:bg-gray-50 cursor-pointer 
-                ${shipment.id == currentShipment?.id ? 'border-blue-500 bg-blue-100' : ''}`}
-              onClick={() => handleShipmentChange(shipment)}
-            >
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                <div>
-                  <p className="font-bolder text-green-600 hover:underline capitalize text-sm sm:text-base">
-                    {shipment.objectName}
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-500">
-                    {shipment.pickupAddress} → {shipment.deliveryAddress}
-                  </p>
-                  <p className="text-xs sm:text-sm">Prix: {shipment.price}€</p>
-                </div>
-                {shipment?.status === 'En attente' && user?.role === "transporteur" && (
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full">
+                {currentShipment.status === "En attente" && userData?.role === "transporteur" && (
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAcceptShipment(shipment.id);
-                    }}
-                    className="mt-2 sm:mt-0 bg-green-500 text-white py-1 px-2 sm:px-3 rounded hover:bg-green-600 text-xs sm:text-sm"
+                    onClick={() => handleAcceptShipment(currentShipment.id)}
+                    className="w-full flex items-center justify-center gap-2 bg-green-500 text-white py-2 px-3 rounded-lg text-sm hover:bg-green-600 transition-colors"
                   >
-                    Accepter
+                    <FaCheck className="w-4 h-4" />
+                    <span>Accepter l'offre</span>
                   </button>
                 )}
+
+                {(currentShipment.status === "En attente" || currentShipment.status === "Accepter") && (
+                  <>
+                    {userData?.role === "expediteur" && (
+                      <button
+                        onClick={() => setIsNewOfferModalOpen(true)}
+                        className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm hover:bg-green-600 bg-green-500 text-white transition-colors"
+                      >
+                        💬 Faire une nouvelle offre
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setIsModalOpen(true)}
+                      className={`w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm hover:bg-red-600 transition-colors ${
+                        currentShipment.status === "Accepter" 
+                          ? "bg-red-500 text-white" 
+                          : "bg-red-500 text-white"
+                      }`}
+                    >
+                      <FaTimes className="w-4 h-4" />
+                      <span>Annuler l'offre</span>
+                    </button>
+                  </>
+                )}
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-    ) : (
-      <div className="bg-white p-4 m-4 rounded-lg shadow text-center">
-        <FiPackage className="text-green-600 text-4xl mx-auto" />
-        <p className="text-gray-500 mt-2">Aucun autre colis actif trouvé</p>
-      </div>
-    )} */}
 
+            {/* Modale d'annulation */}
+            {isModalOpen && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                <div className="bg-white p-5 rounded-lg shadow-lg w-11/12 sm:w-80">
+                  <h3 className="text-lg font-semibold mb-3">Pourquoi annuler l'offre ?</h3>
+                  <div className="space-y-2">
+                    {userData?.role === "transporteur" ? (
+                      <>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name="cancelReason"
+                            value="transporteur_annulation"
+                            onChange={(e) => setCancelReason(e.target.value)}
+                            className="form-radio"
+                          />
+                          <span className="text-sm sm:text-base">J'ai décidé d'annuler la livraison</span>
+                        </label>
 
-{otherShipments.length > 0 ? (
-  <div className="bg-white p-3 m-2 sm:m-4 rounded-lg shadow">
-    <h3 className="text-md sm:text-lg font-semibold mb-3 sm:mb-4">Autres colis à expédier</h3>
-    <div className="space-y-3 max-h-[210px] overflow-y-auto"> {/* Ajout de max-h et overflow-y */}
-      {otherShipments
-      .filter(shipment => shipment.price !== 0) 
-      .map((shipment) => (
-        
-        <div 
-          key={shipment.id} 
-          className={`border p-2 sm:p-3 rounded-lg hover:bg-gray-50 cursor-pointer 
-            ${shipment.id == currentShipment?.id ? 'border-blue-500 bg-blue-100' : ''}`}
-          onClick={() => handleShipmentChange(shipment)}
-        >
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-            <div>
-              <p className="font-bolder text-green-600 hover:underline capitalize text-sm sm:text-base">
-                {shipment.objectName}
-              </p>
-              <p className="text-xs sm:text-sm text-gray-500">
-                {shipment.pickupAddress} → {shipment.deliveryAddress}
-              </p>
-              <p className="text-xs sm:text-sm">Prix: {shipment.price}€</p>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name="cancelReason"
+                            value="client_annulation"
+                            onChange={(e) => setCancelReason(e.target.value)}
+                            className="form-radio"
+                          />
+                          <span className="text-sm sm:text-base">Le client a décidé d'annuler le transport</span>
+                        </label>
+                      </>
+                    ) : (
+                      <>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name="cancelReason"
+                            value="client_annulation"
+                            onChange={(e) => setCancelReason(e.target.value)}
+                            className="form-radio"
+                          />
+                          <span className="text-sm sm:text-base">J'ai décidé d'annuler ma demande</span>
+                        </label>
+
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name="cancelReason"
+                            value="transporteur_annulation"
+                            onChange={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setCancelReason(e.target.value);
+                            }}
+                            className="form-radio"
+                          />
+                          <span className="text-sm sm:text-base">Le transporteur a décidé d'annuler la livraison</span>
+                        </label>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end space-x-2 mt-4">
+                    <button
+                      onClick={() => setIsModalOpen(false)}
+                      className="bg-gray-300 px-3 py-1 rounded-lg text-sm"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleCancelShipment();
+                      }}
+                      className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600"
+                    >
+                      Confirmer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {isNewOfferModalOpen && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                <div className="bg-white p-5 rounded-lg shadow-lg w-11/12 sm:w-96">
+                  <h3 className="text-lg font-semibold mb-3">Proposer un nouveau prix en (€)</h3>
+                  <input
+                    type="number"
+                    placeholder="Entrer un nouveau prix (€)"
+                    value={newOfferPrice}
+                    onChange={(e) => setNewOfferPrice(e.target.value)}
+                    className="w-full border rounded p-2 mb-4"
+                  />
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      onClick={() => {
+                        setIsNewOfferModalOpen(false);
+                        setNewOfferPrice("");
+                      }}
+                      className="bg-gray-300 px-3 py-1 rounded-lg text-sm"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      onClick={async () => {
+                        await addDoc(collection(db, "messages"), {
+                          shipmentId: currentShipment.id,
+                          sender: uid,
+                          users: [uid, receiverId],
+                          type: "new_offer",
+                          timestamp: serverTimestamp(),
+                          price: newOfferPrice,
+                          createdAt: serverTimestamp(),
+                        });
+                        setIsNewOfferModalOpen(false);
+                        setNewOfferPrice(null);
+                        await Promise.all([
+                          sendEmailNotification(currentShipment.id, "new_offer"),
+                          sendPushNotification(currentShipment.id, "new_offer"),
+                        ]);
+                      }}
+                      className="bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600"
+                    >
+                      Envoyer l'offre
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {!currentShipment && (
+          <div className="bg-white p-1 m-1 rounded-sm text-center">
+            <FiPackage className="text-green-500 text-sm mx-auto" />
+            <p className="text-gray-500 mt-2">Aucun autre colis actif trouvé</p>
+          </div>
+        )}
+
+        {/* Chat Area */}
+        <div className="flex flex-col flex-1 p-2 sm:p-4 bg-gray-100 ">
+          {/* Messages */}
+          <div className="flex-1  space-y-3 w-full mx-auto px-2 sm:max-w-2xl sm:px-0">
+            {messages
+              .filter((msg) => msg.shipmentId === currentShipment?.id)
+              .map((msg, i) => {
+                const isLast = isLastMessageOfGroup(msg, i);
+                const isFirst = isFirstMessageOfGroup(msg, i);
+                const isSentByMe = msg.sender === uid;
+                const shouldMarkAsRead = !isSentByMe && !msg.isRead;
+                const isRead = isSentByMe && (msg.isRead || lastMessageReadStatus[msg.id]);
+                const uniqueKey = `${msg.id}-${i}`;
+
+                return (
+                  <div
+                    key={uniqueKey}
+                    ref={shouldMarkAsRead ? (node) => messageObserver(node, msg.id) : null}
+                    className={clsx(
+                      "flex items-end gap-2",
+                      isSentByMe ? "justify-end" : "justify-start",
+                      msg.pending && "opacity-100"
+                    )}
+                  >
+                    {/* Avatar de l'expéditeur (si ce n'est pas moi et dernier message du groupe) */}
+                    {!isSentByMe && isLast && (
+                      <div className="size-8">
+                        <Avatar
+                          size={8}
+                          src={msg.avatar}
+                          name={`${chatPartner?.firstName} ${chatPartner?.lastName}`}
+                        />
+                      </div>
+                    )}
+
+                    {/* Contenu du message */}
+                    <div
+                      className={clsx(
+                        "relative",
+                        isSentByMe ? "bg-green-500 text-white" : "bg-gray-200 text-gray-800",
+                        isLast && !isFirst && (isSentByMe ? "rounded-tr-lg" : "rounded-tl-lg"),
+                        isFirst && !isLast && (isSentByMe ? "rounded-br-lg" : "rounded-bl-lg"),
+                        !isFirst && !isLast && (isSentByMe ? "rounded-r-lg" : "rounded-l-lg"),
+                        "p-3 max-w-[80%] sm:max-w-[70%] text-sm sm:text-base"
+                      )}
+                    >
+                      {/* Message avec pièces jointes */}
+                      {msg.attachments && msg.attachments.length > 0 ? (
+                        <div className="space-y-2">
+                          {msg.attachments.map((attachment, index) => (
+                            <div key={index} className="group relative">
+                              {attachment.type === "image" ? (
+                                <div className="relative group">
+                                  <Link href={attachment.url} passHref legacyBehavior>
+                                    <a target="_blank" rel="noopener noreferrer">
+                                      <Image
+                                        src={attachment.url}
+                                        width={100}
+                                        height={100}
+                                        alt="Image partagée"
+                                        className="rounded-lg max-w-full cursor-pointer hover:opacity-90"
+                                      />
+                                    </a>
+                                  </Link>
+                                  {!isSentByMe && (
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <button 
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          downloadFile(attachment.url, attachment.name || `image_${msg.id}_${index}.jpg`);
+                                        }}
+                                        className="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70"
+                                      >
+                                        <FaDownload />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="flex items-center p-2 bg-white bg-opacity-20 rounded-lg">
+                                  <FaFile className="text-xl mr-2" />
+                                  <div>
+                                    <p className="text-sm font-medium truncate max-w-[180px]">
+                                      {attachment.name || "Fichier joint"}
+                                    </p>
+                                    <p className="text-xs text-gray-300">
+                                      {formatFileSize(attachment.size)} - {attachment.mimeType}
+                                    </p>
+                                  </div>
+                                  {!isSentByMe && (
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <button 
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          downloadFile(attachment.url, attachment.name || `file_${msg.id}_${index}`);
+                                        }}
+                                        className="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70"
+                                      >
+                                        <FaDownload />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                          {msg.message && msg.message !== `${msg.attachments.length} fichier(s) joint(s)` && (
+                            <p className="text-sm sm:text-base mt-2">{msg.message}</p>
+                          )}
+                        </div>
+                      ) : msg.offerDetails ? (
+                        <div className="space-y-2">
+                          <div className="font-semibold text-sm sm:text-lg">📦 Nouvelle offre de transport</div>
+                          {currentShipment?.status === "Accepter" && (
+                            <div className="flex items-center bg-green-100 text-green-800 p-2 mb-3 rounded-t-lg">
+                              <FaCheckCircle className="mr-2 text-green-500" />
+                              <span className="text-sm font-medium">Cette Offre a été acceptée</span>
+                            </div>
+                          )}
+                          <div className="space-y-1">
+                            <p className="flex items-center text-xs sm:text-sm">
+                              <FaBox className="mr-1" /> Object : {currentShipment?.objectName}
+                            </p>
+                            <p className="text-xs sm:text-sm">💰 Prix proposé: {msg.offerDetails.price}€</p>
+                            <p className="text-xs sm:text-sm">📅 Date de début: {msg.offerDetails.startDate}</p>
+                            {msg.offerDetails.endDate && (
+                              <p className="text-xs sm:text-sm">📅 Date de fin: {msg.offerDetails.endDate}</p>
+                            )}
+                            <p className="mt-2 text-xs sm:text-sm">📝 Informations supplémentaires:</p>
+                            <p className="text-xs sm:text-sm">{msg.offerDetails.additionalInfo}</p>
+                          </div>
+                          {!isSentByMe && (
+                            <div className="mt-3 flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                id={`validate-${msg.id}`}
+                                checked={acceptedOffers[msg.id] || false}
+                                onChange={() => handleTransporteurOfferAcceptance(msg)}
+                                className="form-checkbox h-4 w-4 text-green-600"
+                              />
+                              <label className="text-xs sm:text-sm">
+                                {acceptedOffers[msg.id] ? "Offre acceptée" : "Valider cette offre"}
+                              </label>
+                            </div>
+                          )}
+                        </div>
+                      ) : msg.type === "new_offer" ? (
+                        <div className="space-y-2">
+                          <div className="font-semibold text-sm sm:text-lg">📦 Nouvelle offre de transport proposée :</div>
+                          {currentShipment?.status === "Accepter" && (
+                            <div className="flex items-center bg-green-100 text-green-800 p-2 mb-3 rounded-t-lg">
+                              <FaCheckCircle className="mr-2 text-green-500" />
+                              <span className="text-sm font-medium">Cette Offre a été acceptée</span>
+                            </div>
+                          )}
+                          <div className="space-y-1">
+                            <p className="flex items-center text-xs sm:text-sm">
+                              <FaBox className="mr-1" /> Object : {currentShipment?.objectName}
+                            </p>
+                            <p className="text-xs sm:text-sm">💰 Prix proposé: {msg.price}€</p>
+                            <p className="text-xs sm:text-sm">📅 Date de début: {currentShipment?.pickupDate?.toDate?.()?.toLocaleString("fr-FR", {
+                              weekday: "short",
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            }) ?? "Date invalide"}</p>
+                            {currentShipment?.deliveryDate && (
+                              <p className="text-xs sm:text-sm">📅 Date de fin: {currentShipment?.deliveryDate?.toDate?.()?.toLocaleString("fr-FR", {
+                                weekday: "short",
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              }) ?? "Date invalide"}</p>
+                            )}
+                          </div>
+                          {(!isSentByMe || (!msg.accepted && userData?.role !== "expediteur")) && (
+                            <div className="mt-3 flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                id={`validate-${msg.id}`}
+                                disabled={msg.accepted}
+                                checked={pendingAcceptance[msg.id] || false}
+                                onChange={() => handleNewOfferAcceptance(msg)}
+                                className="form-checkbox h-4 w-4 text-green-600"
+                              />
+                              <label className="text-xs sm:text-sm">
+                                {pendingAcceptance[msg.id] ? "En cours..." : "Accepter cette offre"}
+                              </label>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex items-end">
+                          <p className="text-sm sm:text-base">{msg.message}</p>
+                          {isSentByMe && (
+                            <div className={clsx(
+                              "ml-2",
+                              isRead ? "text-green-500" : "text-gray-400"
+                            )}>
+                              <FaCheckDouble className="text-xs" />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {isSentByMe && isLast && (
+                      <div className="size-8">
+                        <Avatar
+                          size={8}
+                          src={userData?.photoURL}
+                          name={`${userData?.firstName} ${userData?.lastName}`}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {messages.length <= 0 && (
+            <div className="p-4 m-4 rounded-lg shadow text-center">
+              <MdMessage className="text-green-600 text-4xl mx-auto" />
+              <p className="text-gray-500 mt-2">Aucun message pour le moment</p>
             </div>
-            {shipment?.status === 'En attente' && userData?.role === "transporteur" && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAcceptShipment(shipment.id);
+          )}
+
+          {/* Message Input */}
+          <div className="flex flex-col gap-2 p-2 sm:p-4 bg-white w-full mx-auto">
+            {/* Aperçu des fichiers joints */}
+            {previewFiles.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {previewFiles.map((file, index) => (
+                  <div key={index} className="relative border rounded-lg p-2 max-w-[200px]">
+                    {file.type.startsWith('image/') ? (
+                      <img 
+                        src={URL.createObjectURL(file)} 
+                        alt="Preview" 
+                        className="max-h-20 max-w-full object-contain"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center p-2">
+                        <FaFile className="text-3xl text-gray-500" />
+                        <span className="text-xs truncate w-full text-center mt-1">{file.name}</span>
+                      </div>
+                    )}
+                    <button
+                      onClick={() => removeFile(index)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                    >
+                      <FaTimes className="text-xs" />
+                    </button>
+                    <span className="text-xs block mt-1">
+                      {Math.round(file.size / 1024)} KB
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <textarea
+                value={newMessage}
+                rows={2}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                  }
                 }}
-                className="mt-2 sm:mt-0 bg-green-500 text-white py-1 px-2 sm:px-3 rounded hover:bg-green-600 text-xs sm:text-sm"
+                placeholder="Écrivez votre message..."
+                className="flex-1 p-2 border border-gray-300 rounded-lg text-sm sm:text-base resize-none"
+              />
+
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-4">
+                  <label className="cursor-pointer p-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 flex items-center justify-center">
+                    <input
+                      type="file"
+                      accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      multiple
+                    />
+                    {isUploading ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : (
+                      <FaPaperclip />
+                    )}
+                  </label>
+                </div>
+                <button
+                  onClick={sendMessage}
+                  disabled={isUploading || (newMessage.trim() === '' && previewFiles.length === 0)}
+                  className="px-3 py-2 bg-green-500 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed text-sm sm:text-base h-full"
+                >
+                  Envoyer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Liste des autres colis */}
+        {otherShipments.length > 0 ? (
+          <div className="bg-white p-3 m-2 sm:m-4 rounded-lg shadow">
+            <h3 className="text-md sm:text-lg font-semibold mb-3 sm:mb-4">Autres colis à expédier</h3>
+            <div className="space-y-3">
+              {otherShipments
+                .filter(shipment => shipment.price !== 0)
+                .map((shipment) => (
+                  <div 
+                    key={shipment.id} 
+                    className={`border p-2 sm:p-3 rounded-lg hover:bg-gray-50 cursor-pointer 
+                      ${shipment.id === currentShipment?.id ? 'border-blue-500 bg-blue-100' : ''}`}
+                    onClick={() => handleShipmentChange(shipment)}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                      <div>
+                        <p className="font-bolder text-green-600 hover:underline capitalize text-sm sm:text-base">
+                          {shipment.objectName}
+                        </p>
+                        <p className="text-xs sm:text-sm text-gray-500">
+                          {shipment.pickupAddress} → {shipment.deliveryAddress}
+                        </p>
+                        <p className="text-xs sm:text-sm">Prix: {shipment.price}€</p>
+                      </div>
+                      {shipment?.status === 'En attente' && userData?.role === "transporteur" && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAcceptShipment(shipment.id);
+                          }}
+                          className="mt-2 sm:mt-0 bg-green-500 text-white py-1 px-2 sm:px-3 rounded hover:bg-green-600 text-xs sm:text-sm"
+                        >
+                          Accepter
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white p-2 m-2 rounded-lg shadow text-center">
+            <FiPackage className="text-green-600 text-sm mx-auto" />
+            <p className="text-gray-500 mt-2">Aucun autre colis actif trouvé</p>
+          </div>
+        )}
+      </div>
+
+      {transporteurOfferModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-5 rounded-lg shadow-lg w-11/12 sm:w-80">
+            <h3 className="text-lg font-semibold mb-3">Confirmer l'acceptation</h3>
+            <p>Voulez-vous accepter cette offre de <span className="capitalize font-bold">{transporteurOfferModal.transporteurName} ?</span></p>
+            <div className="flex justify-end space-x-2 mt-4">
+              <button
+                onClick={() => {
+                  setAcceptedOffers(prev => ({ ...prev, [transporteurOfferModal.msgId]: false }));
+                  setTransporteurOfferModal(null);
+                }}
+                className="bg-gray-300 px-3 py-1 rounded-lg text-sm"
+              >
+                Non
+              </button>
+              <button
+                onClick={async () => {
+                  await handleAcceptTransporteurOffer(transporteurOfferModal.msgId);
+                }}
+                className="bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600"
+              >
+                Oui, accepter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {newOfferModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-5 rounded-lg shadow-lg w-11/12 sm:w-80">
+            <h3 className="text-lg font-semibold mb-3">Accepter la nouvelle offre</h3>
+            <p>Acceptez-vous le nouveau prix de {newOfferModal.price}€ ?</p>
+            <div className="flex justify-end space-x-2 mt-4">
+              <button
+                onClick={() => {
+                  setPendingAcceptance(prev => ({ ...prev, [newOfferModal.msgId]: false }));
+                  setNewOfferModal(null);
+                }}
+                className="bg-gray-300 px-3 py-1 rounded-lg text-sm"
+              >
+                Refuser
+              </button>
+              <button
+                onClick={async () => {
+                  await handleAcceptNewOffer(newOfferModal.msgId, newOfferModal.price);
+                  setNewOfferModal(null);
+                }}
+                className="bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600"
               >
                 Accepter
               </button>
-            )}
+            </div>
           </div>
         </div>
-
-      ))}
-    </div>
-  </div>
-) : (
-  <div className="bg-white p-2 m-2 rounded-lg shadow text-center">
-    <FiPackage className="text-green-600 text-sm mx-auto" />
-    <p className="text-gray-500 mt-2">Aucun autre colis actif trouvé</p>
-  </div>
-)}
-
-  </div>
-</div>
-
+      )}
 
 
 

@@ -12,17 +12,17 @@ export default function Home() {
   const router = useRouter();
   const [showLoader, setShowLoader] = useState(true);
 
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/firebase-messaging-sw.js')
-        .then(registration => {
-          console.log('Service Worker enregistré:', registration);
-        })
-        .catch(error => {
-          console.error('Erreur d’enregistrement SW:', error);
-        });
-    }
-  }, []);
+  // useEffect(() => {
+  //   if ('serviceWorker' in navigator) {
+  //     navigator.serviceWorker.register('/firebase-messaging-sw.js')
+  //       .then(registration => {
+  //         console.log('Service Worker enregistré:', registration);
+  //       })
+  //       .catch(error => {
+  //         console.error('Erreur d’enregistrement SW:', error);
+  //       });
+  //   }
+  // }, []);
 
   useEffect(() => {
 
@@ -31,7 +31,7 @@ export default function Home() {
       
       // Gestion des notifications en premier plan
       const unsubscribe = onMessage(messaging, (payload) => {
-        console.log('Message reçu en premier plan:', payload);
+        // console.log('Message reçu en premier plan:', payload);
         
         // Mettre à jour le compteur de notifications
         // const newCount = parseInt(payload.data?.count || 0);
@@ -84,10 +84,10 @@ export default function Home() {
     if ('serviceWorker' in navigator && firebaseConfig) {
       navigator.serviceWorker.register('/firebase-messaging-sw.js')
         .then(registration => {
-          console.log('SW registered');
+          // console.log('SW registered');
         })
         .catch(err => {
-          console.log('SW registration failed:', err);
+          // console.log('SW registration failed:', err);
         });
     }
   }, []);

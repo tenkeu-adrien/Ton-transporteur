@@ -18,15 +18,14 @@ import AddressForm from "@/components/AddressForm";
 import Footer from "@/components/Footer";
 import { ChatButton } from "@/components/ChatButton";
 import { PopularPackages } from "@/components/ShipementColis";
+import Image from "next/image";
 
 export default function Home() {
 
 
 
   const { user,logout} = useContext(AuthContext);
-const handleStart =()=>{
-  router.push("/start")
-}
+
 
   // console.log("data de user  connecter  dans accueil ; userData" ,userData)
    const router = useRouter()
@@ -59,9 +58,9 @@ const handleStart =()=>{
     Envoyez et recevez vos colis partout en France et en Europe. Économisez de l&apos;argent car aucun frais de commission n&apos;est appliqué : vous payez exactement vos frais de transport.
   </p>
   <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-    <button className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition duration-300" onClick={() => handleStart()}>
+    <Link className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition duration-300"  href="/start">
       Expédier ou recevoir un colis
-    </button>
+    </Link>
     <Link href="/mes-colis" className="bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700 transition duration-300">
       Voir les colis sur ma route
     </Link>
@@ -69,17 +68,17 @@ const handleStart =()=>{
 </div>
 
           {/* Image illustrative */}
-          {/* <div className="relative h-[500px]">
+          <div className="relative h-[400px] mt-10 w-[600px]">
             <Image
-              src="/images/home_page.avif" // Remplacez par le chemin de votre image
+              src="/images/accueil.png" 
               alt="Transport de colis"
-              layout="fill"
-              objectFit="cover"
-              width={100}
-              height={100}
-              className="rounded-lg shadow-lg"
+              // layout="fill"
+              // objectFit="cover"
+              width={600}
+              height={600}
+              className="rounded-lg shadow-lg  "
             />
-          </div> */}
+          </div>
         </div>
       </div>
     </section>
@@ -221,7 +220,7 @@ const handleStart =()=>{
           </div>
         </div>
         <p className="text-gray-600 italic mb-4">
-          "Ravi de cette premiere experience  avec Ton-transporteur appli tres bien fait efficase . facile pour les validations de livraion . aucun frais de commission a payer pour ta mise en relation avec un transporteur . je recommande !"
+        "Ravi de cette première expérience avec Ton-Transporteur. Application très bien faite et efficace. Facile pour la validation des livraisons. Aucun frais de commission à payer pour la mise en relation avec un transporteur. Je recommande !"
         </p>
         <p className="font-semibold text-green-700">Marie L.</p>
       </div>
@@ -236,7 +235,7 @@ const handleStart =()=>{
           </div>
         </div>
         <p className="text-gray-600 italic mb-4">
-          "Je suis un voyageur régulier, j'habite Amsderdam depuis plusieurs annee et je  rentre souvent a Amiens . J'ai enregister mon traject pour recevoir des propositions de livraison de colis pour des particuliers "
+       " Je suis un voyageur régulier. J'habite Amsterdam depuis plusieurs années et je rentre souvent à Amiens. J'ai enregistré mon trajet pour recevoir des propositions de livraison de colis de la part de particuliers."
         </p>
         <p className="font-semibold text-green-700">Thomas P.</p>
       </div>
@@ -269,7 +268,7 @@ const handleStart =()=>{
 
         </div>
         <p className="text-gray-600 italic mb-4">
-          "Premiere et bonne experience avec ton-transporteur Pour mon déménagement,  je recommande deja mon entourage pour des besoins de livraion j'ai reussir a trouver un chauffeur alors que  ce n'etait pas gagner ,  demenagement realiser a la perfection je pense donc que tout le monde peut l'utiliser !"
+          "Première et bonne expérience avec Ton-Transporteur. Pour mon déménagement, je recommande déjà mon entourage pour leurs besoins de livraison. J&apos;ai réussi à trouver un chauffeur alors que ce n&apos;était pas gagné. Déménagement réalisé à la perfection. Je pense donc que tout le monde peut l&apos;utiliser !"
         </p>
         <p className="font-semibold text-green-700">Luc D.</p>
       </div>
@@ -286,7 +285,7 @@ const handleStart =()=>{
 
         </div>
         <p className="text-gray-600 italic mb-4">
-        "Je suis responsable logistique et je dois gérer une centaine d’expéditions. Avec Ton-Transporteur, je gère toutes mes livraisons de manière simple et automatisée."
+        "Je suis responsable logistique et je dois gérer une centaine d&apos;expéditions. Avec Ton-Transporteur, je gère toutes mes livraisons de manière simple et automatisée."
         </p>
         <p className="font-semibold text-green-700">Martin L.</p>
       </div>
@@ -494,3 +493,11 @@ const handleStart =()=>{
 // };
 
 // export default ExpeditionForm;
+
+
+
+
+// je travaille sur une application nextjs avec firebase et j'aimerais 
+// que si la connexion firebase et mon projet prends du temps qu'il rediriger un vers un composant lui indiquant le probleme de connexionavec icon 
+// associe mon application c'est ton-transporteur  je veux que ce soit  une page comme 404 dans mon application nextjs et aussi stylise moi  aussi mon fichier 404  
+// de mon application nextjs 14

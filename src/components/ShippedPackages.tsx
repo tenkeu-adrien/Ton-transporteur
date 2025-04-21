@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-import { FaCalendarAlt, FaChevronLeft, FaChevronRight, FaHashtag, FaMapMarkerAlt, FaRegComments, FaSpinner } from "react-icons/fa";
+import { FaCalendarAlt, FaChevronLeft, FaChevronRight, FaHashtag, FaMapMarkerAlt, FaRegComments, FaSearch, FaSpinner } from "react-icons/fa";
 import { FaMoneyBillWave } from "react-icons/fa6";
 import { auth, db } from "../../lib/firebaseConfig";
 import { updateShipmentStatus } from "../../lib/functions";
@@ -71,12 +71,12 @@ const ShipmentCard = ({ shipment, handleClick, handleCancelShipment }) => {
 
                 {/* Informations du colis */}
                 <div className="w-2/3 p-4">
-                  <Link
+                  <a
                     className="text-xl font-semibold mb-2 block capitalize" 
                     href={`/colis/${shipment.id}`}
                   >
                     {shipment.objectName}
-                  </Link>
+                  </a>
                   <p className="flex items-center">
       <FaHashtag className="mr-2" /> {/* Ajoutez l'icône ici */}
       <span className="font-medium text-sm">Référence du colis:</span> {shipment?.reference ?? null}
@@ -264,67 +264,46 @@ const ShipmentCard = ({ shipment, handleClick, handleCancelShipment }) => {
 };
 
 
-
-
-
-
-
-
-
-
 const ShipmentsList = () => {
-  // ... états principaux et fonctions ...
-  const [filterStatus, setFilterStatus] = useState("Tous");
+  const [filterStatus, setFilterStatus] = useState("En attente");
   const [isLoading, setIsLoading] = useState(true);
   const [shipments, setShipments] = useState([]);
- const [transporteur  ,setTransporteur] = useState(null)
-  // const [user, setUser] = useState(null);
-  const router =useRouter()
+  const [transporteur, setTransporteur] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
-const {user ,userData} = useContext(AuthContext)
- useEffect( () => {
+  const { user, userData } = useContext(AuthContext);
 
+  useEffect(() => {
     const fetchTransporteur = async () => {
       const q = query(
         collection(db, "users"),
-        where("role", "==", "transporteur"), // Filtre par rôle
-        limit(1) // Vous n'en avez qu'un
+        where("role", "==", "transporteur"),
+        limit(1)
       );
       
       const snapshot = await getDocs(q);
       if (!snapshot.empty) {
         const doc = snapshot.docs[0];
         setTransporteur({ id: doc.id, ...doc.data() });
-        // setChatPartner({ id: doc.id, ...doc.data() })
       }
     };
   
     fetchTransporteur();
   }, []);
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [cancelReason, setCancelReason] = useState("");
 
-  const handleCancelShipment =  async (shipmentId, reason) => {
-    // Implémentez votre logique d'annulation ici
-    // Mettez à jour le statut du shipment dans votre state
-    let newStatus = "Annuler"
-    let cancelReason=reason
-    let recipientEmail =transporteur?.email
+  const handleCancelShipment = async (shipmentId, reason) => {
+    let newStatus = "Annuler";
+    let cancelReason = reason;
+    let recipientEmail = transporteur?.email;
     let userr = { ...userData, id: user?.uid };
-   await   updateShipmentStatus(shipmentId ,newStatus,cancelReason , userr,recipientEmail)
-   toast.info("Offre Annuler")
+    await updateShipmentStatus(shipmentId, newStatus, cancelReason, userr, recipientEmail);
+    toast.info("Offre Annuler");
   };
-  const handleClick =(shipmentId)=>{
-    router.push(`/chat/${shipmentId}`)
-   }
 
-
-  //  useEffect(() => {
-  //   const unsubscribe = auth.onAuthStateChanged((user) => {
-  //     setUser(user);
-  //   });
-  //   return () => unsubscribe();
-  // }, []);
+  const handleClick = (shipmentId) => {
+    router.push(`/chat/${shipmentId}`);
+  };
 
   useEffect(() => {
     if (!user) {
@@ -334,14 +313,11 @@ const {user ,userData} = useContext(AuthContext)
 
     const fetchShipments = () => {
       setIsLoading(true);
-      // Requête pour récupérer les shipments en temps réel (sauf ceux annulés)
       const q = query(
         collection(db, "shipments"),
-        where("expediteurId", "==", user.uid),
-        where("status", "not-in", ["Annuler"]) // Exclure les shipments annulés
+        where("expediteurId", "==", user.uid)
       );
     
-      // Écouteur en temps réel
       const unsubscribe = onSnapshot(q, (snapshot) => {
         const shipmentsData = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -350,70 +326,84 @@ const {user ,userData} = useContext(AuthContext)
         setShipments(shipmentsData);
         setIsLoading(false);
       }, (error) => {
-        // console.error("Erreur lors du chargement des expéditions :", error);
         setIsLoading(false);
       });
     
-      // Nettoyage de l'écouteur en cas de démontage du composant
       return () => unsubscribe();
     };
 
     fetchShipments();
   }, [user]);
 
-const filteredShipments =
-  filterStatus === "Tous"
-    ? shipments
-    : shipments.filter((shipment) => shipment.status === filterStatus);
+  // Fonction de recherche
+  const filteredShipments = shipments.filter((shipment) => {
+    // Filtrage par statut
+    const statusMatch = filterStatus === "Tous" || shipment.status === filterStatus;
+    const searchTermLower = searchTerm.toLowerCase();
+    // Filtrage par terme de recherche
+    const searchMatch = 
+    searchTerm === "" ||
+    shipment.objectName?.toString().toLowerCase().includes(searchTermLower) ||
+    shipment.reference?.toString().toLowerCase().includes(searchTermLower) ||
+    shipment.price?.toString().includes(searchTerm);
+  
+  return statusMatch && searchMatch;
+});
 
-    const cardsPerPage = 5; // Nombre de cartes par page
-
-    // Calculer les cartes à afficher pour la page actuelle
-    const indexOfLastCard = currentPage * cardsPerPage;
-    const indexOfFirstCard = indexOfLastCard - cardsPerPage;
-    const currentCards = filteredShipments.slice(indexOfFirstCard, indexOfLastCard);
-    const totalPages = Math.ceil(filteredShipments.length / cardsPerPage);
-    // Fonction pour changer de page
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-//     console.log("shipments car" ,currentCards)
-// console.log("shipments" , shipments)
-    
+  const cardsPerPage = 5;
+  const indexOfLastCard = currentPage * cardsPerPage;
+  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+  const currentCards = filteredShipments.slice(indexOfFirstCard, indexOfLastCard);
+  const totalPages = Math.ceil(filteredShipments.length / cardsPerPage);
+  
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="p-4 sm:p-6 bg-white shadow-md rounded-lg">
-      {/* ... en-tête et filtre ... */}
-<div className="flex flex-col sm:flex-row items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold mb-4 sm:mb-0">📦 Mes colis</h2>   
-          <Link
-  href="/start"
-  className="inline-flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1"
->
-  <span>Expédier un colis</span>
-  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-  </svg>
-</Link>
-   </div>
-   <div className="mb-8">
-        <label htmlFor="statusFilter" className="mr-2 font-medium">
-          Filtrer par statut :
-        </label>
-        <select
-          id="statusFilter"
-          value={filterStatus}
-          onChange={(e) => {
-            setFilterStatus(e.target.value);
-            setCurrentPage(1); // Réinitialiser à la première page lors du changement de filtre
-          }}
-          className="p-2 border border-gray-300 rounded"
-        >
-          <option value="Tous">Tous</option>
-          {/* <option value="En cours">En cours</option> */}
-          {/* <option value="Annuler">Annuler</option> */}
-          <option value="En attente">En attente</option>
-        </select>
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold mb-4 sm:mb-0">📦 Mes colis</h2>   
       </div>
-      {/* Liste des colis */}
+      
+      {/* Barre de recherche et filtre */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <FaSearch className="text-gray-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Rechercher par nom, référence ou prix..."
+            className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+        
+        <div className="flex items-center">
+          <label htmlFor="statusFilter" className="mr-2 font-medium whitespace-nowrap">
+            Filtrer par statut :
+          </label>
+          <select
+            id="statusFilter"
+            value={filterStatus}
+            onChange={(e) => {
+              setFilterStatus(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="p-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          >
+            <option value="Tous">Tous</option>
+            <option value="Annuler">Annuler</option>
+            <option value="En attente">En attente</option>
+            <option value="Accepter">Accepter</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Liste des colis (reste inchangé) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
         {isLoading && (
           <div className="col-span-full text-center py-5">
@@ -425,8 +415,9 @@ const filteredShipments =
         {!isLoading && currentCards.length === 0 && (
           <div className="col-span-full text-center py-5">
             <FiPackage className="text-green-600 text-4xl mx-auto" />
-            <p className="text-gray-500 mt-2">Aucun colis actif trouvé.</p>
-            
+            <p className="text-gray-500 mt-2">
+              {searchTerm ? "Aucun résultat trouvé pour votre recherche" : "Aucun colis actif trouvé."}
+            </p>
           </div>
         )}
 
@@ -440,13 +431,13 @@ const filteredShipments =
         ))}
       </div>
 
-      {/* ... pagination ... */}
+      {/* Pagination (reste inchangé) */}
       {filteredShipments.length > cardsPerPage && (
         <div className="flex justify-between items-center mt-6">
           <button
             onClick={() => paginate(currentPage - 1)}
             disabled={currentPage === 1}
-            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
           >
             <FaChevronLeft className="text-gray-700" />
             <span className="text-sm text-gray-700">Précédent</span>
@@ -457,7 +448,7 @@ const filteredShipments =
           <button
             onClick={() => paginate(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
           >
             <span className="text-sm text-gray-700">Suivant</span>
             <FaChevronRight className="text-gray-700" />

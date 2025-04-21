@@ -114,8 +114,8 @@ export const loginUser = async (email, password) => {
 
     return { success: true, user: userDoc.data() };
   } catch (error) {
-    console.error("Erreur lors de la connexion :", error);
-    return { success: false, error: error.message };
+    // console.error("Erreur lors de la connexion :", error);
+    return { success: false, error: error }
   }
 };
 
@@ -252,10 +252,10 @@ export const updateShipmentStatus = async (
         case "Annuler":
           emailType = "Annuler";
           break;
-        case "Accepté":
+        case "Accepter":
           emailType = "acceptance";
           break;
-        case "Livré":
+        case "Livrer":
           emailType = "delivery";
           break;
         default:

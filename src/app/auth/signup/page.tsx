@@ -90,7 +90,7 @@ const [timerActive, setTimerActive] = useState(false);
   const [verificationDigits, setVerificationDigits] = useState(['', '', '', '']);
   const [showExpiredModal, setShowExpiredModal] = useState(false);
   const [email ,setEmail] =useState("null")
-
+const [error ,setError] = useState(null)
 const digitRefs = [
   useRef(null),
   useRef(null),
@@ -222,7 +222,7 @@ const handleKeyDown = (index, e) => {
   }
 };
     // Fonction pour envoyer l'email de vérification
-    const sendVerificationEmail = async (email, code) => {
+     const sendVerificationEmail = async (email, code) => {
       try {
         // Configuration de l'email
         const emailData = {
@@ -240,7 +240,7 @@ const handleKeyDown = (index, e) => {
         });
   
         if (!response.ok) {
-          throw new Error("Erreur lors de l'envoi de l'email");
+          // throw new Error("Erreur lors de l'envoi de l'email");
         }
   
         setIsCodeSent(true);
@@ -248,51 +248,120 @@ const handleKeyDown = (index, e) => {
     setTimerActive(true);
     setShowExpiredModal(false);
       } catch (error) {
-        console.error("Erreur:", error);
-        toast.error("Erreur lors de l'envoi de l'email de vérification");
+        // console.error("Erreur:", error);
+        
+        // toast.error("Erreur lors de l'envoi de l'email de vérification");
+        setError(error.message)
+        return null
       }
     };
 
-  const onSubmit = async (data) => {
-    setIsSubmitting(true);
-    try {
-      // Créer l'utilisateur dans Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password
-      );
-      // Générer le code de vérification
-      const code = generateVerificationCode();
-      setGeneratedCode(code);
+//   const onSubmit = async (data) => {
 
-      // Enregistrer les données utilisateur dans Firestore avec le code de vérification
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phoneNumber: data.phoneNumber,
-        profile: data.profile,
-        role: data.role ?? "expediteur", 
-        verificationCode: code,
-        isVerified: false,
-        createdAt: serverTimestamp(),
-      });
+//     setIsSubmitting(true)
+//     try {
+//       // Créer l'utilisateur dans Firebase Auth
+//       const userCredential = await createUserWithEmailAndPassword(
+//         auth,
+//         data.email,
+//         data.password
+//       );
+//       // Générer le code de vérification
+//       const code = generateVerificationCode();
+//       setGeneratedCode(code);
 
-      // Envoyer l'email de vérification
-     ;
-      toast.success("Compte créé ! Veuillez vérifier votre email pour le code de vérification.");
-      await sendVerificationEmail(data.email, code)
-setEmail(data.email)
-      
-    } catch (error) {
-      console.error("Erreur:", error);
-      toast.error(`Erreur lors de l'inscription: ${error.message}`);
-    } finally {
-      setIsSubmitting(false);
+//       // Enregistrer les données utilisateur dans Firestore avec le code de vérification
+//       await setDoc(doc(db, "users", userCredential.user.uid), {
+//         firstName: data.firstName,
+//         lastName: data.lastName,
+//         email: data.email,
+//         phoneNumber: data.phoneNumber,
+//         profile: data.profile,
+//         role: data.role ?? "expediteur", 
+//         verificationCode: code,
+//         isVerified: false,
+//         createdAt: serverTimestamp(),
+//       });
+
+//       // Envoyer l'email de vérification
+//      ;
+//       toast.success("Compte créé ! Veuillez vérifier votre email pour le code de vérification.");
+//       await sendVerificationEmail(data.email, code)
+// setEmail(data.email)
+//       // router.push("/Dashboard")
+//     } catch (error) {
+//       // console.error("Erreur:", error);
+//       // toast.error(`Erreur lors de l'inscription: ${error.message}`);
+//       setError(error.message)
+//     } finally {
+//       setIsSubmitting(false);
+//     }
+//   };
+
+
+const onSubmit = async (data) => {
+  setIsSubmitting(true);
+  setError(null); // Réinitialiser les erreurs
+  
+  try {
+    // 1. Création de l'utilisateur
+    const userCredential = await createUserWithEmailAndPassword(
+      auth, 
+      data.email, 
+      data.password
+    );
+
+    // 2. Génération et envoi du code
+    const code = generateVerificationCode();
+    setGeneratedCode(code);
+    setEmail(data.email);
+
+    // 3. Enregistrement dans Firestore
+    const userData = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      phoneNumber: data.phoneNumber,
+      profile: data.profile,
+      role: data.role ?? "expediteur",
+      verificationCode: code,
+      isVerified: false,
+      createdAt: serverTimestamp(),
+    };
+
+    await setDoc(doc(db, "users", userCredential.user.uid), userData);
+
+    // 4. Envoi de l'email
+    await sendVerificationEmail(data.email, code);
+    
+    toast.success("Compte créé ! Vérifiez votre email pour le code de vérification.");
+    
+  } catch (error) {
+    // console.error("Erreur d'inscription:", error);
+    const friendlyError = getFriendlyError(error);
+    setError(friendlyError);
+    // toast.error(friendlyError);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+  const getFriendlyError = (error) => {
+    const errorCode = error.code || error.message;
+    
+    switch (errorCode) {
+      case 'auth/email-already-in-use':
+        return 'Cet email est déjà utilisé. Essayez de vous connecter ou utilisez un autre email.';
+      case 'auth/weak-password':
+        return 'Le mot de passe doit contenir au moins 6 caractères.';
+      case 'auth/invalid-email':
+        return 'Adresse email invalide.';
+      case 'auth/operation-not-allowed':
+        return 'Opération non autorisée. Contactez le support.';
+      // Ajoutez d'autres cas au besoin
+      default:
+        return error.message || 'Une erreur est survenue lors de l\'inscription.';
     }
   };
-
 
   // Fonction pour vérifier le code
   // const verifyCode = async () => {
@@ -330,11 +399,13 @@ setEmail(data.email)
         toast.success("Compte vérifié avec succès !");
         router.push("/Dashboard");
       } catch (error) {
-        console.error("Erreur lors de la vérification:", error);
-        toast.error("Erreur lors de la vérification du compte");
+        // console.error("Erreur lors de la vérification:", error);
+        // toast.error("Erreur lors de la vérification du compte");
+        return null
       }
     } else {
-      toast.error("Code de vérification incorrect");
+      setError("Code de vérification incorrect")
+
     }
     setVerifier(false);
   };
@@ -407,7 +478,7 @@ const handleResendCode = async () => {
   return (
 
 <>
-<Navbar  user={user} logout={logout}  />
+<Navbar  user={user} logout={logout} />
 
 
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-10">
@@ -418,10 +489,15 @@ const handleResendCode = async () => {
         <h1 className="text-2xl font-bold mb-2 text-center">Formulaire d&apos;Inscription</h1>
       
         <div className="text-center"> 
-              <Link className=" inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className=" inline-block text-3xl text-green-400" href="/Accueil" >
                Ton-Transporteur
-              </Link>
+              </a>
             </div>
+            {error && (
+  <p className="text-red-500 text-sm mb-1 text-center">
+    {error}
+  </p>
+)}
         <div className='flex justify-center relative bg-none'>
      
       </div> 
@@ -429,7 +505,7 @@ const handleResendCode = async () => {
       <p className='mb-2 mt-3'>Saisissez vos informations personnelles pour créer votre compte.</p>
         <p className=''>Déjà un compte ?
 
-<Link href="/auth/signin" >  <span className='ml-2  hover:text-green-600  text-green-400'>Connectez-vous</span></Link></p>
+<a href="/auth/signin">  <span className='ml-2  hover:text-green-600  text-green-400'>Connectez-vous</span></a></p>
       </div>
 
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
@@ -620,7 +696,11 @@ const handleResendCode = async () => {
         <p className="text-gray-600 mb-6">
           Veuillez entrer le code à 4 chiffres envoyé à votre adresse email
         </p>
-        
+        {error && (
+  <p className="text-red-500 text-sm mb-6">
+    {error}
+  </p>
+)}
         <div className="flex justify-center gap-4 mb-6">
           {[0, 1, 2, 3].map((index) => (
             <input

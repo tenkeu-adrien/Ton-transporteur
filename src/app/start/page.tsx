@@ -22,14 +22,17 @@ import imageCompression from 'browser-image-compression';
 // import { sendNotificationToAdmin } from '../../../helpers';
 const formSchema = z.object({
   objectName: z.string().min(1, "Le nom de l'objet est requis"),
-  quantity: z.preprocess((val) => Number(val), z.number().min(1, "La quantité doit être au moins 1")),
+  quantity: z.preprocess(
+    (val) => Number(val || 0),
+    z.number().min(1, "La quantité doit être au moins 1")
+  ),
   weight: z.string().min(1, "Le poids est requis"),
-  size: z.string().optional(),
+  size: z.string().min(1, "veuillez choisir la taille de votre colis"),
   additionalInfo: z.string().optional(),
   knowsDimensions: z.boolean(),
-  length: z.preprocess((val) => val ? Number(val) : undefined, z.number().optional()),
-  width: z.preprocess((val) => val ? Number(val) : undefined, z.number().optional()),
-  height: z.preprocess((val) => val ? Number(val) : undefined, z.number().optional()),
+  length: z.preprocess((val) => val ? Number(val) : 0, z.number().optional()),
+  width: z.preprocess((val) => val ? Number(val) : 0, z.number().optional()),
+  height: z.preprocess((val) => val ? Number(val) : 0, z.number().optional()),
   images: z.array(z.any()).max(4, "Vous ne pouvez télécharger que 4 images maximum.").optional(),
   pickupAddress: z.string().min(1, "L'adresse d'enlèvement est requise"),
   pickupType: z.string().min(1, "Le type d'enlèvement est requis"),
@@ -44,7 +47,11 @@ const formSchema = z.object({
   ),
   floor: z.string().optional(),
   access: z.string().optional(),
-  price: z.preprocess((val) => Number(val), z.number().min(10, "Le prix doit être d'au moins 200€")),
+  price:z.preprocess(
+    (val) => Number(val || 0),
+    z.number().min(1, "Veuillez proposer  un prix ")
+  ),
+
 });
 
 const compressImage = async (image) => {
@@ -68,11 +75,11 @@ export default function ExpeditionSystem() {
    const router =useRouter()
   const user = auth.currentUser
 
-//  useEffect(()=>{
-//   if (!user) {
-//     router.replace('/auth/signin')
-// }
-//  } ,[user,router])
+ useEffect(()=>{
+  if (!user) {
+    router.push('/auth/signin')
+}
+ } ,[user,router])
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {logout} = useContext(AuthContext);
@@ -130,75 +137,133 @@ export default function ExpeditionSystem() {
   };
 
 
-  const onSubmitData = async (data) => {
+//   const onSubmitData = async (data) => {
   
-console.log("data de l'envoie" ,data)
+// // console.log("data de l'envoie" ,data)
+//   setIsSubmitting(true);
+//     toast.success("Traitement en cours...");
+//     try {
+//       // Compresser les images
+//       // Générer la référence unique en premier
+//     const reference = await generateUniqueReference();
+//       // const compressedImages = await Promise.all(
+//       //   data.images.map(async (image) => compressImage(image))
+//       // );
+  
+//       // Télécharger les images en parallèle
+//       // const imageUrls = await Promise.all(
+//       //   compressedImages.map(async (image) => {
+//       //     const storageRef = ref(storage, `images/${image.name}`);
+//       //     await uploadBytes(storageRef, image);
+//       //     return getDownloadURL(storageRef);
+//       //   })
+//       // );
+//       const uploadPromises = data.images.map(async (image) => {
+//         const compressedImage = await compressImage(image);
+//         const storageRef = ref(storage, `images/${compressedImage.name}_${Date.now()}`);
+//         await uploadBytes(storageRef, compressedImage);
+//         return getDownloadURL(storageRef);
+//       });
+
+//       const imageUrls = await Promise.all(uploadPromises);
+//       // Préparer les données pour Firestore
+//       const expeditionData = {
+//         ...data,
+//         expediteurId: user?.uid,
+//         status: "En attente",
+//         reference,
+//         enlevement:false,
+//         dechargement:false,
+//         images: imageUrls,
+//         createdAt: new Date(),
+//         departure: {
+//           address: departure.address_line1,
+//           coordinates: { lat: departure.lat, lon: departure.lon },
+//         },
+//         destination: {
+//           address: destination.address_line1,
+//           coordinates: { lat: destination.lat, lon: destination.lon },
+//         },
+//       };
+  
+//       await runTransaction(db, async (transaction) => {
+//         const docRef = doc(collection(db, "shipments"));
+//         transaction.set(docRef, expeditionData);
+//         expeditionData.id = docRef.id;
+//       });
+  
+//       // Rediriger l'utilisateur
+//       toast.success("Colis ajouté avec succès");
+//       setIsSubmitting(false)
+//       router.push("/mes-colis");
+//     } catch (error) {
+//       // console.error("Error: ", error);
+//       toast.error("Une erreur s'est produite");
+//     } finally {
+//       setIsSubmitting(false);
+//     }
+//   };
+
+
+const onSubmitData = async (data) => {
   setIsSubmitting(true);
-    toast.success("Traitement en cours...");
-    try {
-      // Compresser les images
-      // Générer la référence unique en premier
+  toast.success("Traitement en cours...");
+  
+  try {
     const reference = await generateUniqueReference();
-      // const compressedImages = await Promise.all(
-      //   data.images.map(async (image) => compressImage(image))
-      // );
-  
-      // Télécharger les images en parallèle
-      // const imageUrls = await Promise.all(
-      //   compressedImages.map(async (image) => {
-      //     const storageRef = ref(storage, `images/${image.name}`);
-      //     await uploadBytes(storageRef, image);
-      //     return getDownloadURL(storageRef);
-      //   })
-      // );
-      const uploadPromises = data.images.map(async (image) => {
-        const compressedImage = await compressImage(image);
-        const storageRef = ref(storage, `images/${compressedImage.name}_${Date.now()}`);
-        await uploadBytes(storageRef, compressedImage);
-        return getDownloadURL(storageRef);
-      });
 
-      const imageUrls = await Promise.all(uploadPromises);
-      // Préparer les données pour Firestore
-      const expeditionData = {
-        ...data,
-        expediteurId: user?.uid,
-        status: "En attente",
-        reference,
-        enlevement:false,
-        dechargement:false,
-        images: imageUrls,
-        createdAt: new Date(),
-        departure: {
-          address: departure.address_line1,
-          coordinates: { lat: departure.lat, lon: departure.lon },
-        },
-        destination: {
-          address: destination.address_line1,
-          coordinates: { lat: destination.lat, lon: destination.lon },
-        },
-      };
-  
-      await runTransaction(db, async (transaction) => {
-        const docRef = doc(collection(db, "shipments"));
-        transaction.set(docRef, expeditionData);
-        expeditionData.id = docRef.id;
-      });
-  
-      // Rediriger l'utilisateur
-      toast.success("Colis ajouté avec succès");
-      setIsSubmitting(false)
-      router.push("/mes-colis");
-    } catch (error) {
-      // console.error("Error: ", error);
-      toast.error("Une erreur s'est produite");
-    } finally {
-      setIsSubmitting(false);
+    // Upload des images vers le backend
+    const formData = new FormData();
+    data.images.forEach((image) => {
+      formData.append('files', image);
+    });
+
+    const uploadResponse = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('Échec de l\'upload des images');
     }
-  };
 
+    const { files: uploadedImages } = await uploadResponse.json();
 
+    // Préparer les données pour Firestore
+    const expeditionData = {
+      ...data,
+      expediteurId: user?.uid,
+      status: "En attente",
+      reference,
+      enlevement: false,
+      dechargement: false,
+      images: uploadedImages.map(img => img.url), // On ne stocke que les URLs
+      createdAt: new Date(),
+      departure: {
+        address: departure.address_line1,
+        coordinates: { lat: departure.lat, lon: departure.lon },
+      },
+      destination: {
+        address: destination.address_line1,
+        coordinates: { lat: destination.lat, lon: destination.lon },
+      },
+    };
 
+    await runTransaction(db, async (transaction) => {
+      const docRef = doc(collection(db, "shipments"));
+      transaction.set(docRef, expeditionData);
+      expeditionData.id = docRef.id;
+    });
+
+    toast.success("Colis ajouté avec succès");
+    router.push("/mes-colis");
+  } catch (error) {
+    console.error("Error: ", error);
+    toast.error("Une erreur s'est produite");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
 
 
@@ -369,6 +434,8 @@ console.log("data de l'envoie" ,data)
                     <option value="25kg-90kg">25kg à 90kg</option>
                     <option value="90kg-105kg">90kg à 105kg</option>
                     <option value="+105kg">+105kg</option>
+                    <option value="+105kg">+500kg</option>
+                    <option value="+105kg">+1000kg</option>
                   </select>
                   {errors.weight && <p className="text-red-500">{errors.weight.message}</p>}
 <label htmlFor="">Taille de l&apos;object</label>
@@ -515,8 +582,8 @@ console.log("data de l'envoie" ,data)
                     className="w-full p-3 border border-green-300 rounded-lg mb-4"
                   >
                     <option value="">Sélectionnez le type d&apos;enlèvement</option>
-                    <option value="Manutention 1 personne (23€)">Manutention 1 personne (23€)</option>
-                    <option value="Manutention 2 personnes (59€)">Manutention 2 personnes (59€)</option>
+                    <option value="Manutention 1 personne (23€)">Manutention 1 personne </option>
+                    <option value="Manutention 2 personnes (59€)">Manutention 2 personnes </option>
                     <option value="Au pied du véhicule">Au pied du véhicule</option>
                   </select>
                   {errors.pickupType && <p className="text-red-500">{errors.pickupType.message}</p>}
@@ -587,8 +654,8 @@ console.log("data de l'envoie" ,data)
                     className="w-full p-3 border border-green-300 rounded-lg mb-4"
                   >
                     <option value="Au pied du véhicule">Au pied du véhicule</option>
-                    <option value="Manutention 1 personne (23€)">Manutention 1 personne (23€)</option>
-                    <option value="Manutention 2 personnes (59€)">Manutention 2 personnes (59€)</option>
+                    <option value="Manutention 1 personne (23€)">Manutention 1 personne </option>
+                    <option value="Manutention 2 personnes (59€)">Manutention 2 personnes </option>
                   </select>
                   {errors.pickupType && <p className="text-red-500">{errors.pickupType.message}</p>}
 

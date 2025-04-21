@@ -1,47 +1,40 @@
 "use client";
 import Link from "next/link";
-import React, {useContext, useEffect, useState } from "react";
-import {FaChevronLeft, FaChevronRight, FaRegComments, FaSpinner } from "react-icons/fa";
-import {MdInfoOutline } from "react-icons/md";
+import React, { useContext, useEffect, useState } from "react";
+import { FaChevronLeft, FaChevronRight, FaRegComments, FaSpinner, FaSearch } from "react-icons/fa";
 import ShipmentModal from "./ShipmentModal";
 import { useRouter } from "next/navigation";
-// import { AuthContext } from "../../context/AuthContext";
 import { FaMapMarkerAlt, FaMoneyBillWave, FaCalendarAlt } from "react-icons/fa";
 import Image from "next/image";
 import Loader from "./Loader";
 import { AuthContext } from "../../context/AuthContext";
 import { FiPackage } from "react-icons/fi";
+
 const Transporteur = ({ data, isLoading }) => {
-  const [filterStatus, setFilterStatus] = useState("Tous");
+  const [filterStatus, setFilterStatus] = useState("En attente");
   const [selectedShipment, setSelectedShipment] = useState(null);
-  const { user,loading  ,userData} = useContext(AuthContext);
-
-  const [currentPage, setCurrentPage] = useState(1); // État pour la pagination
-  const router =useRouter()
-  const cardsPerPage = 5; // Nombre de cartes par page
-
-  // console.log("userData" ,userData)
-  // Calculer les cartes à afficher pour la page actuelle
-  const indexOfLastCard = currentPage * cardsPerPage;
-  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
-  const currentCards = data.slice(indexOfFirstCard, indexOfLastCard);
+  const [searchTerm, setSearchTerm] = useState("");
+  const { user, loading, userData } = useContext(AuthContext);
+  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
+  const cardsPerPage = 5;
 
   useEffect(() => {
     if (userData?.role !== "transporteur") {
-      router.back(); // Redirige vers la page d'accueil si l'utilisateur n'est pas connecté
+      router.back();
     }
   }, [user]);
 
   if (loading) {
-    return <Loader />; // Affiche un message de chargement pendant la vérification
+    return <Loader />;
   }
 
   if (!user) {
-    return null; // Ne rend rien si l'utilisateur n'est pas connecté (la redirection se fait dans useEffect)
+    return null;
   }
-  
-  // Fonction pour changer de page
+
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  
   const getStatusColor = (status) => {
     switch (status) {
       case "Accepter":
@@ -55,62 +48,96 @@ const Transporteur = ({ data, isLoading }) => {
     }
   };
 
-  const filteredShipments = filterStatus === "Tous"
-    ? currentCards
-    : currentCards.filter((shipment) => shipment.status === filterStatus);
+  // Fonction de filtrage combinée (statut + recherche)
+  const filteredShipments = data.filter((shipment) => {
+    const statusMatch = filterStatus === "Tous" || shipment.status === filterStatus;
+    
+    if (searchTerm === "") return statusMatch;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      statusMatch && (
+        (shipment.objectName && shipment.objectName.toString().toLowerCase().includes(searchLower)) ||
+        (shipment.reference && shipment.reference.toString().toLowerCase().includes(searchLower)) ||
+        (shipment.price && shipment.price.toString().includes(searchTerm))
+    ));
+  });
 
+  const indexOfLastCard = currentPage * cardsPerPage;
+  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+  const currentCards = filteredShipments.slice(indexOfFirstCard, indexOfLastCard);
+  const totalPages = Math.ceil(filteredShipments.length / cardsPerPage);
 
-    // const handleViewDetails = (id) => {
-    //   router.push(`/colis/${id}`); // Navigue vers la page de détails du colis
-    // };
-    // const { user, userData, loading, error  ,logout} = useContext(AuthContext);
-    const message="chargement"
-    const handleClick =(shipmentId)=>{
-      router.push(`/chat/${shipmentId}`)
-    }
+  const handleClick = (shipmentId) => {
+    router.push(`/chat/${shipmentId}`);
+  };
+
   return (
     <>
       <div className="p-4 sm:p-6 bg-white shadow-md rounded-lg">
         <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
           <h2 className="text-xl font-semibold mb-4 sm:mb-0">📦 Colis a expédier</h2>   
-   </div>
-   <div className="mb-4">
-        <label htmlFor="statusFilter" className="mr-2 font-medium">
-          Filtrer par statut :
-        </label>
-        <select
-          id="statusFilter"
-          value={filterStatus}
-          onChange={(e) => {
-            setFilterStatus(e.target.value);
-            setCurrentPage(1); // Réinitialiser à la première page lors du changement de filtre
-          }}
-          className="p-2 border border-gray-300 rounded"
-        >
-          <option value="Tous">Tous</option>
-          <option value="En attente">En attente</option>
-          <option value="Accepter">Accepter</option>
-          <option value="Annuler">Annuler</option>
-        </select>
-      </div>
+        </div>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-    {isLoading && (
-    <div className="col-span-full text-center py-5">
-      <FaSpinner className="animate-spin text-green-500 text-4xl mx-auto" />
-      <p className="text-gray-500 mt-2">Chargement des données...</p>
-    </div>
-  )}
-  {!isLoading && filteredShipments.length === 0 && (
-    <div className="col-span-full text-center py-5">
-    <FiPackage className="text-green-600 text-4xl mx-auto" />
-      <p className="text-gray-500 mt-2">Aucun colis actif trouvé.</p>
-    </div>
-  )}
+        {/* Ajout de la barre de recherche et du filtre */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FaSearch className="text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Rechercher par nom, référence ou prix..."
+              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
+          
+          <div className="flex items-center">
+            <label htmlFor="statusFilter" className="mr-2 font-medium whitespace-nowrap">
+              Filtrer par statut :
+            </label>
+            <select
+              id="statusFilter"
+              value={filterStatus}
+              onChange={(e) => {
+                setFilterStatus(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="p-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="Tous">Tous</option>
+              <option value="En attente">En attente</option>
+              <option value="Accepter">Accepter</option>
+              <option value="Annuler">Annuler</option>
+            </select>
+          </div>
+        </div>
 
-    {!isLoading &&
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {isLoading && (
+            <div className="col-span-full text-center py-5">
+              <FaSpinner className="animate-spin text-green-500 text-4xl mx-auto" />
+              <p className="text-gray-500 mt-2">Chargement des données...</p>
+            </div>
+          )}
+          
+          {!isLoading && currentCards.length === 0 && (
+            <div className="col-span-full text-center py-5">
+              <FiPackage className="text-green-600 text-4xl mx-auto" />
+              <p className="text-gray-500 mt-2">
+                {searchTerm ? "Aucun résultat trouvé pour votre recherche" : "Aucun colis actif trouvé."}
+              </p>
+            </div>
+          )}
+
+{!isLoading &&
       filteredShipments.map((shipment) => (
-        <Link
+        <a
           key={shipment.id}
           href={`/colis/${shipment.id}`} // Redirection vers la page de détails
           className="block"
@@ -197,12 +224,7 @@ const Transporteur = ({ data, isLoading }) => {
             <div>
               <p className="text-sm font-medium text-gray-700 dark:text-dark-100">Date de livraison</p>
               <p className="text-sm text-gray-600 dark:text-dark-300">
-                {/* {new Date(shipment?.deliveryDate).toLocaleString("fr-FR", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })} */}
+               
                     {shipment.deliveryDate && shipment.deliveryDate.toDate
                             ? shipment.deliveryDate.toDate().toLocaleString("fr-FR", {
                                 weekday: "long",
@@ -212,15 +234,9 @@ const Transporteur = ({ data, isLoading }) => {
                               })
                             : "Date invalideee"}
 </p>
-              
             </div>
           </div>
-
                  </div>
-
-
-
-
                 </div>
               </div>
             </div>
@@ -242,7 +258,7 @@ const Transporteur = ({ data, isLoading }) => {
       <p className="text-sm text-gray-500">Expéditeur</p>
     </div>
   </div>
-  {shipment.status !== "Annuler" && <button
+  {shipment.status !== "Annulerr" && <button
     onClick={(e) =>{
       e.preventDefault() ;
       e.stopPropagation() ;
@@ -255,48 +271,42 @@ const Transporteur = ({ data, isLoading }) => {
   </button> }
   
 </div>
-
-
-
-
           </div>
-        </Link>
+        </a>
       ))}
   </div>
 
- 
-  <div className="flex justify-between items-center mt-6">
-    <button
-      onClick={() => paginate(currentPage - 1)}
-      disabled={currentPage === 1}
-      className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      <FaChevronLeft className="text-gray-700" />
-      <span className="text-sm text-gray-700">Précédent</span>
-    </button>
-    <span className="text-sm text-gray-700">
-      Page {currentPage} sur {Math.ceil(filteredShipments.length / cardsPerPage)}
-    </span>
-    <button
-      onClick={() => paginate(currentPage + 1)}
-      disabled={currentPage === Math.ceil(filteredShipments.length / cardsPerPage)}
-      className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      <span className="text-sm text-gray-700">Suivant</span>
-      <FaChevronRight className="text-gray-700" />
-    </button>
-  </div>
+        {/* Pagination (inchangée) */}
+        <div className="flex justify-between items-center mt-6">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FaChevronLeft className="text-gray-700" />
+            <span className="text-sm text-gray-700">Précédent</span>
+          </button>
+          <span className="text-sm text-gray-700">
+            Page {currentPage} sur {totalPages}
+          </span>
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span className="text-sm text-gray-700">Suivant</span>
+            <FaChevronRight className="text-gray-700" />
+          </button>
+        </div>
 
-
-      {selectedShipment && (
-        <ShipmentModal
-          shipment={selectedShipment}
-          onClose={() => setSelectedShipment(null)}
-        />
-      )}
+        {selectedShipment && (
+          <ShipmentModal
+            shipment={selectedShipment}
+            onClose={() => setSelectedShipment(null)}
+          />
+        )}
       </div>
     </>
-   
   );
 };
 

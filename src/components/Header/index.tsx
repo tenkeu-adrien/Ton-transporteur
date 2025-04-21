@@ -92,9 +92,9 @@ const Header = (props: {
                 placeholder="rechercherr"
                 className="w-full bg-transparent pl-9 pr-4 font-medium focus:outline-none xl:w-125"
               /> */}
-              <a href="/Accueil" className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
+              {/* <a href="/Accueil" className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
     Visiter le site web
-</a>
+</a> */}
 
             {/* </div> */}
           {/* </form> */}
@@ -105,6 +105,15 @@ const Header = (props: {
             {/* <!-- Dark Mode Toggler --> */}
             {/* <DarkModeSwitcher /> */}
             {/* <!-- Dark Mode Toggler --> */}
+            <Link
+  href="/start"
+  className="inline-flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1"
+>
+  <span>Expédier un colis</span>
+  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+  </svg>
+</Link>
 
             {/* <!-- Notification Menu Area --> */}
             <DropdownNotification />

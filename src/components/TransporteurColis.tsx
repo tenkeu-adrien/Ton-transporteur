@@ -57,24 +57,10 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
 
   // Fonction pour changer de page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  // const getStatusColor = (status) => {
-  //   switch (status) {
-  //     case "En cours":
-  //       return "bg-blue-500";
-  //     case "Livré":
-  //       return "bg-green-500";
-  //     case "Annulé":
-  //       return "bg-red-500";
-  //     case "En attente":
-  //       return "bg-yellow-500";
-  //     default:
-  //       return "bg-gray-500";
-  //   }
-  // };
+ 
 
  
   useEffect(() => {
-    // if (!shipment?.id || !userData?.id || !userData?.role) return;
   
     const fetchOtherShipments = async () => {
       try {
@@ -84,12 +70,12 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
         const q = userData?.role === "expediteur"
           ? query(
               shipmentsRef,
-              where("price", ">", 0),
+              where("price", "!=", 0),
               where("expediteurId", "==", shipment?.expediteurId)
             )
           : query(
               shipmentsRef,
-              where("price", ">", 0)
+              where("price", "!=", 0)
             );
             // console.log("requete" ,q)
         const querySnapshot = await getDocs(q);
@@ -124,26 +110,7 @@ if (!user) {
 }
 
 
-  // Afficher un indicateur de chargement si `loading` est true
-  // if (loading) {
-  //   return (
-  //     <div className="flex justify-center items-center h-64">
-  //       <FaSpinner className="animate-spin text-4xl text-green-600" />
-  //       <span className="ml-3 text-lg">Chargement en cours...</span>
-  //     </div>
-  //   );
-  // }
 
-  // // Afficher un message d'erreur si `error` est présent
-  // if (error) {
-  //   return (
-  //     <div className="text-center text-red-600 p-6">
-  //       <p>Erreur : {error}</p>
-  //     </div>
-  //   );
-  // }
-
-  // Fonction pour soumettre l'offre
   const handleSubmitOffer = async () => {
     setIsSubmitting(true);
     try {
@@ -206,17 +173,17 @@ if (!user) {
         {/* Carte avec la Map */}
         <div className="mt-6">
         <div className="flex items-center space-x-2">
-      <Link href={"/shipments"}>
+      <Link href="#"  onClick={()=>router.back()}>
         <span className="flex items-center space-x-2">
           <IoMdArrowBack className="text-3xl text-green-500" />
-          <span className="text-green-500 lowercase">Back</span>
+          <span className="text-green-500 ">Retour</span>
         </span>
       </Link>
     </div>
           <h2 className="text-xl font-bold mb-4">Carte et itinérairee</h2>        
         </div>
         <div className="bg-white dark:bg-dark-700 rounded-lg shadow-lg overflow-hidden">
-          <div className="relative h-[400px] w-full">
+          <div className="relative h-[600px] w-full">
           <MapWithRoute
           from={{
             lat: shipment.departure.coordinates.lat,
@@ -370,12 +337,7 @@ if (!user) {
                   <div>
                     <p className="text-sm font-medium text-gray-700 dark:text-dark-100">Date de livraison</p>
                     <p className="text-sm text-gray-600 dark:text-dark-300">
-                      {/* {new Date(shipment?.deliveryDate).toLocaleString("fr-FR", {
-                        weekday: "long",
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })} */}
+                      
                           {shipment?.deliveryDate && shipment.deliveryDate.toDate
                                   ? shipment.deliveryDate.toDate().toLocaleString("fr-FR", {
                                       weekday: "long",
@@ -475,7 +437,7 @@ if (!user) {
           value={offerPrice}
           onChange={(e) => setOfferPrice(e.target.value)}
           className="w-full p-2 mt-1 border border-gray-300 dark:border-dark-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-dark-600 dark:text-dark-100"
-          placeholder="propose un prix au client"
+          placeholder="propose un prix au client en euro (€) "
         />
       </div>
 
@@ -588,14 +550,15 @@ if (!user) {
     </>
   ) : (
     <div className="flex justify-center mt-6">
-      <button
+      <a
+      href="#"
         onClick={handleClick}
         className="w-full max-w-md flex items-center justify-center gap-2 px-4 py-3 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 transition duration-300"
       >
         <FaRegComments className="w-5 h-5" />
         <span>Discuter avec le transporteur</span>
         <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
-      </button>
+      </a>
     </div>
   )}
 </div>
@@ -621,7 +584,7 @@ if (!user) {
   <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2"> {/* Ajout de max-height et overflow */}
     {/* Afficher les cartes de la page actuelle */}
     {currentCards.map((otherShipment) => (
-      <Link
+      <a
         key={otherShipment.id}
         href={`/colis/${otherShipment.id}`}
         className="block"
@@ -673,7 +636,7 @@ if (!user) {
             </div>
           </div>
         </div>
-      </Link>
+      </a>
     ))}
 
     {currentCards.length <= 0 && (

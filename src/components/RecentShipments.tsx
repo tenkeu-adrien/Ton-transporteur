@@ -291,11 +291,11 @@ const RecentShipments = () => {
       </div>
 
       {/* Bouton pour voir toutes les annonces */}
-      <div className="text-center mt-8">
+      {/* <div className="text-center mt-8">
         <Link href="/mes-colis" className="w-full capitalize bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded transition-colors text-sm">
           Voir toutes les annonces
         </Link>
-      </div>
+      </div> */}
     </div>
   );
 };

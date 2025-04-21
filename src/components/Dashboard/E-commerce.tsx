@@ -2,7 +2,7 @@
 // import dynamic from "next/dynamic";
 import React, { useContext, useEffect, useState } from "react";
 import ChatCard from "../Chat/ChatCard";
-import TableOne from "../Tabless/TableOne";
+// import TableOne from "../Tabless/TableOne";
 import CardDataStats from "../CardDataStats";
 import { FaClock, FaSpinner, FaTimesCircle, FaCheckCircle, FaBox } from "react-icons/fa";
 import { collection, getDocs, query, where } from "firebase/firestore";
@@ -35,7 +35,7 @@ const ECommerce: React.FC = () => {
         let shipmentQuery;
   
         // Filtrer d'abord les envois avec un prix supérieur à 0
-        let baseQuery = query(shipmentsRef, where("price", ">", 0));
+        let baseQuery = query(shipmentsRef, where("price", "!=", 0));
   
         // Appliquer un filtre supplémentaire selon le rôle de l'utilisateur
         if (userData?.role === "expediteur") {

@@ -166,6 +166,7 @@ export const subscribeToMessages = (callback: (payload: any) => void) => {
   return unsubscribe; // très important pour le cleanup
 };
 
+auth.languageCode = 'fr'
 export { 
   auth, 
   db, 

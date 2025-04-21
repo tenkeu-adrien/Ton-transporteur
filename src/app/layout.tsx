@@ -25,6 +25,7 @@ export default function RootLayout({
       <ToastContainer />
                 <NotificationSetup />
       <AuthProvider>
+      
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
           {children}
         </div>

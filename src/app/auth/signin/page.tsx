@@ -1,21 +1,23 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
+// import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { loginUser } from "../../../../lib/functions";
-import { auth, googleProvider} from "../../../../lib/firebaseConfig";
-// import { signInWithRedirect,getRedirectResult } from "firebase/auth";
-import { getAuth, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "firebase/auth";
+// import { auth, googleProvider} from "../../../../lib/firebaseConfig";
+// import { getAuth, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "firebase/auth";
 import { AuthContext } from "../../../../context/AuthContext";
 import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { FiLogOut } from "react-icons/fi";
+import PasswordResetModal from "@/components/PasswordResetModal";
+import { useSearchParams } from 'next/navigation';
+
+// import { FiLogOut } from "react-icons/fi";
 
 // Définir le schéma de validation avec Zod
 const schema = z.object({
@@ -27,16 +29,16 @@ export default function AuthPage() {
 const router = useRouter()
  const [isSubmitting, setIsSubmitting] = useState(false);
  const { user, logout ,setUser } = useContext(AuthContext);
+const [error ,setError] = useState(null)
+const [showResetModal, setShowResetModal] = useState(false);
 
-
-
+const searchParams = useSearchParams();
+const redirect = searchParams.get('redirect') || "/Dashboard";
  useEffect(() => {
    if (user) {
      router.back(); // Redirige vers la page d'accueil si l'utilisateur n'est pas connecté
    }
  }, [user,  router]);
-// Mise à jour du contexte avec l'utilisateur
-     // Rediriger l'utilisateur
 const [showPassword, setShowPassword] = useState(false); // Gérer l'état de visibilité du mot de passe
 
 const togglePasswordVisibility = () => {
@@ -49,7 +51,7 @@ const {
 } = useForm({
   resolver: zodResolver(schema), // Intégrer Zod avec React Hook Form
 });
-
+// console.log("error" ,error)
 const onSubmit = async (data) => {
   setIsSubmitting(true);
   try {
@@ -61,94 +63,42 @@ const onSubmit = async (data) => {
       setUser(user);
 
       // Afficher le toast de connexion réussie
-      toast.success('Connexion réussie !', {
-        position: "top-right", // Positionner le toast en haut à droite
-        autoClose: 5000, // Fermer automatiquement après 5 secondes
-      });
-
-      // Rediriger vers le tableau de bord après la connexion
-      setTimeout(() => {
-        router.push("/Dashboard");
-      }, 2000); // Attendre 2 secondes avant la redirection
+      toast.success('Connexion réussie !');
+      // Redirection selon le contexte
+      router.push(redirect);
     } else {
-      console.error("Erreur de connexion", response.error);
-      toast.error("Erreur de connexion : " + response.error.message);
+      setError(response.error)
     }
   } catch (error) {
-    console.error("Erreur de connexion", error);
-    toast.error("Erreur de connexion : " + error.message);
+    setError(error)
   } finally {
     setIsSubmitting(false);
   }
 };
 
-// const handleGoogleLogin = async () => {
-//   try {
-//     const result = await signInWithRedirect(auth, googleProvider);
-//     console.log("Utilisateur Google connecté:", result.user);
-//   } catch (error) {
-//     console.error("Erreur Google:", error);
-//   }
-// };
-
-// const handleGoogleLogin = async () => {
-//   try {
-//     await signInWithRedirect(auth, googleProvider);
-    
-//     const result = await getRedirectResult(auth);
-//     if (result) {
-//       // setUser(result.user); // Met à jour l'utilisateur dans le contexte
-//       console.log("Utilisateur Google connecté:", result.user);
-//       router.push("/Dashboard")
-//     }
-//   } catch (error) {
-//     console.error("Erreur Google:", error);
-//   }
-// };
-
-const handleGoogleLogin = async () => {
-  try {
-    const resultatGoogle = await signInWithRedirect(auth, googleProvider);
-      console.log("connexion google" ,resultatGoogle)
-  } catch (error) {
-    console.error("Erreur Google:", error);
-  }
-};
-
-const handleFacebookLogin = async () => {
-  // try {
-  //   const result = await signInWithRedirect(auth, facebookProvider);
-  //   console.log("Utilisateur Facebook connecté:", result.user);
-  // } catch (error) {
-  //   console.error("Erreur Facebook:", error);
-  // }
-
-  try {
-    // await signInWithRedirect(auth, facebookProvider);
-    
-    const result = await getRedirectResult(auth);
-    if (result) {
-      // console.log("Utilisateur Google connecté:", result.user);
+const getFriendlyErrorMessage = (error) => {
+  // Si l'erreur vient directement de Firebase (avec code)
+  if (error.code) {
+    switch (error.code) {
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+        return 'Email ou mot de passe incorrect.';
+      case 'auth/user-not-found':
+        return 'Aucun compte trouvé avec cet email.';
+      case 'auth/too-many-requests':
+        return 'Trop de tentatives. Compte temporairement bloqué.';
+      case 'auth/user-disabled':
+        return 'Votre compte a été désactivé.';
+      default:
+        return `Erreur de connexion: ${error.message}`;
     }
-  } catch (error) {
-    console.error("Erreur Google:", error);
   }
+  
+  // Si c'est une autre erreur (comme votre erreur Firestore)
+  return error.message || 'Une erreur est survenue. Veuillez réessayer.';
 };
 
-// useEffect(() => {
-//   // Écouter les changements d'état d'authentification
-//   const unsubscribe = onAuthStateChanged(auth, (user) => {
-//     if (user) {
-//       // console.log("Utilisateur connecté:", user);
-//       router.push("/Dashboard"); // Rediriger vers le tableau de bord
-//     } else {
-//       console.log("Aucun utilisateur connecté");
-//     }
-//   });
 
-//   // Nettoyer l'écouteur lors du démontage du composant
-//   return () => unsubscribe();
-// }, [user,router]);
   return (
 
     <>
@@ -157,14 +107,14 @@ const handleFacebookLogin = async () => {
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
             <div className="text-center -mr-[350px]"> 
-              <Link className="mb-5.5 inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className="mb-5.5 inline-block text-3xl text-green-400" href="/Accueil" >
                Ton-Transporteur
-              </Link>
+              </a>
 
               <p className="2xl:px-20">
                 Bienvenue !
               </p>
-
+        
               <span className="inline-block">
               
             <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 720 722.539" role="img" className="mt-12 "  >
@@ -217,7 +167,11 @@ const handleFacebookLogin = async () => {
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
                 Se connecter
               </h2>
-
+              {error && (
+  <p className="text-red-500 text-sm mb-6">
+    {getFriendlyErrorMessage(error)}
+  </p>
+)}
               <form  onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
@@ -227,7 +181,6 @@ const handleFacebookLogin = async () => {
                     <input
                       type="email"
                       placeholder="Enter your email"
-                      //  className="mt-1 block w-full px-3 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                       className="mt-1 block w-full px-3 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                     
                       {...register("email")} // Enregistrer le champ avec React Hook Form
@@ -266,7 +219,6 @@ const handleFacebookLogin = async () => {
                       placeholder="password"
                        className="mt-1 block w-full px-3 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
 
-                      // className=" focus:outline-none focus:ring-green-500 focus:border-green-500  w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                       {...register("password")} // Enregistrer le champ avec React Hook Form
                       />
 
@@ -278,9 +230,7 @@ const handleFacebookLogin = async () => {
                       )}
 
                     <span className="absolute right-4 top-4">
-                    {/* <?xml version="1.0" ?>
-
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> */}
+                  
 <svg fill="#00" width="22px" height="22px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
 
 <g id="Password" opacity="0.5">
@@ -325,14 +275,20 @@ const handleFacebookLogin = async () => {
         <div className="mt-6 gridd gridd-colss-2 gap-3">
  
 </div>
-                <div className="mt-6 text-center">
-                  <p>
-                    vous n&apos;avez pas de compte ?
-                    <Link href="/auth/signup" className="text-green-500">
-                    créer 
-                    </Link>
-                  </p>
-                </div>
+<div className="mt-6 text-center">
+  <p>
+    vous n&apos;avez pas de compte ?
+    <a href="/auth/signup" className="text-green-500">
+      créer 
+    </a>
+  </p>
+  <button 
+    onClick={() => setShowResetModal(true)}
+    className="mt-2 text-sm text-green-600 hover:text-green-700 font-medium"
+  >
+    Mot de passe oublié ?
+  </button>
+</div>
               </form>
             </div>
           </div>
@@ -340,7 +296,7 @@ const handleFacebookLogin = async () => {
       </div>
 
 
-
+      {showResetModal && <PasswordResetModal onClose={() => setShowResetModal(false)} />}
       
       <Footer />
     </>)

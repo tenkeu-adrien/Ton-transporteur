@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 
                   <div style="text-align: center; margin: 20px 0;">
                     <a href="${process.env.NEXT_PUBLIC_BASE_URL}/chat/${shipment.id}" 
-                       style="display: inline-block; background-color:rgb(6, 249, 18); color: #ffffff; padding: 12px 20px; 
+                       style="display: inline-block; background-color:rgb(54, 244, 63); color: #ffffff; padding: 12px 20px; 
                               border-radius: 5px; text-decoration: none; font-weight: bold;">
                       Voir la conversation
                     </a>
@@ -57,6 +57,44 @@ export async function POST(req: Request) {
               </div>
             `
           };
+
+    case "new_offer":
+          return {
+    subject: "Nouvelle offre de transport reçue",
+    html: `
+      <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+          <h2 style="color: #333; font-size: 20px; font-weight: bold; text-align: center;">
+            Nouvelle offre de transport proposée <span style="color:orange">🚛💰</span>
+          </h2>
+
+          <p style="color: #555; font-size: 16px; line-height: 1.5;">
+            Bonjour,
+            <br><br>
+            <strong style="font-size:18px;">${user.firstName} ${user.lastName}</strong> vous a proposé une nouvelle offre de transport 
+            pour le colis <strong style="font-size:18px;">${shipment.objectName}</strong>.
+          </p>
+
+          <p style="color: #555; font-size: 16px; line-height: 1.5;">
+            <strong>Prix proposé :</strong> <span style="font-size: 18px; font-weight: bold;">${shipment.price} €</span>
+          </p>
+
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="${process.env.NEXT_PUBLIC_BASE_URL}/chat/${shipment.id}" 
+               style="display: inline-block; background-color:rgb(54, 244, 63); color: #ffffff; padding: 12px 20px; 
+                      border-radius: 5px; text-decoration: none; font-weight: bold;">
+              Voir et répondre à l'offre
+            </a>
+          </div>
+
+          <p style="color: #999; font-size: 14px; text-align: center;">
+            Vous pouvez accepter ou refuser cette offre depuis la conversation.
+          </p>
+        </div>
+      </div>
+    `
+  };
+
         case "Annuler":
           return {
             subject: "Offre de transport annulée",

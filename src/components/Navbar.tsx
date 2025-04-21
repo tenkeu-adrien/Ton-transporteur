@@ -77,9 +77,9 @@ if (!isClient) {
     <div className="container mx-auto px-6 py-4 flex justify-between items-center">
       {/* Logo */}
       <div className="flex items-center gap-4">
-        <Link href="/Accueil" className="text-2xl font-bold text-green-600">
+        <a href="/Accueil" className="text-2xl font-bold text-green-600">
           Ton-Transporteur
-        </Link>
+        </a>
       </div>
 
       {/* Desktop Menu */}
@@ -134,19 +134,19 @@ if (!isClient) {
             >
               Déconnexion
             </button>
-            <Link href="/Dashboard" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+            <a href="/Dashboard" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
               Dashboard
-            </Link>
+            </a>
           </>
 
         ) : (
           <>
-          <Link href="/auth/signin" className="text-gray-700 hover:text-green-600">
+          <a href="/auth/signin" className="text-gray-700 hover:text-green-600">
             Connexion
-          </Link>
-          <Link href="/auth/signup" className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">
+          </a>
+          <a href="/auth/signup" className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">
             Inscription
-          </Link>
+          </a>
         </>
         )}
       </div>

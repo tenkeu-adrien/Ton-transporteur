@@ -289,7 +289,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             />
           </svg>
           ),
-          label: "Gestion des Expeditions",
+          label: "Gestion Des Expeditions",
           route: "/shipments",
           requiredRole: "transporteur" // Nouvelle propriété
         },
