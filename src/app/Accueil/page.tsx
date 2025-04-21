@@ -68,7 +68,7 @@ export default function Home() {
 </div>
 
           {/* Image illustrative */}
-          <div className="relative h-[400px] mt-10 w-[600px]">
+          {/* <div className="relative h-[400px] mt-10 w-[600px]">
             <Image
               src="/images/accueil.png" 
               alt="Transport de colis"
@@ -78,7 +78,7 @@ export default function Home() {
               height={600}
               className="rounded-lg shadow-lg  "
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
