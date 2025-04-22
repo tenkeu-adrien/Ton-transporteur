@@ -417,7 +417,114 @@ if (!user) {
 
       {/* Barre Latérale Droite - Formulaire d'Offre */}
       <div className="w-full lg:w-1/3">
-        <div className="bg-white dark:bg-dark-700 rounded-lg shadow-lg overflow-hidden">
+      <div className="bg-white dark:bg-dark-700 rounded-lg shadow-lg overflow-hidden mt-8">
+
+<div className="p-4 sm:p-5">
+<h2 className="text-xl font-semibold text-gray-700 dark:text-dark-100 mb-4">
+ Autres Shipments Disponibles
+</h2>
+<div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2"> {/* Ajout de max-height et overflow */}
+ {/* Afficher les cartes de la page actuelle */}
+ {currentCards.map((otherShipment) => (
+   <a
+     key={otherShipment.id}
+     href={`/colis/${otherShipment.id}`}
+     className="block"
+   >
+     <div className="flex items-start p-3 bg-gray-50 dark:bg-dark-600 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+       {/* Image du colis (plus petite) */}
+       {otherShipment.images && otherShipment.images.length > 0 && (
+         <Image
+           src={otherShipment.images[0]}
+           alt={`Image de ${otherShipment.objectName}`}
+           className="w-20 h-20 object-cover rounded-lg mr-4"
+           width={20}
+           height={20}
+         />
+       )}
+
+       {/* Informations du colis */}
+       <div className="flex-1">
+         {/* Nom du colis */}
+         <div className="flex items-center space-x-2 mb-1">
+           <FaBox className="text-green-600 dark:text-green-300" />
+           <p className="text-sm font-medium text-gray-700 dark:text-dark-100">
+             {otherShipment.objectName}
+           </p>
+         </div>
+
+         {/* Prix proposé */}
+         <div className="flex items-center space-x-2 mb-1">
+           <FaMoneyBillWave className="text-blue-600 dark:text-blue-300" />
+           <p className="text-sm text-gray-600 dark:text-dark-300">
+             {otherShipment.price} €
+           </p>
+         </div>
+
+         {/* Adresse de départ */}
+         <div className="flex items-center space-x-2 mb-1">
+           <FaMapMarkerAlt className="text-purple-600 dark:text-purple-300" />
+           <p className="text-sm text-gray-600 dark:text-dark-300">
+             Départ : {otherShipment.pickupAddress}
+           </p>
+         </div>
+
+         {/* Adresse d'arrivée */}
+         <div className="flex items-center space-x-2">
+           <FaMapMarkerAlt className="text-yellow-600 dark:text-yellow-300" />
+           <p className="text-sm text-gray-600 dark:text-dark-300">
+             Arrivée : {otherShipment.deliveryAddress}
+           </p>
+         </div>
+       </div>
+     </div>
+   </a>
+ ))}
+
+ {currentCards.length <= 0 && (
+   <div className="bg-white p-4 m-4 rounded-lg shadow text-center">
+     <FiPackage className="text-green-600 text-4xl mx-auto" />
+     <p className="text-gray-500 mt-2">Aucun autre colis actif trouvé</p>
+   </div>
+ )}
+</div>
+
+{/* Pagination */}
+<div className="flex justify-between items-center mt-6">
+ {/* Bouton Précédent */}
+ <button
+   onClick={() => paginate(currentPage - 1)}
+   disabled={currentPage === 1}
+   className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-dark-600 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+ >
+   <FaChevronLeft className="text-gray-700 dark:text-dark-100" />
+   <span className="text-sm text-gray-700 dark:text-dark-100">Précédent</span>
+ </button>
+
+ {/* Numéro de page */}
+ <span className="text-sm text-gray-700 dark:text-dark-100">
+   Page {currentPage} sur {Math.ceil(otherShipments.length / cardsPerPage)}
+ </span>
+
+ {/* Bouton Suivant */}
+ <button
+   onClick={() => paginate(currentPage + 1)}
+   disabled={currentPage === Math.ceil(otherShipments.length / cardsPerPage)}
+   className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-dark-600 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+ >
+   <span className="text-sm text-gray-700 dark:text-dark-100">Suivant</span>
+   <FaChevronRight className="text-gray-700 dark:text-dark-100" />
+ </button>
+</div>
+</div>
+
+ </div>
+
+
+
+
+
+        <div className="bg-white dark:bg-dark-700 rounded-lg shadow-lg overflow-hidden mt-8">
 
          
           <div className="p-4 sm:p-5">
@@ -515,6 +622,7 @@ if (!user) {
           onChange={(e) => setAdditionalInfo(e.target.value)}
           className="w-full p-2 mt-1 border border-gray-300 dark:border-dark-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-dark-600 dark:text-dark-100"
           rows={4}
+          spellCheck={true}
           placeholder="Ajoutez des détails..."
         />
       </div>
@@ -575,108 +683,7 @@ if (!user) {
 
 
 
-        <div className="bg-white dark:bg-dark-700 rounded-lg shadow-lg overflow-hidden mt-8">
-
-   <div className="p-4 sm:p-5">
-  <h2 className="text-xl font-semibold text-gray-700 dark:text-dark-100 mb-4">
-    Autres Shipments Disponibles
-  </h2>
-  <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2"> {/* Ajout de max-height et overflow */}
-    {/* Afficher les cartes de la page actuelle */}
-    {currentCards.map((otherShipment) => (
-      <a
-        key={otherShipment.id}
-        href={`/colis/${otherShipment.id}`}
-        className="block"
-      >
-        <div className="flex items-start p-3 bg-gray-50 dark:bg-dark-600 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-          {/* Image du colis (plus petite) */}
-          {otherShipment.images && otherShipment.images.length > 0 && (
-            <Image
-              src={otherShipment.images[0]}
-              alt={`Image de ${otherShipment.objectName}`}
-              className="w-20 h-20 object-cover rounded-lg mr-4"
-              width={20}
-              height={20}
-            />
-          )}
-
-          {/* Informations du colis */}
-          <div className="flex-1">
-            {/* Nom du colis */}
-            <div className="flex items-center space-x-2 mb-1">
-              <FaBox className="text-green-600 dark:text-green-300" />
-              <p className="text-sm font-medium text-gray-700 dark:text-dark-100">
-                {otherShipment.objectName}
-              </p>
-            </div>
-
-            {/* Prix proposé */}
-            <div className="flex items-center space-x-2 mb-1">
-              <FaMoneyBillWave className="text-blue-600 dark:text-blue-300" />
-              <p className="text-sm text-gray-600 dark:text-dark-300">
-                {otherShipment.price} €
-              </p>
-            </div>
-
-            {/* Adresse de départ */}
-            <div className="flex items-center space-x-2 mb-1">
-              <FaMapMarkerAlt className="text-purple-600 dark:text-purple-300" />
-              <p className="text-sm text-gray-600 dark:text-dark-300">
-                Départ : {otherShipment.pickupAddress}
-              </p>
-            </div>
-
-            {/* Adresse d'arrivée */}
-            <div className="flex items-center space-x-2">
-              <FaMapMarkerAlt className="text-yellow-600 dark:text-yellow-300" />
-              <p className="text-sm text-gray-600 dark:text-dark-300">
-                Arrivée : {otherShipment.deliveryAddress}
-              </p>
-            </div>
-          </div>
-        </div>
-      </a>
-    ))}
-
-    {currentCards.length <= 0 && (
-      <div className="bg-white p-4 m-4 rounded-lg shadow text-center">
-        <FiPackage className="text-green-600 text-4xl mx-auto" />
-        <p className="text-gray-500 mt-2">Aucun autre colis actif trouvé</p>
-      </div>
-    )}
-  </div>
-
-  {/* Pagination */}
-  <div className="flex justify-between items-center mt-6">
-    {/* Bouton Précédent */}
-    <button
-      onClick={() => paginate(currentPage - 1)}
-      disabled={currentPage === 1}
-      className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-dark-600 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      <FaChevronLeft className="text-gray-700 dark:text-dark-100" />
-      <span className="text-sm text-gray-700 dark:text-dark-100">Précédent</span>
-    </button>
-
-    {/* Numéro de page */}
-    <span className="text-sm text-gray-700 dark:text-dark-100">
-      Page {currentPage} sur {Math.ceil(otherShipments.length / cardsPerPage)}
-    </span>
-
-    {/* Bouton Suivant */}
-    <button
-      onClick={() => paginate(currentPage + 1)}
-      disabled={currentPage === Math.ceil(otherShipments.length / cardsPerPage)}
-      className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-dark-600 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      <span className="text-sm text-gray-700 dark:text-dark-100">Suivant</span>
-      <FaChevronRight className="text-gray-700 dark:text-dark-100" />
-    </button>
-  </div>
-</div>
-
-    </div>
+   
       </div>
       
     </div>

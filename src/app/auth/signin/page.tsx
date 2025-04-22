@@ -1,7 +1,7 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod";
 // import Image from "next/image";
-import Link from "next/link";
+// import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -15,7 +15,6 @@ import { FaSpinner } from "react-icons/fa";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import PasswordResetModal from "@/components/PasswordResetModal";
-import { useSearchParams } from 'next/navigation';
 
 // import { FiLogOut } from "react-icons/fi";
 
@@ -32,8 +31,14 @@ const router = useRouter()
 const [error ,setError] = useState(null)
 const [showResetModal, setShowResetModal] = useState(false);
 
-const searchParams = useSearchParams();
-const redirect = searchParams.get('redirect') || "/Dashboard";
+const [redirect, setRedirect] = useState('/Dashboard');
+
+useEffect(() => {
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    setRedirect(params.get('redirect') || '/Dashboard');
+  }
+}, []);
  useEffect(() => {
    if (user) {
      router.back(); // Redirige vers la page d'accueil si l'utilisateur n'est pas connecté
@@ -41,9 +46,9 @@ const redirect = searchParams.get('redirect') || "/Dashboard";
  }, [user,  router]);
 const [showPassword, setShowPassword] = useState(false); // Gérer l'état de visibilité du mot de passe
 
-const togglePasswordVisibility = () => {
-  setShowPassword(!showPassword); // Alterner l'état de visibilité
-};
+
+
+
 const {
   register,
   handleSubmit,
@@ -168,7 +173,7 @@ const getFriendlyErrorMessage = (error) => {
                 Se connecter
               </h2>
               {error && (
-  <p className="text-red-500 text-sm mb-6">
+  <p className="text-red-500 text-xl mb-6">
     {getFriendlyErrorMessage(error)}
   </p>
 )}
@@ -186,7 +191,7 @@ const getFriendlyErrorMessage = (error) => {
                       {...register("email")} // Enregistrer le champ avec React Hook Form
     />
     {errors.email && (
-      <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+      <p className="mt-1 text-xl text-red-600">{errors.email.message}</p>
     )}
 
                     <span className="absolute right-4 top-4">
@@ -226,7 +231,7 @@ const getFriendlyErrorMessage = (error) => {
 
 
                       {errors.password && (
-                        <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                        <p className="mt-1 text-xl text-red-600">{errors.password.message}</p>
                       )}
 
                     <span className="absolute right-4 top-4">

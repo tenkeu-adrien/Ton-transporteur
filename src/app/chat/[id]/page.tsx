@@ -55,6 +55,8 @@ interface Shipment {
   status: 'En attente' | 'accepted' | 'completed';
   find:any
 }
+
+
 const useReadMessages = (currentUserId: string) => {
   const [readQueue, setReadQueue] = useState<Set<string>>(new Set());
 
@@ -1417,6 +1419,8 @@ const handleCancelShipment =  async () => {
             )}
 
             <div className="flex gap-2">
+
+      
               <textarea
                 value={newMessage}
                 rows={2}
@@ -1427,12 +1431,13 @@ const handleCancelShipment =  async () => {
                     sendMessage();
                   }
                 }}
+                spellCheck={true}
                 placeholder="Écrivez votre message..."
                 className="flex-1 p-2 border border-gray-300 rounded-lg text-sm sm:text-base resize-none"
               />
 
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-4">
+                <div className="">
                   <label className="cursor-pointer p-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 flex items-center justify-center">
                     <input
                       type="file"
