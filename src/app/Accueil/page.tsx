@@ -32,7 +32,7 @@ export default function Home() {
   return (
     <>
       <Head>
-  <title>Tton Transporteur - Service de Livraison Fiable et Écologique</title>
+  <title>Ton Transporteur - Service de Livraison Fiable et Écologique</title>
   <meta name="description" content="Avec Ton Transporteur, bénéficiez d&apos;un service de livraison fiable et écologique. Suivez vos colis en temps réel et améliorez l&apos;efficacité de vos opérations logistiques." />
 </Head>
 
@@ -53,7 +53,7 @@ export default function Home() {
   <h1 className="text-4xl font-bold text-gray-800 mb-6">
     Transportez vos colis légers, lourds et déménagement simplement et écologiquement
   </h1>
-  <span className="mb-3">Bienvenue sur Trouve ton transporteur</span>
+  <span className="mb-3">Bienvenue chez  Ton-transporteur</span>
   <p className="text-gray-600 mb-8">
     Envoyez et recevez vos colis partout en France et en Europe. Économisez de l&apos;argent car aucun frais de commission n&apos;est appliqué : vous payez exactement vos frais de transport.
   </p>
@@ -61,9 +61,9 @@ export default function Home() {
     <Link className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition duration-300"  href="/start">
       Expédier ou recevoir un colis
     </Link>
-    <Link href="/mes-colis" className="bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700 transition duration-300">
+    {/* <Link href="/mes-colis" className="bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700 transition duration-300">
       Voir les colis sur ma route
-    </Link>
+    </Link> */}
   </div>
 </div>
 
@@ -117,8 +117,8 @@ export default function Home() {
     <div className="min-h-screen bg-gray-100">
       {/* Hero Section */}
       <div className="bg-green-600 py-20 text-white text-center">
-        <h1 className="text-4xl font-bold mb-4">Trouvez des transporteurs fiables pour vos colis</h1>
-        <p className="text-lg mb-8">Livrez ou transportez des colis en toute simplicité.</p>
+        <h1 className="text-4xl font-bold mb-4">Trouvez des transporteurs fiables pour vos colis  legers ,lours et déménagement</h1>
+        <p className="text-lg mb-8"> Faites vous livrer  vos colis en toute simplicité.</p>
         <div className="space-x-4">
           <Link href="/start" className="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100">
             Commencer
@@ -161,7 +161,7 @@ export default function Home() {
       Ton-Transporteur propose une assurance pour tous vos envois
     </h1>
     <p className="text-lg md:text-xl mb-8 opacity-90">
-      Un pépin peut arriver à tout moment sur la route. Avec Ton-Transporteur, vos colis voyagent toujours assurés !
+      Un pépin peut arriver à tout moment sur la route. Avec Ton-Transporteur, vos colis voyagent  toujours assurés !
     </p>
     <div className="flex flex-col sm:flex-row justify-center gap-4">
       <Link 

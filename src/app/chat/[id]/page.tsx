@@ -187,7 +187,7 @@ const [acceptedOffers, setAcceptedOffers] = useState({});
 const [pendingAcceptance, setPendingAcceptance] = useState({});
 let isCurrentMessage = null
   const messagesEndRef = useRef(null);
-
+let tempId
   const markMessageRead = useReadMessages(user?.uid);
   const messageObserver = useMessageObserver((messageId) => {
     if (!user?.uid) return;
@@ -1431,7 +1431,7 @@ const handleCancelShipment =  async () => {
                     sendMessage();
                   }
                 }}
-                spellCheck={true}
+                // spellCheck={true}
                 placeholder="Écrivez votre message..."
                 className="flex-1 p-2 border border-gray-300 rounded-lg text-sm sm:text-base resize-none"
               />
