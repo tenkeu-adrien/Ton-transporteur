@@ -1,6 +1,6 @@
 "use client"
 import Navbar from '@/components/Navbar';
-import Head from 'next/head';
+// import Head from 'next/head';
 import Image from 'next/image';
 import { AuthContext } from '../../../../context/AuthContext';
 import { useContext } from 'react';
@@ -11,10 +11,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Head>
-        <title>Ton-transporteur - Déménagement Marseille à Toulouse</title>
-        <meta name="description" content="Solution de déménagement économique entre Marseille et Toulouse" />
-      </Head>
+     
 
       {/* Header */}
      <Navbar  user={user}  logout={logout}/>
@@ -169,8 +166,10 @@ export default function Home() {
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
+            <Image
               src="/img/cities/colis.webp" 
+              width={100}
+              height={100}
               alt="Colis" 
               className="rounded-lg h-48 object-cover"
             />
@@ -199,10 +198,12 @@ export default function Home() {
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
+            <Image
               src="/img/cities/meuble.webp" 
               alt="Meuble" 
               className="rounded-lg h-48 object-cover"
+              width={100}
+              height={100}
             />
           </div>
         </div>
@@ -247,10 +248,12 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image
                 src="/boite-en-carton.png" 
                 alt="Déposez une annonce" 
                 className="h-24 mx-auto mb-4"
+                width={100}
+                height={100}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Déposez une annonce</h3>
               <p className="text-gray-600">
@@ -259,10 +262,12 @@ export default function Home() {
             </div>
             
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image 
                 src="/bulle-de-discussion.png" 
                 alt="Recevez des propositions" 
                 className="h-24 mx-auto mb-4"
+                width={100}
+                height={100}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Recevez des propositions</h3>
               <p className="text-gray-600">
@@ -271,10 +276,12 @@ export default function Home() {
             </div>
             
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image
                 src="/verifier.png" 
                 alt="Validez votre réservation" 
                 className="h-24 mx-auto mb-4"
+                width={100}
+                height={100}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Validez votre réservation</h3>
               <p className="text-gray-600">
