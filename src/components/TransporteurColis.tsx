@@ -41,11 +41,11 @@ const TransporteurColis = ({ shipment ,loading ,error }) => {
 // console.log("currentShipment",otherShipments)
 // console.log("shipment" ,shipment)
   const router = useRouter();
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/auth/signin'); // Redirige vers la page d'accueil si l'utilisateur n'est pas connecté
-    }
-  }, [user, loading, router]);
+  // useEffect(() => {
+  //   if (!loading && !user) {
+  //     router.push('/auth/signin'); // Redirige vers la page d'accueil si l'utilisateur n'est pas connecté
+  //   }
+  // }, [user, loading, router]);
 
   
   

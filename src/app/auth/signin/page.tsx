@@ -70,7 +70,7 @@ const onSubmit = async (data) => {
       // Afficher le toast de connexion réussie
       toast.success('Connexion réussie !');
       // Redirection selon le contexte
-      router.push(redirect);
+      router.push("/Dashboard");
     } else {
       setError(response.error)
     }
@@ -120,7 +120,7 @@ const getFriendlyErrorMessage = (error) => {
                 Bienvenue !
               </p>
         
-              <span className="inline-block">
+              <span className="inline-block -mr-[200px]">
               
             <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 720 722.539" role="img" className="mt-12 "  >
   <g id="Group_64" data-name="Group 64" transform="translate(-600.001 -166)">

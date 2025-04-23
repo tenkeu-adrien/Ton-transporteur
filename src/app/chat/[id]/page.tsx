@@ -185,7 +185,6 @@ const [transporteurOfferModal, setTransporteurOfferModal] = useState(null);
 const [newOfferModal, setNewOfferModal] = useState(null);
 const [acceptedOffers, setAcceptedOffers] = useState({});
 const [pendingAcceptance, setPendingAcceptance] = useState({});
-let isCurrentMessage = null
   const messagesEndRef = useRef(null);
 let tempId
   const markMessageRead = useReadMessages(user?.uid);

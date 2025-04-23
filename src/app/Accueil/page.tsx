@@ -32,7 +32,7 @@ export default function Home() {
   return (
     <>
       <Head>
-  <title>Ton Transporteur - Service de Livraison Fiable et Écologique</title>
+  <title>Ton-Transporteur - Service de Livraison Fiable et Écologique</title>
   <meta name="description" content="Avec Ton Transporteur, bénéficiez d&apos;un service de livraison fiable et écologique. Suivez vos colis en temps réel et améliorez l&apos;efficacité de vos opérations logistiques." />
 </Head>
 
@@ -205,7 +205,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8 rounded-2xl">
+      <div className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8 rounded-2xl" id="livraison">
   <div className="max-w-7xl mx-auto text-center">
     <h2 className="text-3xl font-bold  mb-12">Ce que disent nos clients</h2>
     
