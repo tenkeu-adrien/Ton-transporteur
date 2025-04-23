@@ -1,6 +1,5 @@
 "use client"
 import Navbar from '@/components/Navbar';
-import Head from 'next/head';
 import Image from 'next/image';
 import { AuthContext } from '../../../../context/AuthContext';
 import { useContext } from 'react';
@@ -11,10 +10,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Head>
+      {/* <Head>
         <title>Ton-transporteur - Déménagement Marseille à Toulouse</title>
         <meta name="description" content="Solution de déménagement économique entre Marseille et Toulouse" />
-      </Head>
+      </Head> */}
 
       {/* Header */}
      <Navbar  user={user}  logout={logout}/>
@@ -139,10 +138,12 @@ export default function Home() {
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
+            <Image
               src="/img/cities/transporteur.webp" 
               alt="Transporteur" 
               className="rounded-lg h-48 object-cover"
+              width={100}
+              height={100}
             />
           </div>
         </div>
@@ -169,10 +170,12 @@ export default function Home() {
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
+            <Image 
               src="/img/cities/colis.webp" 
               alt="Colis" 
               className="rounded-lg h-48 object-cover"
+              height={100}
+              width={100}
             />
           </div>
         </div>
@@ -199,10 +202,12 @@ export default function Home() {
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
+            <Image 
               src="/img/cities/meuble.webp" 
               alt="Meuble" 
               className="rounded-lg h-48 object-cover"
+              width={100}
+              height={100}
             />
           </div>
         </div>
@@ -271,10 +276,12 @@ export default function Home() {
             </div>
             
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image 
                 src="/verifier.png" 
                 alt="Validez votre réservation" 
                 className="h-24 mx-auto mb-4"
+                width={100}
+                height={100}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Validez votre réservation</h3>
               <p className="text-gray-600">

@@ -11,10 +11,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Head>
-        <title>Ton-transporteur - Déménagement Marseille à Toulouse</title>
-        <meta name="description" content="Solution de déménagement économique entre Marseille et Toulouse" />
-      </Head>
+     
 
       {/* Header */}
      <Navbar  user={user}  logout={logout}/>

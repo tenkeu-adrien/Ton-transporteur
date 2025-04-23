@@ -1,6 +1,5 @@
 "use client"
 import Navbar from '@/components/Navbar';
-import Head from 'next/head';
 import Image from 'next/image';
 import { AuthContext } from '../../../../context/AuthContext';
 import { useContext } from 'react';
@@ -11,10 +10,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Head>
-        <title>Ton-transporteur - Déménagement Marseille à Toulouse</title>
-        <meta name="description" content="Solution de déménagement économique entre Marseille et Toulouse" />
-      </Head>
+    
 
       {/* Header */}
      <Navbar  user={user}  logout={logout}/>

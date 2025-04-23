@@ -41,15 +41,15 @@ const menuData = {
         links: [
           { text: 'Pièces de véhicule', href: '/livraison/vehicule' },
           { text: 'Scooter', href: '/livraison/vehicule/scooter' },
-          { text: 'Commode', href: '/livraison/meuble/commode' },
+          // { text: 'Commode', href: '/livraison/meuble/commode' },
           { text: 'Meuble', href: '/livraison/meuble' },
           { text: 'Vélo', href: '/livraison/vehicule/velo' },
           { text: 'Canapé', href: '/livraison/meuble/canape' },
           { text: 'Electroménager', href: '/livraison/electromenager-electronique' },
           { text: 'Pneu', href: '/livraison/vehicule/pneu' },
-          { text: 'Moto', href: '/livraison/vehicule/moto' },
+          // { text: 'Moto', href: '/livraison/vehicule/moto' },
           { text: 'Outils de jardinage', href: '/livraison/jardinage-decoration' },
-          { text: 'Moteur', href: '/livraison/vehicule/moteur' },
+          // { text: 'Moteur', href: '/livraison/vehicule/moteur' },
           // { text: 'Tondeuse', href: '/livraison/jardinage-decoration/tonde' }
         ]
       }

@@ -31,10 +31,7 @@ export default function Home() {
    const router = useRouter()
   return (
     <>
-      <Head>
-  <title>Ton-Transporteur - Service de Livraison Fiable et Écologique</title>
-  <meta name="description" content="Avec Ton Transporteur, bénéficiez d&apos;un service de livraison fiable et écologique. Suivez vos colis en temps réel et améliorez l&apos;efficacité de vos opérations logistiques." />
-</Head>
+      
 
       {/* demande de permission pour la notification */}
       {/* <FCMSetup /> */}
