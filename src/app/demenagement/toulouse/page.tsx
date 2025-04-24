@@ -17,7 +17,7 @@ export default function Home() {
      <Navbar  user={user}  logout={logout}/>
 
       {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-white">
+      <section className="py-12 md:py-20 bg-green-400">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-8 md:mb-0">
@@ -30,7 +30,7 @@ export default function Home() {
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <a 
-                  href="/devis/demenagement" 
+                  href="/start" 
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors"
                 >
                   Faire un devis
@@ -54,7 +54,7 @@ export default function Home() {
                 </div>
               </div> */}
               <div className="text-center -mr-[350px]"> 
-              <a className="mb-1 inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className="mb-1 inline-block text-3xl text-green-800" href="/Accueil" >
                Ton-Transporteur
               </a>
 
@@ -123,7 +123,7 @@ export default function Home() {
             Déménagement en urgence à toulouse
             </h3>
             <h4 className="text-lg text-green-600 mb-4">
-              UN IMPÉRATIF OU UNE URGENCE ? BRING4YOU VOUS PROPOSE LA SOLUTION DE DÉMÉNAGEMENT
+              UN IMPÉRATIF OU UNE URGENCE ? Ton-transporteur VOUS PROPOSE LA SOLUTION DE DÉMÉNAGEMENT
             </h4>
             <p className="text-gray-600 mb-4">
               Vous êtes pris au dernier moment dans l'école de vos rêves ou trouvez un nouveau boulot à Marseille ou à Toulouse et vous devez déménager en urgence ? Aucun souci ! Avec Ton-transporteur, vous obtenez des réponses rapides pour un déménagement express entre Marseille et Toulouse en semaine comme en week-end.
@@ -136,10 +136,12 @@ export default function Home() {
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
-              src="/img/cities/transporteur.webp" 
+            <Image 
+              src="/2.jpg" 
               alt="Transporteur" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -159,7 +161,7 @@ export default function Home() {
               Vous n'avez pas besoin d'un camion de 20m3 impossible à garer dans votre rue pour effectuer le déménagement de votre studio ? 1 lit. 1 frigo. 1 bureau et quelques cartons à déménager ? Ton-transporteur vous trouve ce qu'il vous faut simplement et au meilleur prix.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
@@ -167,11 +169,11 @@ export default function Home() {
           </div>
           <div className="flex justify-center">
             <Image
-              src="/img/cities/colis.webp" 
+              src="/3.jpg" 
               width={100}
-              height={100}
+              height={0}
               alt="Colis" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
             />
           </div>
         </div>
@@ -191,7 +193,7 @@ export default function Home() {
               Devis gratuits en ligne. Solutions économiques, efficaces et écologiques pour les pros. Vous changez de locaux et vous cherchez une solution adaptée à la taille et vos besoins ? Ton-transporteur vous offre un service de qualité.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
@@ -199,11 +201,11 @@ export default function Home() {
           </div>
           <div className="flex justify-center">
             <Image
-              src="/img/cities/meuble.webp" 
+              src="/2.jpg" 
               alt="Meuble" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
               width={100}
-              height={100}
+              height={0}
             />
           </div>
         </div>
@@ -217,24 +219,16 @@ export default function Home() {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
-          Déménager un local professionel à Toulouse
+          Quel est le coût moyen d'un déménagement à Toulouse ?
           </h2>
           <div className="prose max-w-none text-gray-600">
-            <p>
-              Vous prévoyez un déménagement entre Marseille et Toulouse? Ne cherchez plus, Bring4You est là pour vous offrir un service professionnel et sécurisé qui vous facilitera la vie!
-            </p>
-            <p>
-              Avec Ton-transporteur, vous pouvez déménager facilement et rapidement de Marseille à Toulouse, sans tracas ni stress. Nous comprenons que chaque déménagement est unique, c'est pourquoi nous vous offrons un service sur mesure adapté à vos besoins.
-            </p>
-            <p>
-              Que vous souhaitiez déménager un lit, des meubles ou même votre jardin, notre équipe de déménageurs expérimentés est là pour répondre à tous vos besoins. Nous disposons des ressources nécessaires pour assurer un transport sûr et efficace de vos biens, quels qu'ils soient.
-            </p>
-            <p>
-              De plus, grâce à notre comparateur de devis en ligne, vous pouvez facilement comparer les différentes options de déménagement et choisir celle qui correspond le mieux à votre budget et à vos exigences. Nous nous engageons à vous fournir des tarifs compétitifs et transparents, sans frais cachés.
-            </p>
-            <p>
-              La satisfaction de nos clients est notre priorité absolue, c'est pourquoi nous offrons des garanties déménagement pour vous assurer une tranquillité d'esprit totale. Nous mettons tout en œuvre pour que votre déménagement se déroule sans accroc, du début à la fin.
-            </p>
+            <p>Vous vous demandez sûrement combien vous coûtera votre déménagement à Toulouse. Le coût dépend de plusieurs facteurs tels que la distance, la quantité de mobilier, et les services dont vous avez besoin. Faire appel à un déménageur professionnel comme Ton-transporteur garantit une expertise et une efficacité dans le transfert de vos biens.</p>
+      <p className='text-xl font-semibold'>Les éléments à considérer pour le coût d'un déménagement à Toulouse :</p>
+          <p className='mt-2 mb-2 font-semibold text-xl'> Distance et Itinéraire :     </p> <span>La distance entre les adresses de départ et d'arrivée influencera le tarif du déménagement. Un déménagement local à Toulouse peut avoir un coût différent par rapport à un transfert interurbain ou national.</span>
+          <p   className='mt-2 mb-2 font-semibold text-xl'>  Volume et Type de Mobilier :     </p> <p> Plus le volume de mobilier à déplacer est important, plus le tarif risque d'augmenter. Des éléments spécifiques tels qu'un piano nécessitent souvent une assistance particulière et peuvent impacter le coût du service.</p>   
+          <p  className='mt-2 mb-2 font-semibold text-xl'>  Services Additionnels :    </p> <p> En fonction de vos besoins, vous pourriez bénéficier de services supplémentaires tels que l'emballage, le démontage et le remontage du mobilier. Ces services peuvent simplifier votre projet de déménagement, mais ils peuvent également avoir un impact sur le tarif final.  </p>
+          {/* <p  className='mt-2 mb-2 font-semibold text-xl'>  Location de Véhicule :     </p> <p> Si vous préférez gérer vous-même votre déménagement en louant un véhicule, le coût de la location doit être pris en compte dans votre budget global.</p> */}
+          <p  className='mt-2 mb-2 font-semibold text-xl'>  Équipe de Déménageurs :     </p> <p> Engager une équipe de déménageurs expérimentés peut assurer un transfert rapide et sécurisé de vos biens. La qualité du service de la société de déménagement contribue également à la tranquillité d'esprit du client.</p>
           </div>
         </div>
       </section>
@@ -243,7 +237,7 @@ export default function Home() {
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-12">
-            Comment trouver un déménageur entre Marseille et Toulouse ?
+          Comment trouver un transporteur à  Toulouse ?
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -284,9 +278,9 @@ export default function Home() {
                 height={100}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Validez votre réservation</h3>
-              <p className="text-gray-600">
-                Réglez en ligne pour bénéficier d'une assurance et suivre votre colis. Votre paiement ne sera versé au voyageur qu'une fois le colis livré.
-              </p>
+              <p className="text-justify text-gray-600">
+  Vous ne payez que le prix du transport  Aucun frais supplémentaire ne vous sera demandé, et le paiement se fait directement au moment de l'envoi ou à la livraison.
+</p>
             </div>
           </div>
         </div>

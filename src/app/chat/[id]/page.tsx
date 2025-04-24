@@ -1213,8 +1213,8 @@ const handleCancelShipment =  async () => {
                                     <a target="_blank" rel="noopener noreferrer">
                                       <Image
                                         src={attachment.url}
-                                        width={100}
-                                        height={100}
+                                        width={150}
+                                        height={150}
                                         alt="Image partagée"
                                         className="rounded-lg max-w-full cursor-pointer hover:opacity-90"
                                       />

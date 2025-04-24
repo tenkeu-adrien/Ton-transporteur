@@ -11,17 +11,7 @@ export default function page() {
     <Navbar  user={user} logout={logout}/>
     <section className="bg-white">
     {/* Script section - à placer dans un composant séparé ou dans _document.js */}
-    <script 
-      type="text/plain" 
-      dangerouslySetInnerHTML={{
-        __html: `window.LoadScript = function(src, callback) {
-          var script = document.createElement('script');
-          script.onload = callback;
-          script.src = src;
-          document.head.appendChild(script);
-        };`
-      }} 
-    />
+  
   
     {/* Hero Section */}
     <div className="bg-green-50 py-12 md:py-20">
@@ -29,7 +19,7 @@ export default function page() {
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4">
-            Déménagement d'entreprise  avec Ton-transporteur
+            Déménagement  de bureau  avec Ton-transporteur
             </h1>
             <h2 className="text-xl md:text-2xl text-gray-600 mb-8">
               La solution logistique pour commerçants et particuliers
@@ -103,32 +93,13 @@ export default function page() {
     {/* Main Content */}
     <div className="container mx-auto px-4 py-12">
       {/* FAQ Schema - à mettre dans _document.js idéalement */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "Comment expédier votre meuble ?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "1. Déposez votre demande de livraison <a href=https://bring4you.com/create>ici</a> <br/>2. Recevez des propositions<br/> 3. Validez votre réservation"
-                }
-              },
-              // ... autres questions
-            ]
-          })
-        }}
-      />
+     
   
       {/* How It Works Section */}
       <section className="py-12">
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
-            Comment trouver un déménageur pour votre appartement?
+            Comment trouver un déménageur pour votre Bureau?
           </h2>
         </div>
   
@@ -143,7 +114,7 @@ export default function page() {
             </div>
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Déposez une annonce</h3>
             <p className="text-gray-600">
-              Proposez  une demande de déménagement de votre appartement. Détaillez votre annonce avec l'adresse, les dimensions et le prix
+              Proposez  une demande de déménagement de votre Bureau. Détaillez votre annonce avec l'adresse, les dimensions et le prix
               proposé pour la livraison. Pensez à ajouter une photo de votre meuble.
             </p>
           </div>
@@ -158,7 +129,7 @@ export default function page() {
             </div>
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Recevez des propositions</h3>
             <p className="text-gray-600">
-              Les voyageurs vous contactent par texto ou mail. Mettez-vous d'accord sur les détails du déménagements de votre appartement  (prix, date d'enlèvement et de livraison).
+              Les voyageurs vous contactent par texto ou mail. Mettez-vous d'accord sur les détails du déménagements de votre bureau  (prix, date d'enlèvement et de livraison).
             </p>
           </div>
   
@@ -195,7 +166,7 @@ export default function page() {
         </h2>
         
         <p className="text-gray-600 mb-6">
-          Vous pouvez envoyer tout type de meuble via Bring4You. Petit, moyen, gros, encombrants nous avons une solution pour toutes vos demandes d'expédition de meuble.
+          Vous pouvez envoyer tout type de meuble via Ton-transporteur. Petit, moyen, gros, encombrants nous avons une solution pour toutes vos demandes d'expédition de meuble.
         </p>
         
         <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p>
@@ -238,7 +209,7 @@ export default function page() {
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
           98% de nos clients nous recommandent :{' '}
           <a 
-            href="https://fr.trustpilot.com/review/www.bring4you.com" 
+            href="https://fr.trustpilot.com/review/www.Ton-transporteur.com" 
             className="text-green-600 hover:text-green-800 transition-colors"
           >
             Lire plus d'avis
@@ -252,7 +223,7 @@ export default function page() {
               author: "Nathalie M."
             },
             {
-              text: "Pour résumer mon envoi de commode : Efficacité, Rapidité, Compétitivité, Amabilité . Je ne pensais pas qu'il était encore possible de trouver toutes ces qualités réunies,et pourtant c'est possible. Vous pouvez faire appel à Bring4You les yeux fermés. Encore merci",
+              text: "Pour résumer mon envoi de commode : Efficacité, Rapidité, Compétitivité, Amabilité . Je ne pensais pas qu'il était encore possible de trouver toutes ces qualités réunies,et pourtant c'est possible. Vous pouvez faire appel à Ton-transporteur les yeux fermés. Encore merci",
               author: "JM B."
             },
             {

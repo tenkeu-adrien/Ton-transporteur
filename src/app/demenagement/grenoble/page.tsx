@@ -242,7 +242,7 @@ export default function Home() {
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-12">
-            Comment trouver un déménageur entre Marseille et Toulouse ?
+          Comment trouver un transporteur à   grenoble ?
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -277,9 +277,10 @@ export default function Home() {
                 className="h-24 mx-auto mb-4"
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Validez votre réservation</h3>
-              <p className="text-gray-600">
-                Réglez en ligne pour bénéficier d'une assurance et suivre votre colis. Votre paiement ne sera versé au voyageur qu'une fois le colis livré.
-              </p>
+              <p className="text-justify text-gray-600">
+  Vous ne payez que le prix du transport  Aucun frais supplémentaire ne vous sera demandé, et le paiement se fait directement au moment de l'envoi ou à la livraison.
+</p>
+      
             </div>
           </div>
         </div>

@@ -16,12 +16,12 @@ export default function Home() {
      <Navbar  user={user}  logout={logout}/>
 
       {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-white">
+      <section className="py-12 md:py-20 bg-green-400">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-8 md:mb-0">
               <h1 className="text-4xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4">
-              Déménagement à Lyon avec lyon
+              Trouvez votre déménageur à Nantes
               </h1>
               <h2 className="text-xl md:text-2xl text-gray-600 mb-8">
                 Solution de déménagement économique, efficace et écologique
@@ -53,7 +53,7 @@ export default function Home() {
                 </div>
               </div> */}
               <div className="text-center -mr-[350px]"> 
-              <a className="mb-1 inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className="mb-1 inline-block text-3xl text-green-800" href="/Accueil" >
                Ton-Transporteur
               </a>
 
@@ -119,26 +119,28 @@ export default function Home() {
         <div className="flex flex-col">
           <div className="mb-4">
             <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
-            Déménagement en urgence à Lyon
+            Déménagement en urgence à Nantes
             </h3>
             <h4 className="text-lg text-green-600 mb-4">
-              UN IMPÉRATIF OU UNE URGENCE ? BRING4YOU VOUS PROPOSE LA SOLUTION DE DÉMÉNAGEMENT
+              UN IMPÉRATIF OU UNE URGENCE ? Ton-transporteur VOUS PROPOSE LA SOLUTION DE DÉMÉNAGEMENT
             </h4>
             <p className="text-gray-600 mb-4">
               Vous êtes pris au dernier moment dans l'école de vos rêves ou trouvez un nouveau boulot à Marseille ou à Toulouse et vous devez déménager en urgence ? Aucun souci ! Avec Ton-transporteur, vous obtenez des réponses rapides pour un déménagement express entre Marseille et Toulouse en semaine comme en week-end.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
-              src="/img/cities/transporteur.webp" 
+            <Image 
+              src="/2.jpg" 
               alt="Transporteur" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -149,7 +151,7 @@ export default function Home() {
         <div className="flex flex-col">
           <div className="mb-4">
             <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
-            Déménager un studio à Lyon
+            Déménager un studio à Nantes
             </h3>
             <h4 className="text-lg text-green-600 mb-4">
               BESOIN DE TROUVER UN PETIT CAMION OU D'UN UTILITAIRE POUR UN PETIT DÉMÉNAGEMENT ?
@@ -158,17 +160,19 @@ export default function Home() {
               Vous n'avez pas besoin d'un camion de 20m3 impossible à garer dans votre rue pour effectuer le déménagement de votre studio ? 1 lit. 1 frigo. 1 bureau et quelques cartons à déménager ? Ton-transporteur vous trouve ce qu'il vous faut simplement et au meilleur prix.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
-              src="/img/cities/colis.webp" 
+            <Image
+              src="/1.jpg" 
               alt="Colis" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -179,7 +183,7 @@ export default function Home() {
         <div className="flex flex-col">
           <div className="mb-4">
             <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
-              Déménager vos locaux  à Lyon
+              Déménager vos locaux  à Nantes
             </h3>
             <h4 className="text-lg text-green-600 mb-4">
               Ton-transporteur, C'EST AUSSI DES SOLUTIONS POUR LES PROFESSIONNELS
@@ -188,17 +192,19 @@ export default function Home() {
               Devis gratuits en ligne. Solutions économiques, efficaces et écologiques pour les pros. Vous changez de locaux et vous cherchez une solution adaptée à la taille et vos besoins ? Ton-transporteur vous offre un service de qualité.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
-              src="/img/cities/meuble.webp" 
+            <Image 
+              src="/3.jpg" 
               alt="Meuble" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -212,41 +218,54 @@ export default function Home() {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
-          Déménager un local professionel à Lyon
+          Déménagement à Nantes ? Une solution rentable pour votre déménagement
           </h2>
           <div className="prose max-w-none text-gray-600">
             <p>
-              Vous prévoyez un déménagement entre Marseille et Toulouse? Ne cherchez plus, Bring4You est là pour vous offrir un service professionnel et sécurisé qui vous facilitera la vie!
-            </p>
-            <p>
-              Avec Ton-transporteur, vous pouvez déménager facilement et rapidement de Marseille à Toulouse, sans tracas ni stress. Nous comprenons que chaque déménagement est unique, c'est pourquoi nous vous offrons un service sur mesure adapté à vos besoins.
-            </p>
-            <p>
-              Que vous souhaitiez déménager un lit, des meubles ou même votre jardin, notre équipe de déménageurs expérimentés est là pour répondre à tous vos besoins. Nous disposons des ressources nécessaires pour assurer un transport sûr et efficace de vos biens, quels qu'ils soient.
-            </p>
-            <p>
-              De plus, grâce à notre comparateur de devis en ligne, vous pouvez facilement comparer les différentes options de déménagement et choisir celle qui correspond le mieux à votre budget et à vos exigences. Nous nous engageons à vous fournir des tarifs compétitifs et transparents, sans frais cachés.
-            </p>
-            <p>
-              La satisfaction de nos clients est notre priorité absolue, c'est pourquoi nous offrons des garanties déménagement pour vous assurer une tranquillité d'esprit totale. Nous mettons tout en œuvre pour que votre déménagement se déroule sans accroc, du début à la fin.
+            Obtenez un devis gratuit afin de parvenir au choix qui vous sied le mieux. En effet. il faut tenir compte de plusieurs critères qui modifient le coût final de l'intervention. On peut spécifier par exemple la présence ou non d'ascenseur dans la copropriété au sein de laquelle vous emménagez. ou alors la superficie du logement que vous souhaitez quitter. En effectuant des devis comparatifs vous pouvez faire le tri des différentes options dont vous nécessitez ou non. 
             </p>
           </div>
         </div>
       </section>
 
+
+
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
+          Quel est le coût moyen d'un déménagement à Nantes ?
+          </h2>
+          <div className="prose max-w-none text-gray-600">
+            <p>
+            Vous vous demandez certainement combien pourrait coûter votre déménagement à Nantes avec Ton-transporteur. Notre société de déménagement met à votre disposition une équipe expérimentée pour rendre votre expérience de déménagement agréable et abordable.
+            </p>
+            <p className='font-semibold  mb-4 mt-4 text-xl'>Coût des Services de Déménagement à Nantes :</p>
+            <p className=''>Formules Flexibles : Chez Ton-transporteur, nous comprenons que chaque client a des besoins uniques. C'est pourquoi nous proposons différentes formules de déménagement, adaptées à votre budget et à vos exigences. Que vous ayez besoin d'une prestation complète avec emballage, démontage, et montage, ou simplement d'une location de camion avec chauffeur, notre équipe s'adapte à vos besoins.
+Tarification Transparente : Notre service de déménagement à Nantes se distingue par sa transparence en matière de tarification. Aucun coût caché, vous recevez un devis clair avant le déménagement. Nous croyons en une relation de confiance avec nos clients.
+Assistance Personnalisée : Notre équipe de déménageurs professionnels est là pour vous aider à chaque étape. Que vous ayez des questions sur la location d'un utilitaire ou que vous ayez besoin d'aide pour choisir la meilleure formule, nos experts en déménagement sont disponibles pour vous guider.</p>
+
+
+          </div>
+        </div>
+      </section>
+
+
+     
       {/* How It Works Section */}
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-12">
-            Comment trouver un déménageur entre Marseille et Toulouse ?
+          Comment trouver un transporteur à Nantes?
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image 
                 src="/boite-en-carton.png" 
                 alt="Déposez une annonce" 
                 className="h-24 mx-auto mb-4"
+                width={100}
+                height={0}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Déposez une annonce</h3>
               <p className="text-gray-600">
@@ -255,10 +274,12 @@ export default function Home() {
             </div>
             
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image
                 src="/bulle-de-discussion.png" 
                 alt="Recevez des propositions" 
                 className="h-24 mx-auto mb-4"
+                width={100}
+                height={0}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Recevez des propositions</h3>
               <p className="text-gray-600">
@@ -267,15 +288,17 @@ export default function Home() {
             </div>
             
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image 
                 src="/verifier.png" 
                 alt="Validez votre réservation" 
                 className="h-24 mx-auto mb-4"
+                width={100}
+                height={0}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Validez votre réservation</h3>
-              <p className="text-gray-600">
-                Réglez en ligne pour bénéficier d'une assurance et suivre votre colis. Votre paiement ne sera versé au voyageur qu'une fois le colis livré.
-              </p>
+              <p className="text-justify text-gray-600">
+  Vous ne payez que le prix du transport  Aucun frais supplémentaire ne vous sera demandé, et le paiement se fait directement au moment de l'envoi ou à la livraison.
+</p>
             </div>
           </div>
         </div>

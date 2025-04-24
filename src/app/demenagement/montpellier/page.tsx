@@ -17,12 +17,12 @@ export default function Home() {
      <Navbar  user={user}  logout={logout}/>
 
       {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-white">
+      <section className="py-12 md:py-20 bg-green-400">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-8 md:mb-0">
               <h1 className="text-4xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4">
-              Déménagement à Lyon avec lyon
+              Déménagement à Montpellier avec Ton-transporteur
               </h1>
               <h2 className="text-xl md:text-2xl text-gray-600 mb-8">
                 Solution de déménagement économique, efficace et écologique
@@ -30,7 +30,7 @@ export default function Home() {
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <a 
-                  href="/devis/demenagement" 
+                  href="/start" 
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors"
                 >
                   Faire un devis
@@ -54,7 +54,7 @@ export default function Home() {
                 </div>
               </div> */}
               <div className="text-center -mr-[350px]"> 
-              <a className="mb-1 inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className="mb-1 inline-block text-3xl text-green-800" href="/Accueil" >
                Ton-Transporteur
               </a>
 
@@ -120,26 +120,28 @@ export default function Home() {
         <div className="flex flex-col">
           <div className="mb-4">
             <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
-            Déménagement en urgence à Lyon
+            Déménagement en urgence à  Montpellier 
             </h3>
             <h4 className="text-lg text-green-600 mb-4">
-              UN IMPÉRATIF OU UNE URGENCE ? BRING4YOU VOUS PROPOSE LA SOLUTION DE DÉMÉNAGEMENT
+              UN IMPÉRATIF OU UNE URGENCE ? Ton-transporteur VOUS PROPOSE LA SOLUTION DE DÉMÉNAGEMENT
             </h4>
             <p className="text-gray-600 mb-4">
               Vous êtes pris au dernier moment dans l'école de vos rêves ou trouvez un nouveau boulot à Marseille ou à Toulouse et vous devez déménager en urgence ? Aucun souci ! Avec Ton-transporteur, vous obtenez des réponses rapides pour un déménagement express entre Marseille et Toulouse en semaine comme en week-end.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
             </a>
           </div>
-          <div className="flex justify-center">
-            <img 
-              src="/img/cities/transporteur.webp" 
+          <div className="flex justify-center ">
+            <Image 
+              src="/2.jpg" 
               alt="Transporteur" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -150,7 +152,7 @@ export default function Home() {
         <div className="flex flex-col">
           <div className="mb-4">
             <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
-            Déménager un studio à Lyon
+            Déménager un studio à Montpellier
             </h3>
             <h4 className="text-lg text-green-600 mb-4">
               BESOIN DE TROUVER UN PETIT CAMION OU D'UN UTILITAIRE POUR UN PETIT DÉMÉNAGEMENT ?
@@ -159,17 +161,19 @@ export default function Home() {
               Vous n'avez pas besoin d'un camion de 20m3 impossible à garer dans votre rue pour effectuer le déménagement de votre studio ? 1 lit. 1 frigo. 1 bureau et quelques cartons à déménager ? Ton-transporteur vous trouve ce qu'il vous faut simplement et au meilleur prix.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
-              src="/img/cities/colis.webp" 
+            <Image 
+              src="/3.jpg" 
               alt="Colis" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -180,7 +184,7 @@ export default function Home() {
         <div className="flex flex-col">
           <div className="mb-4">
             <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
-              Déménager vos locaux  à Lyon
+              Déménager vos locaux  à Montpellier
             </h3>
             <h4 className="text-lg text-green-600 mb-4">
               Ton-transporteur, C'EST AUSSI DES SOLUTIONS POUR LES PROFESSIONNELS
@@ -189,17 +193,19 @@ export default function Home() {
               Devis gratuits en ligne. Solutions économiques, efficaces et écologiques pour les pros. Vous changez de locaux et vous cherchez une solution adaptée à la taille et vos besoins ? Ton-transporteur vous offre un service de qualité.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
-              src="/img/cities/meuble.webp" 
+            <Image 
+              src="/1.jpg" 
               alt="Meuble" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -213,41 +219,69 @@ export default function Home() {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
-          Déménager un local professionel à Lyon
+          Vous déménagez à Montpellier ? Ton-transporteur est la réponse !
           </h2>
           <div className="prose max-w-none text-gray-600">
-            <p>
-              Vous prévoyez un déménagement entre Marseille et Toulouse? Ne cherchez plus, Bring4You est là pour vous offrir un service professionnel et sécurisé qui vous facilitera la vie!
-            </p>
-            <p>
-              Avec Ton-transporteur, vous pouvez déménager facilement et rapidement de Marseille à Toulouse, sans tracas ni stress. Nous comprenons que chaque déménagement est unique, c'est pourquoi nous vous offrons un service sur mesure adapté à vos besoins.
-            </p>
-            <p>
-              Que vous souhaitiez déménager un lit, des meubles ou même votre jardin, notre équipe de déménageurs expérimentés est là pour répondre à tous vos besoins. Nous disposons des ressources nécessaires pour assurer un transport sûr et efficace de vos biens, quels qu'ils soient.
-            </p>
-            <p>
-              De plus, grâce à notre comparateur de devis en ligne, vous pouvez facilement comparer les différentes options de déménagement et choisir celle qui correspond le mieux à votre budget et à vos exigences. Nous nous engageons à vous fournir des tarifs compétitifs et transparents, sans frais cachés.
-            </p>
-            <p>
-              La satisfaction de nos clients est notre priorité absolue, c'est pourquoi nous offrons des garanties déménagement pour vous assurer une tranquillité d'esprit totale. Nous mettons tout en œuvre pour que votre déménagement se déroule sans accroc, du début à la fin.
-            </p>
+            <p> Vous planifiez votre prochain grand déménagement ? Si Montpellier est votre destination, ne cherchez pas plus loin que Ton-transporteur. Cette entreprise de déménagement fiable s'assurera que vos biens arrivent rapidement et en toute sécurité à leur nouveau domicile. Mais qu'est-ce qui fait de Montpellier une ville où il fait bon déménager ? Voyons pourquoi cette ville du sud de la France est une nouvelle maison idéale pour tant de gens. </p>
           </div>
         </div>
       </section>
+
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
+          Quel est le coût moyen d'un déménagement à Montpellier ?
+          </h2>
+          <div className="prose max-w-none text-gray-600">
+            <p>Vous vous demandez peut-être quel sera le coût moyen de votre déménagement à Montpellier. Le tarif d'un déménageur peut varier en fonction de plusieurs facteurs tels que la distance, le volume des biens à déplacer, les services supplémentaires nécessaires et la formule choisie. </p>
+            
+
+            <p className='font-semibold  text-xl mb-2 mt-2'>Facteurs influençant le coût :</p>
+            <p>Volume et mobilier : Le coût dépend généralement du volume total des biens à déménager, ainsi que de la nature du mobilier. Des objets volumineux ou fragiles peuvent nécessiter une attention particulière et affecter le prix de la prestation.
+Distance et manutention : La distance entre les lieux de départ et d'arrivée joue un rôle crucial dans le calcul du coût. De même, la complexité de la manutention, notamment pour les accès difficiles, peut influencer le tarif.
+Services supplémentaires : Si vous avez besoin de services complémentaires tels que l'emballage, le démontage et le remontage de meubles, ou encore la location de matériel spécifique, cela peut impacter le coût total du déménagement.
+Choix de la formule :
+Il est essentiel de considérer différentes formules proposées par l'entreprise de déménagement. Les formules varient généralement en fonction du niveau de service souhaité. Certaines incluent l'emballage, le démontage du mobilier, le transport, et même la mise en garde-meuble si nécessaire.
+Garde-meuble et matériel :
+Si votre projet de déménagement implique une période de transition entre votre ancien et votre nouveau logement, un service de garde-meuble peut être envisagé. Assurez-vous de comprendre les coûts associés à cette prestation, ainsi que l'étendue du matériel mis à disposition pour assurer la sécurité de vos biens.
+Choix de l'entreprise de déménagement :
+La sélection d'une entreprise de déménagement expérimentée avec une équipe qualifiée peut influencer la réussite de votre projet. Vérifiez les prestations incluses dans le devis, examinez les retours clients, et assurez-vous que l'entreprise est en mesure de répondre à vos besoins spécifiques.
+En résumé, le coût moyen d'un déménagement à Montpellier dépend de divers éléments tels que le volume, la distance, les services supplémentaires, et la formule choisie. Prenez le temps de comparer les offres des déménageurs locaux et de sélectionner celle qui correspond le mieux à vos besoins et à votre budget.</p>
+          </div>
+        </div>
+      </section>
+
+
+
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
+          Obtenez votre devis personnalisé pour votre déménagement à Montpellier 
+          </h2>
+          <div className="prose max-w-none text-gray-600">
+            <p>
+            Pour organiser votre déménagement à Montpellier en toute sérénité, Ton-transporteur propose un formulaire en ligne simple et rapide pour obtenir un devis personnalisé. En renseignant les détails de votre déménagement, tels que la date, le volume des biens à transporter, et les services supplémentaires souhaités, vous recevrez une estimation claire et détaillée. Ce devis sur mesure vous permettra de comparer les offres et de choisir la solution la plus adaptée à vos besoins, tout en profitant de l'expertise et du professionnalisme de Ton-transporteur </p>
+          </div>
+        </div>
+      </section>
+
+                                  
 
       {/* How It Works Section */}
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-12">
-            Comment trouver un déménageur entre Marseille et Toulouse ?
+          Comment trouver un transporteur à Montpellier  ?
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image 
                 src="/boite-en-carton.png" 
                 alt="Déposez une annonce" 
                 className="h-24 mx-auto mb-4"
+                width={100}
+                height={0}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Déposez une annonce</h3>
               <p className="text-gray-600">
@@ -256,10 +290,12 @@ export default function Home() {
             </div>
             
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image 
                 src="/bulle-de-discussion.png" 
                 alt="Recevez des propositions" 
                 className="h-24 mx-auto mb-4"
+                width={100}
+                height={0}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Recevez des propositions</h3>
               <p className="text-gray-600">
@@ -268,15 +304,17 @@ export default function Home() {
             </div>
             
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image 
                 src="/verifier.png" 
                 alt="Validez votre réservation" 
                 className="h-24 mx-auto mb-4"
+                width={100}
+                height={0}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Validez votre réservation</h3>
-              <p className="text-gray-600">
-                Réglez en ligne pour bénéficier d'une assurance et suivre votre colis. Votre paiement ne sera versé au voyageur qu'une fois le colis livré.
-              </p>
+              <p className="text-justify text-gray-600">
+  Vous ne payez que le prix du transport  Aucun frais supplémentaire ne vous sera demandé, et le paiement se fait directement au moment de l'envoi ou à la livraison.
+</p>
             </div>
           </div>
         </div>

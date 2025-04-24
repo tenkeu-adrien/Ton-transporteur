@@ -77,28 +77,22 @@ export default function HomePage() {
   // Témoignages
   const testimonials = [
     {
-      text: "Dommage que je ne connaissais pas ce site avant. Je suis plus que satisfait. Dorénavant tout mes envois passeront par BRING4YOU.",
-      author: "Hervé S."
+      text: "Dommage que je ne connaissais pas ce site avant. Je suis plus que satisfait. Dorénavant tout mes envois passeront par Ton-transporteur.",
+      author: "Stéphane G."
     },
     {
       text: "Je recommande à 200%. La meilleure solution pour transporter des pièces de véhicule ou de moto.",
-      author: "Magali F."
+      author: "Carine B."
     },
     {
-      text: "J'ai un garage et j'achète des pièces en ligne sur leboncoin. Moteur, vespa, pièces automobiles, boite de vitesse...: je fais tous livrer par Bring4You.",
-      author: "René A."
+      text: "J'ai un garage et j'achète des pièces en ligne sur leboncoin. Moteur, vespa, pièces automobiles, boite de vitesse...: je fais tous livrer par Ton-transporteur.",
+      author: "Fabrice J."
     }
   ];
 
   return (
     <>
-      <Head>
-        {/* Structured Data for FAQ */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
-        />
-      </Head>
+     
 <Navbar  user={user} logout={logout}/>
       <section className="content">
   <div className="bg-gray-100 py-8">
@@ -130,6 +124,16 @@ export default function HomePage() {
         <div className="w-full lg:w-5/12">
           <div className="mb-4"></div>
           <span className="inline-block">
+          <div className="text-center -mr-[350px]"> 
+              <a className="mb-1 inline-block text-3xl text-green-400" href="/Accueil" >
+               Ton-Transporteur
+              </a>
+
+              <p className="2xl:px-20">
+                {/* Bienvenue ! */}
+              </p>
+        
+              <span className="inline-block">
               
             <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 720 722.539" role="img" className="mt-12 "  >
   <g id="Group_64" data-name="Group 64" transform="translate(-600.001 -166)">
@@ -171,6 +175,8 @@ export default function HomePage() {
     </g>
   </g>
 </svg>
+              </span>
+            </div>
               </span>
         </div>
       </div>
@@ -222,8 +228,10 @@ export default function HomePage() {
         />
         <h3 className="text-xl font-semibold mb-2">Validez votre réservation</h3>
         <p className="text-justify">
-          Réglez en ligne pour bénéficier d'une assurance et suivre votre pièces de véhicule. Votre paiement ne sera versé au
-          voyageur qu'une fois la livraison est effecutée.
+<p className="text-justify text-gray-600">
+  Vous ne payez que le prix du transport  Aucun frais supplémentaire ne vous sera demandé, et le paiement se fait directement au moment de l'envoi ou à la livraison.
+</p>
+
         </p>
       </div>
     </div>
@@ -238,7 +246,7 @@ export default function HomePage() {
   <section id="product_link" className="container mx-auto px-4 py-8">
     <h2 className="text-3xl font-bold text-center mb-6">Quel type de pièces automobiles puis-je envoyer ?</h2>
     <p className="text-justify mb-4">
-      Vous pouvez envoyer tout type de pièces automobiles via Bring4You. Petit, moyen, gros, encombrants nous avons une solution pour toutes vos demandes d'expédition de pièces automobiles. Bring4You est notamment spécialisé dans l'envoi de pièces automobiles encombrants comme des jantes, des roues, des moteurs,... Bring4You livre également de nombreuses motos et scooters à travers toute la France. Envoyer une pièce automobile n'a jamais été aussi simple. Vous pouvez acheter des pièces automobiles sur internet sur des sites comme leconcoin sans souci à présent.
+      Vous pouvez envoyer tout type de pièces automobiles via Ton-transporteur. Petit, moyen, gros, encombrants nous avons une solution pour toutes vos demandes d'expédition de pièces automobiles. Ton-transporteur est notamment spécialisé dans l'envoi de pièces automobiles encombrants comme des jantes, des roues, des moteurs,... Ton-transporteur livre également de nombreuses motos et scooters à travers toute la France. Envoyer une pièce automobile n'a jamais été aussi simple.
     </p>
     <p className="mb-4">Voici des exemples de colis que vous pouvez envoyer :</p>
     <div className="flex flex-wrap -mx-2">
@@ -254,12 +262,12 @@ export default function HomePage() {
     </div>
     <div className="flex justify-center mt-8">
       <div className="w-full lg:w-4/12">
-        <Link href="/create" passHref>
+        <a href="/start" >
           <span id="btn_send_discover" className="block w-full bg-green-500 hover:bg-green-600 text-white text-center py-3 px-4 rounded cursor-pointer transition" role="button">
             <i className="fa fa-suitcase"></i>
             &nbsp;&nbsp;J'envoie un colis
           </span>
-        </Link>
+        </a>
       </div>
     </div>
   </section>
@@ -269,13 +277,13 @@ export default function HomePage() {
     <div className="mb-8">
       <h2 className="text-3xl font-bold text-center mb-6">La solution de transport la moins chère</h2>
       <p className="text-justify">
-        Vous avez des pièces de véhicule à expédier ? Pas de problème vous pouvez livrer avec Bring4You tout sorte de pièce de véhicule: pneus, remorques, carrosserie, moteur, jantes, capot, échappement, compresseur, bougies, courroie, freins, rétroviseur, filtre à air, habitacle, cardan, boudies d'allumage, durite, culasse, pneus, alternateur, filtre à carburant, pompe à eau, essuie-glaces... La liste est longue mais vous raiment livrer tout type de pièces automobiles : pièces détachées, pièces de rechange, piéces d'origine, pièces neuves, pièces de voiture, pièces d'occasion,...Souvent le coup de livraison exorbitant de livraison empêche de livrer des pièces auto indispensables à votre véhicule. Bring4You aide ainsi des particuliers à expédier ces pièces automobiles à travers toute la France. Le prix de livraison dépend du volume, poids et du trajet. Pour livrer des roues de Paris à Marseille, comptez environ 50€. Si le bien à livrer est volumineux ou encombrant comme un moteur, un capot ou une boite de vitesse comptez plutôt autour de 100€. Si votre véhicule est cassé : vous pouvez transporter vos pièces automobiles nécessaires à la réparation de votre véhicule : compresseur de climatisation, injecteur, rotules, démarreur, pièces pour golf, alfa,... Soyez rassurés les bien sont assurés contre le bris et le vol accidentel ! Plus qu'une chose à faire: déposer votre demande en cliquant sur "J'expédie".
+        Vous avez des pièces de véhicule à expédier ? Pas de problème vous pouvez livrer avec Ton-transporteur tout sorte de pièce de véhicule: pneus, remorques, carrosserie, moteur, jantes, capot, échappement, compresseur, bougies, courroie, freins, rétroviseur, filtre à air, habitacle, cardan, boudies d'allumage, durite, culasse, pneus, alternateur, filtre à carburant, pompe à eau, essuie-glaces... La liste est longue mais vous raiment livrer tout type de pièces automobiles : pièces détachées, pièces de rechange, piéces d'origine, pièces neuves, pièces de voiture, pièces d'occasion,...Souvent le coup de livraison exorbitant de livraison empêche de livrer des pièces auto indispensables à votre véhicule. Ton-transporteur aide ainsi des particuliers à expédier ces pièces automobiles à travers toute la France. Le prix de livraison dépend du volume, poids et du trajet. Pour livrer des roues de Paris à Marseille, comptez environ 50€. Si le bien à livrer est volumineux ou encombrant comme un moteur, un capot ou une boite de vitesse comptez plutôt autour de 100€. Si votre véhicule est cassé : vous pouvez transporter vos pièces automobiles nécessaires à la réparation de votre véhicule : compresseur de climatisation, injecteur, rotules, démarreur, pièces pour golf, alfa,... Soyez rassurés les bien sont assurés contre le bris et le vol accidentel ! Plus qu'une chose à faire: déposer votre demande en cliquant sur "J'expédie".
       </p>
     </div>
     <div>
       <h2 className="text-3xl font-bold text-center mb-6">Pourquoi c'est moins cher ?</h2>
       <p className="text-justify">
-        La réponse est simple: grâce à la livraison de colis entre particuliers, des particuliers livrent vos pièces automobiles. Ils remboursent ainsi une partie de leur trajet. Les prix d'envoi de pièces automobiles sont ainsi jusqu'à 4 fois moins cher qu'avec un transporteur professionnel. La livraison de colis par des particuliers garantit un prix imbattable. Vous ne payez que le transporteur et non tous les frais associés à une société professionnelle. Bring4You est le site de référence en France de livraison de pièces automobiles entre particuliers. Des milliers de pièces automobiles ont ainsi été livrées via Bring4You aux 4 coins de la France.
+        La réponse est simple: grâce à la livraison de colis entre particuliers, des particuliers livrent vos pièces automobiles. Ils remboursent ainsi une partie de leur trajet. Les prix d'envoi de pièces automobiles sont ainsi jusqu'à 4 fois moins cher qu'avec un transporteur professionnel. La livraison de colis par des particuliers garantit un prix imbattable. Vous ne payez que le transporteur et non tous les frais associés à une société professionnelle. Bring4You est le site de référence en France de livraison de pièces automobiles entre particuliers. Des milliers de pièces automobiles ont ainsi été livrées via Ton-transporteur aux 4 coins de la France.
       </p>
     </div>
   </section>

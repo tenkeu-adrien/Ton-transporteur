@@ -11,16 +11,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Head>
-        <title>Ton-transporteur - Déménagement Marseille à Toulouse</title>
-        <meta name="description" content="Solution de déménagement économique entre Marseille et Toulouse" />
-      </Head>
+     
 
       {/* Header */}
      <Navbar  user={user}  logout={logout}/>
 
       {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-white">
+      <section className="py-12 md:py-20 bg-green-400">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-8 md:mb-0">
@@ -33,7 +30,7 @@ export default function Home() {
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <a 
-                  href="/devis/demenagement" 
+                  href="/start" 
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors"
                 >
                   Faire un devis
@@ -57,7 +54,7 @@ export default function Home() {
                 </div>
               </div> */}
               <div className="text-center -mr-[350px]"> 
-              <a className="mb-1 inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className="mb-1 inline-block text-3xl text-green-800" href="/Accueil" >
                Ton-Transporteur
               </a>
 
@@ -126,23 +123,25 @@ export default function Home() {
             Déménagement en urgence à Lyon
             </h3>
             <h4 className="text-lg text-green-600 mb-4">
-              UN IMPÉRATIF OU UNE URGENCE ? BRING4YOU VOUS PROPOSE LA SOLUTION DE DÉMÉNAGEMENT
+              UN IMPÉRATIF OU UNE URGENCE ? Ton-transporteur VOUS PROPOSE LA SOLUTION DE DÉMÉNAGEMENT
             </h4>
             <p className="text-gray-600 mb-4">
               Vous êtes pris au dernier moment dans l'école de vos rêves ou trouvez un nouveau boulot à Marseille ou à Toulouse et vous devez déménager en urgence ? Aucun souci ! Avec Ton-transporteur, vous obtenez des réponses rapides pour un déménagement express entre Marseille et Toulouse en semaine comme en week-end.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
-              src="/img/cities/transporteur.webp" 
+            <Image 
+              src="/1.jpg" 
               alt="Transporteur" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -162,17 +161,19 @@ export default function Home() {
               Vous n'avez pas besoin d'un camion de 20m3 impossible à garer dans votre rue pour effectuer le déménagement de votre studio ? 1 lit. 1 frigo. 1 bureau et quelques cartons à déménager ? Ton-transporteur vous trouve ce qu'il vous faut simplement et au meilleur prix.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
-              src="/img/cities/colis.webp" 
+            <Image
+              src="/2.jpg" 
               alt="Colis" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -192,17 +193,19 @@ export default function Home() {
               Devis gratuits en ligne. Solutions économiques, efficaces et écologiques pour les pros. Vous changez de locaux et vous cherchez une solution adaptée à la taille et vos besoins ? Ton-transporteur vous offre un service de qualité.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
-              src="/img/cities/meuble.webp" 
+            <Image
+              src="/3.jpg" 
               alt="Meuble" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -216,24 +219,27 @@ export default function Home() {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
-          Déménager un local professionel à Lyon
+          Quel est le coût moyen d'un déménagement à Lyon ?
           </h2>
           <div className="prose max-w-none text-gray-600">
-            <p>
-              Vous prévoyez un déménagement entre Marseille et Toulouse? Ne cherchez plus, Bring4You est là pour vous offrir un service professionnel et sécurisé qui vous facilitera la vie!
-            </p>
-            <p>
-              Avec Ton-transporteur, vous pouvez déménager facilement et rapidement de Marseille à Toulouse, sans tracas ni stress. Nous comprenons que chaque déménagement est unique, c'est pourquoi nous vous offrons un service sur mesure adapté à vos besoins.
-            </p>
-            <p>
-              Que vous souhaitiez déménager un lit, des meubles ou même votre jardin, notre équipe de déménageurs expérimentés est là pour répondre à tous vos besoins. Nous disposons des ressources nécessaires pour assurer un transport sûr et efficace de vos biens, quels qu'ils soient.
-            </p>
-            <p>
-              De plus, grâce à notre comparateur de devis en ligne, vous pouvez facilement comparer les différentes options de déménagement et choisir celle qui correspond le mieux à votre budget et à vos exigences. Nous nous engageons à vous fournir des tarifs compétitifs et transparents, sans frais cachés.
-            </p>
-            <p>
+        
               La satisfaction de nos clients est notre priorité absolue, c'est pourquoi nous offrons des garanties déménagement pour vous assurer une tranquillité d'esprit totale. Nous mettons tout en œuvre pour que votre déménagement se déroule sans accroc, du début à la fin.
-            </p>
+            <p>Vous envisagez un déménagement à Lyon et vous vous demandez quel pourrait être le coût moyen de cette opération ? Plusieurs facteurs entrent en jeu pour déterminer le prix de votre déménagement, et comprendre ces éléments peut vous aider à planifier votre budget de manière plus précise.  </p>
+         <p className='font-semibold text-xl'>  Distance et emplacement :
+Le coût d'un déménagement peut varier en fonction de la distance à parcourir et de l'emplacement précis à Lyon. Que vous soyez à l'intérieur de la ville ou dans la région du Rhône, cela peut influencer le tarif proposé par un déménageur.
+Volume et type de meubles :
+Le nombre de meubles que vous avez à déménager, ainsi que leur type, peuvent impacter le coût total. Des meubles volumineux ou fragiles peuvent nécessiter des précautions supplémentaires, entraînant des coûts de main-d'œuvre plus élevés.
+Services supplémentaires :
+Si vous avez besoin de services supplémentaires tels que le démontage et le remontage de meubles, l'emballage des objets fragiles, ou même le recours à un service de garde-meuble, cela peut également influencer le prix de la prestation.
+Société de déménagement :
+Le choix de la société de déménagement est crucial. Chaque entreprise peut avoir sa propre politique tarifaire. Prenez le temps de comparer les devis de différentes sociétés pour trouver la meilleure offre qui correspond à vos besoins et à votre budget.
+Équipe de déménageurs :
+La taille de l'équipe de déménageurs nécessaire pour votre transfert impacte directement le coût. Une équipe expérimentée et bien équipée peut rendre le processus plus rapide et efficace.
+Besoin d'entreposage :
+Si vous avez besoin d'entreposer vos biens pendant un certain temps, vérifiez les options de garde-meuble proposées par la société de déménagement. Cela peut être un élément supplémentaire à considérer dans le coût total.
+Prestations personnalisées :
+Certains déménageurs offrent des prestations personnalisées adaptées aux besoins spécifiques des Lyonnais. Que vous déménagiez depuis ou vers la région, assurez-vous que la société de déménagement peut répondre à vos exigences.
+En résumé, le coût moyen d'un déménagement à Lyon dépend de plusieurs facteurs. En faisant appel à une société de déménagement fiable et en évaluant vos besoins spécifiques, vous pouvez obtenir un devis précis et planifier votre déménagement en toute tranquillité.</p>
           </div>
         </div>
       </section>
@@ -242,15 +248,17 @@ export default function Home() {
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-12">
-            Comment trouver un déménageur entre Marseille et Toulouse ?
+            Comment trouver un transporteur à Lyon ?
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image 
                 src="/boite-en-carton.png" 
                 alt="Déposez une annonce" 
                 className="h-24 mx-auto mb-4"
+                width={100}
+                height={0}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Déposez une annonce</h3>
               <p className="text-gray-600">
@@ -259,10 +267,12 @@ export default function Home() {
             </div>
             
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image 
                 src="/bulle-de-discussion.png" 
                 alt="Recevez des propositions" 
                 className="h-24 mx-auto mb-4"
+                width={100}
+                height={0}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Recevez des propositions</h3>
               <p className="text-gray-600">
@@ -271,15 +281,18 @@ export default function Home() {
             </div>
             
             <div className="bg-white p-6 rounded-lg shadow-sm text-center">
-              <img 
+              <Image
                 src="/verifier.png" 
                 alt="Validez votre réservation" 
                 className="h-24 mx-auto mb-4"
+                height={0}
+                width={100}
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Validez votre réservation</h3>
-              <p className="text-gray-600">
-                Réglez en ligne pour bénéficier d'une assurance et suivre votre colis. Votre paiement ne sera versé au voyageur qu'une fois le colis livré.
-              </p>
+              <p className="text-justify text-gray-600">
+  Vous ne payez que le prix du transport  Aucun frais supplémentaire ne vous sera demandé, et le paiement se fait directement au moment de l'envoi ou à la livraison.
+</p>
+      
             </div>
           </div>
         </div>

@@ -171,10 +171,10 @@ export default function page() {
               />
             </div>
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Validez votre réservation</h3>
-            <p className="text-gray-600">
-              Réglez en ligne pour bénéficier d'une assurance et suivre votre meuble. Votre paiement ne sera versé au
-              voyageur qu'une fois la livraison effectuée.
-            </p>
+            <p className="text-justify text-gray-600">
+  Vous ne payez que le prix du transport  Aucun frais supplémentaire ne vous sera demandé, et le paiement se fait directement au moment de l'envoi ou à la livraison.
+</p>
+      
           </div>
         </div>
   

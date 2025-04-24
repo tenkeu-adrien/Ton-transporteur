@@ -1,6 +1,5 @@
 "use client"
 import Navbar from '@/components/Navbar';
-import Head from 'next/head';
 import Image from 'next/image';
 import { AuthContext } from '../../../../context/AuthContext';
 import { useContext } from 'react';
@@ -11,16 +10,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Head>
-        <title>Ton-transporteur - Déménagement Marseille à Toulouse</title>
-        <meta name="description" content="Solution de déménagement économique entre Marseille et Toulouse" />
-      </Head>
+      
 
       {/* Header */}
      <Navbar  user={user}  logout={logout}/>
 
       {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-white">
+      <section className="py-12 md:py-20 bg-green-400">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-8 md:mb-0">
@@ -33,17 +29,17 @@ export default function Home() {
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <a 
-                  href="/devis/demenagement" 
+                  href="/start" 
                   className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors"
                 >
                   Faire un devis
                 </a>
-                <a 
+                {/* <a 
                   href="/tasks" 
                   className="bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors"
                 >
                   Je suis transporteur
-                </a>
+                </a> */}
               </div>
             </div>
             
@@ -57,7 +53,7 @@ export default function Home() {
                 </div>
               </div> */}
               <div className="text-center -mr-[350px]"> 
-              <a className="mb-1 inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className="mb-1 inline-block text-3xl text-green-800" href="/Accueil" >
                Ton-Transporteur
               </a>
 
@@ -126,23 +122,25 @@ export default function Home() {
               Déménagement en urgence de Marseille à Toulouse
             </h3>
             <h4 className="text-lg text-green-600 mb-4">
-              UN IMPÉRATIF OU UNE URGENCE ? BRING4YOU VOUS PROPOSE LA SOLUTION DE DÉMÉNAGEMENT
+              UN IMPÉRATIF OU UNE URGENCE ? Ton-transporteur VOUS PROPOSE LA SOLUTION DE DÉMÉNAGEMENT
             </h4>
             <p className="text-gray-600 mb-4">
-              Vous êtes pris au dernier moment dans l'école de vos rêves ou trouvez un nouveau boulot à Marseille ou à Toulouse et vous devez déménager en urgence ? Aucun souci ! Avec Bring4You, vous obtenez des réponses rapides pour un déménagement express entre Marseille et Toulouse en semaine comme en week-end.
+              Vous êtes pris au dernier moment dans l'école de vos rêves ou trouvez un nouveau boulot à Marseille ou à Toulouse et vous devez déménager en urgence ? Aucun souci ! Avec Ton-transporteur, vous obtenez des réponses rapides pour un déménagement express entre Marseille et Toulouse en semaine comme en week-end.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
-              src="/img/cities/transporteur.webp" 
+            <Image
+              src="/2.jpg" 
               alt="Transporteur" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -159,20 +157,22 @@ export default function Home() {
               BESOIN DE TROUVER UN PETIT CAMION OU D'UN UTILITAIRE POUR UN PETIT DÉMÉNAGEMENT ?
             </h4>
             <p className="text-gray-600 mb-4">
-              Vous n'avez pas besoin d'un camion de 20m3 impossible à garer dans votre rue pour effectuer le déménagement de votre studio ? 1 lit. 1 frigo. 1 bureau et quelques cartons à déménager ? Bring4You vous trouve ce qu'il vous faut simplement et au meilleur prix.
+              Vous n'avez pas besoin d'un camion de 20m3 impossible à garer dans votre rue pour effectuer le déménagement de votre studio ? 1 lit. 1 frigo. 1 bureau et quelques cartons à déménager ? Ton-transporteur vous trouve ce qu'il vous faut simplement et au meilleur prix.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
-              src="/img/cities/colis.webp" 
+            <Image 
+              src="/1.jpg" 
               alt="Colis" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -186,23 +186,25 @@ export default function Home() {
               Déménager vos locaux de Marseille à Toulouse
             </h3>
             <h4 className="text-lg text-green-600 mb-4">
-              BRING4YOU, C'EST AUSSI DES SOLUTIONS POUR LES PROFESSIONNELS
+              Ton-transporteur, C'EST AUSSI DES SOLUTIONS POUR LES PROFESSIONNELS
             </h4>
             <p className="text-gray-600 mb-4">
-              Devis gratuits en ligne. Solutions économiques, efficaces et écologiques pour les pros. Vous changez de locaux et vous cherchez une solution adaptée à la taille et vos besoins ? Bring4You vous offre un service de qualité.
+              Devis gratuits en ligne. Solutions économiques, efficaces et écologiques pour les pros. Vous changez de locaux et vous cherchez une solution adaptée à la taille et vos besoins ? Ton-transporteur vous offre un service de qualité.
             </p>
             <a 
-              href="/devis/demenagement" 
+              href="/start" 
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
               Devis en ligne
             </a>
           </div>
           <div className="flex justify-center">
-            <img 
-              src="/img/cities/meuble.webp" 
+            <Image 
+              src="/2.jpg" 
               alt="Meuble" 
-              className="rounded-lg h-48 object-cover"
+              className="rounded-lg  object-cover"
+              width={100}
+              height={0}
             />
           </div>
         </div>
@@ -242,7 +244,7 @@ export default function Home() {
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-12">
-            Comment trouver un déménageur entre Marseille et Toulouse ?
+          Comment trouver un transporteur à Marseille ?
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -277,9 +279,10 @@ export default function Home() {
                 className="h-24 mx-auto mb-4"
               />
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Validez votre réservation</h3>
-              <p className="text-gray-600">
-                Réglez en ligne pour bénéficier d'une assurance et suivre votre colis. Votre paiement ne sera versé au voyageur qu'une fois le colis livré.
-              </p>
+              <p className="text-justify text-gray-600">
+  Vous ne payez que le prix du transport  Aucun frais supplémentaire ne vous sera demandé, et le paiement se fait directement au moment de l'envoi ou à la livraison.
+</p>
+      
             </div>
           </div>
         </div>

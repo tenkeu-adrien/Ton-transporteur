@@ -109,7 +109,7 @@ const menuData = {
       {/* Menu Particulier */}
       <Menu as="div" className="relative">
         <Menu.Button className="flex items-center gap-1 text-gray-700 hover:text-green-600 text-lg font-medium">
-          Particulier <FaChevronDown className="w-3" />
+        Entreprises & Particuliers <FaChevronDown className="w-3" />
         </Menu.Button>
         <Transition
           enter="transition duration-100 ease-out"
@@ -124,7 +124,7 @@ const menuData = {
               <div className="w-1/2">
                 <h4 className="font-bold text-xl mb-4 text-green-600">
                   <Link href={menuData.particulier.mainLink}>
-                    La solution de transport pour particulier
+                    La solution de transport pour  entreprises  et particuliers
                   </Link>
                 </h4>
                 <Link 
@@ -206,7 +206,7 @@ const menuData = {
         href="/comment" 
         className="text-gray-700 hover:text-green-600 text-lg font-medium flex items-center"
       >
-        Comment ça marche
+        Comment ça marche ?
       </Link>
     </div>
 

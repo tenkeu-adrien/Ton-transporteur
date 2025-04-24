@@ -11,12 +11,12 @@ export default function Home() {
   const { user,logout} = useContext(AuthContext);
     const testimonials = [
         {
-          name: "Myriam L.",
+          name: "Marc T",
           rating: 5,
           comment: "Je suis très satisfaite du service qui a été très rapide."
         },
         {
-          name: "Myriam K.",
+          name: "Thierry B.",
           rating: 5,
           comment: "J'ai été ravie qu'on puisse enlever mes colis en bas de chez moi, les livrer en province dans un délai très raisonnable."
         },
@@ -26,12 +26,12 @@ export default function Home() {
           comment: "Ce n'est pas le premier transport que je fais mais c'est toujours un plaisir. Cela permet de diminuer un peu la note de péage."
         },
         {
-          name: "Jean-Luc P.",
+          name: "Claire V.",
           rating: 5,
           comment: "Je ne connaissais pas cette plateforme. Ayant un transport de meuble a effectuer, j'ai tenté. Une demie journée après avoir déposé mon annonce, j'ai été contacté."
         },
         {
-          name: "Claire L.",
+          name: "Sandrine P.",
           rating: 5,
           comment: "Très bonne expérience pour la première fois, rapide et efficace et moins cher que les prestataires habituels. Je recommande !"
         }
@@ -40,42 +40,25 @@ export default function Home() {
         role: "Je veux envoyer un colis",
         description: "Vous avez un colis ou un meuble à envoyer ? Notre transporteur s’occupe de tout.",
         image: "/user.png",
-        link: "/envoyer",
+        link: "/start",
       },
-      // {
-      //   role: "Je suis le transporteur",
-      //   description: "Je souhaite proposer mes services et effectuer des livraisons près de chez moi.",
-      //   image: "/user.png",
-      //   link: "/transporteur",
-      // },
+      {
+        role: "Je suis un expéditeur",
+        description: "Je souhaite envoyer un colis ou organiser un déménagement facilement avec Ton-Transporteur.",
+        image: "/user.png",
+        link: "/start",
+      },
       {
         role: "Je suis une boutique partenaire",
         description: "Je souhaite livrer mes clients rapidement et à moindre coût.",
         image: "/user.png",
-        link: "/boutique",
+        link: "/start",
       }]
       
     //   const TestimonialsAndFAQ = () => {
         
       
-        const faqs = [
-          {
-            question: "Comment envoyer un colis ?",
-            answer: "Pour envoyer un colis, il suffit de déposer gratuitement une annonce qui sera visible via notre moteur de recherche par les utilisateurs du site ayant un trajet prévu."
-          },
-          {
-            question: "Comment se proposer pour l'acheminement d'un colis ?",
-            answer: "Vous êtes sur l'annonce d'un colis et vous voulez proposer à son expéditeur de l'acheminer ? Cliquez sur l'annonce puis sur le bouton 'Me proposer'."
-          },
-          {
-            question: "Comment m'inscrire en tant que commerçant sur Cocolis ?",
-            answer: "Sur la page d'inscription, renseignez le nom de votre entreprise. Vous avez déjà un compte particulier ? N'hésitez pas à contacter notre équipe."
-          },
-          {
-            question: "Comment fonctionne l'assurance ?",
-            answer: "L'assurance jusqu'à 150 € est offerte. Elle est automatiquement activée dès lors que la réservation et le paiement du transport sont effectués sur Cocolis."
-          }
-        ];
+       
       
         const renderStars = (rating: number) => {
           return (
@@ -117,14 +100,14 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8">
             <a
               href="/auth/signup"
-              className="bg-green-600 hover:bg-green-700 active:bg-gray-900 text-white px-6 py-3 text-base font-medium rounded w-full sm:w-auto transition"
+              className="bg-green-800 hover:bg-green-700 active:bg-gray-900 text-white px-6 py-3 text-base font-medium rounded w-full sm:w-auto transition"
             >
               Je m'inscris !
             </a>
           </div>
         </div>
         <Image
-          src="https://images.prismic.io/cocolis/Zppr7R5LeNNTxTow_hero_comment_4.png?auto=format%2Ccompress&fit=max&w=3840"
+          src="/comment-1.jpg"
           alt="Comment ça marche"
           className="absolute left-[750px] top-0 bottom-0 h-[80%] xl:h-[90%] max-h-[600px] w-auto object-contain hidden lg:block"
           width={100}
@@ -161,7 +144,7 @@ export default function Home() {
         </div>
         <div className="relative flex-1">
           <Image
-            src="https://images.prismic.io/cocolis/ZkOO2iol0Zci9Hzq_splitsi_1_3.png?auto=format%2Ccompress&fit=max&w=3840"
+            src="/comment-2.jpg"
             alt="livraison economique"
             className="w-full h-full object-contain rounded-2xl max-h-[300px] lg:max-h-none"
             width={100}
@@ -238,7 +221,7 @@ export default function Home() {
         <div className="flex-1 space-y-6">
           <h2 className="text-3xl font-bold text-gray-900">Ton-Transporteur et la sécurité</h2>
           <p className="text-gray-800 text-lg">
-            Ton-Transporteur propose <a href="/assurance" className="text-green-600 underline">une assurance</a> pour protéger vos biens <strong>jusqu'à 5 000 euros</strong> lors du transport. Elle couvre la casse et le vol pendant le trajet.
+            Ton-Transporteur propose <strong  className="text-green-600 underline">une assurance</strong> pour protéger vos biens <strong>jusqu'à 5 000 euros</strong> lors du transport. Elle couvre la casse et le vol pendant le trajet.
           </p>
           <p className="text-gray-800 text-lg">
             L'année dernière, seulement <strong>0,002%</strong> des livraisons ont nécessité un dossier d’assurance. Notre service est super fiable !
@@ -248,10 +231,12 @@ export default function Home() {
           </p>
         </div>
         <div className="flex-1">
-          <img
-            src="/assurance.png"
+          <Image
+            src="/umbrella.png"
             alt="Sécurité transport"
-            className="w-full h-auto rounded-lg shadow-md"
+            className="w-[3500px] h-auto rounded-lg shadow-md"
+            width={100}
+            height={0}
           />
         </div>
       </div>
