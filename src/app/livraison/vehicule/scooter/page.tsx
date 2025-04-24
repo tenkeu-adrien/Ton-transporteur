@@ -24,7 +24,7 @@ export default function page() {
     />
   
     {/* Hero Section */}
-    <div className="bg-green-50 py-12 md:py-20">
+    <div className="bg-green-400 py-12 md:py-20">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
@@ -53,7 +53,7 @@ export default function page() {
           
           <div className="md:w-1/2 flex justify-center">
           <div className="text-center -mr-[350px]"> 
-              <a className="mb-1 inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className="mb-1 inline-block text-3xl text-green-800" href="/Accueil" >
                Ton-Transporteur
               </a>
 
@@ -182,16 +182,16 @@ export default function page() {
       {/* Products Section */}
       <section className="py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
-          Quel type de  pièces automobiles puis-je envoyer ?
+        Transport de scooter pas cher
         </h2>
         
         <p className="text-gray-600 mb-6">
-          Vous pouvez envoyer tout type de meuble via Ton-transporteur Petit, moyen, gros, encombrants nous avons une solution pour toutes vos demandes d'expédition de meuble.
+        Vous avez un trouvé un scooter sur leboncoin mais le coût de livraison est trop élevé? Pas de problème, Ton-transporteur s'occupe de livrer votre scooter pas cher. Postez votre demande d'expédition sur le site, des transporteurs vous proposeront de livrer votre scooter partout en France et ce pour pas cher. Ne vous en faites pas, vos colis sont assurés pendant la livraison du colis. Nous livrons toutes les marques de scooter: Daelim, Aprilia, Derbi, Gilera, Honda, Kymco, MBK, Peugeot, Piaggio, Suzuki, Vespa, Yamaha,...
         </p>
         
-        <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p>
+        {/* <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p> */}
         
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {/* <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {[
             "commode", "chaise", "table", "fauteuil", "console", "lit",
             "matelas", "établi", "tabouret", "tapis", "porte", "canapé",
@@ -209,7 +209,7 @@ export default function page() {
               </a>
             </div>
           ))}
-        </div>
+        </div> */}
         
         <div className="flex justify-center mt-8">
           <a 
@@ -224,6 +224,17 @@ export default function page() {
         </div>
       </section>
   
+
+      <section className="py-12">
+        <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
+        Ton-transporteur, la solution de covoiturage de colis pour un transport moins cher et plus écologique
+        </h2>
+        
+        <p className="text-gray-600 mb-6">
+        Ton-transporteur a introduit un nouveau concept: le covoiturage de colis ou covoiturage. Vous pouvez désormais vous faire livrer votre scooter (Piaggio, Vespa,...) par un voyageur effectuant le trajet. Fini les frais de ports exorbitants. L'expéditeur ne paie plus des frais de ports exorbitants mais participe aux frais de transport d'un voyageur proposant de transporter le colis. Ainsi vous ne payez qu'une participation aux frais de transport ce qui permet de réduite vos coûts d'envoi. Afin de vous garantir un envoi moins cher, Ton-transporteur vous permets de fixer vous-même le prix que vous souhaitez payer pour la livraison de votre colis. Ton-transporteur vous aide à fixer le bon prix avec un outil de suggestion de prix à partir des dimensions de votre colis. Ainsi Ton-transporteur vous garantit un envoi de colis moins cher que les services de livraison traditionnels. C’est pour cette raison que Ton-transporteur est considéré comme le “uber du colis”. De nombreux expéditeurs utilisent Ton-transporteur pour livrer des colis achetés sur leboncoin ou faire des déménagements et économiser de l’argent. Enfin si jamais vous ne trouvez pas de voyageur pour effectuer la livraison, Ton-transporteur vous mets également en relation avec des professionnels. Vous ainsi 100% assuré d'être livré et ce en toute sécurité.
+
+Idéalement, récupérer un scooter pour le ramener chez soi pourrait consister à le conduire jusqu'à quai. Cependant, dans les faits, ce n'est que rarement possible car il est probable que le scooter ne soit pas en parfait état de marche, ou à l'inverse, qu'il soit neuf et en rodage et que vous soyez limités par la vitesse maximale. Le trajet peut devenir très long…Il est presque impossible de déplacer un scooter entre son lieu d'achat et son lieu de livraison sans une camionnette. Que vous soyez vendeur ou acheteur, Ton-transporteur vous explique comment transporter votre scooter en toute sécurité sans causer de dommages.
+        </p>
       {/* Testimonials Section */}
       <section className="py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
@@ -235,7 +246,7 @@ export default function page() {
             Lire plus d'avis
           </a>
         </h2>
-        
+        </section>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {

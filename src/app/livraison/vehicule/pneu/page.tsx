@@ -11,20 +11,10 @@ export default function page() {
     <Navbar  user={user} logout={logout}/>
     <section className="bg-white">
     {/* Script section - à placer dans un composant séparé ou dans _document.js */}
-    <script 
-      type="text/plain" 
-      dangerouslySetInnerHTML={{
-        __html: `window.LoadScript = function(src, callback) {
-          var script = document.createElement('script');
-          script.onload = callback;
-          script.src = src;
-          document.head.appendChild(script);
-        };`
-      }} 
-    />
+  
   
     {/* Hero Section */}
-    <div className="bg-green-50 py-12 md:py-20">
+    <div className="bg-green-400 py-12 md:py-20">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
@@ -53,7 +43,7 @@ export default function page() {
           
           <div className="md:w-1/2 flex justify-center">
           <div className="text-center -mr-[350px]"> 
-              <a className="mb-1 inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className="mb-1 inline-block text-3xl text-green-800" href="/Accueil" >
                Ton-Transporteur
               </a>
 
@@ -104,6 +94,7 @@ export default function page() {
   </g>
 </svg>
               </span>
+
             </div>
           </div>
         </div>
@@ -113,26 +104,7 @@ export default function page() {
     {/* Main Content */}
     <div className="container mx-auto px-4 py-12">
       {/* FAQ Schema - à mettre dans _document.js idéalement */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "Comment expédier votre meuble ?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "1. Déposez votre demande de livraison <a href=https://bring4you.com/create>ici</a> <br/>2. Recevez des propositions<br/> 3. Validez votre réservation"
-                }
-              },
-              // ... autres questions
-            ]
-          })
-        }}
-      />
+    
   
       {/* How It Works Section */}
       <section className="py-12">
@@ -202,16 +174,16 @@ export default function page() {
       {/* Products Section */}
       <section className="py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
-          Quel type de  pièces automobiles puis-je envoyer ?
+        Ton-transporteur: le service de covoiturage de colis qui vous permet de réduire vos coûts d’envoi
         </h2>
         
         <p className="text-gray-600 mb-6">
-          Vous pouvez envoyer tout type de meuble via Ton-transporteur Petit, moyen, gros, encombrants nous avons une solution pour toutes vos demandes d'expédition de meuble.
+        Ton-transporteur a introduit un nouveau concept: le covoiturage de colis ou covoiturage. Vous pouvez désormais vous faire livrer vos pneus par des particuliers. Fini les frais de ports exorbitants. L'expéditeur ne paie plus des frais de ports exorbitants mais participe aux frais de transport d'un particulier proposant de transporter le colis. Ainsi vous ne payez qu'une participation aux frais de transport ce qui permet de réduite vos coûts d'envoi. Afin de vous garantir un envoi moins cher, Ton-transporteur vous permets de fixer vous-même le prix que vous souhaitez payer pour la livraison de votre colis. Ton-transporteur vous aide à fixer le bon prix avec un outil de suggestion de prix à partir des dimensions de votre colis. Ainsi Ton-transporteur vous garantit un envoi de colis moins cher que les services de livraison traditionnels. C’est pour cette raison que Ton-transporteur est considéré comme le “uber du colis”. De nombreux expéditeurs utilisent Ton-transporteur pour livrer des colis achetés sur leboncoin ou faire des déménagements et économiser de l’argent. Enfin si jamais vous ne trouvez pas de particulier pour effectuer la livraison, Ton-transporteur vous mets également en relation avec des professionnels. Vous ainsi 100% assuré d'être livré et ce en toute sécurité.
         </p>
         
-        <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p>
+        {/* <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p> */}
         
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {/* <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {[
             "commode", "chaise", "table", "fauteuil", "console", "lit",
             "matelas", "établi", "tabouret", "tapis", "porte", "canapé",
@@ -229,11 +201,11 @@ export default function page() {
               </a>
             </div>
           ))}
-        </div>
+        </div> */}
         
         <div className="flex justify-center mt-8">
           <a 
-            href="/create" 
+            href="/start" 
             className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg inline-flex items-center transition-colors"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,9 +219,9 @@ export default function page() {
       {/* Testimonials Section */}
       <section className="py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
-          98% de nos clients nous recommandent :{' '}
+          98% de nos clients nous recommandent :
           <a 
-            href="https://fr.trustpilot.com/review/www.bring4you.com" 
+            href="https://ton-transporteur.fr" 
             className="text-green-600 hover:text-green-800 transition-colors"
           >
             Lire plus d'avis
@@ -263,7 +235,7 @@ export default function page() {
               author: "Nathalie M."
             },
             {
-              text: "Pour résumer mon envoi de commode : Efficacité, Rapidité, Compétitivité, Amabilité . Je ne pensais pas qu'il était encore possible de trouver toutes ces qualités réunies,et pourtant c'est possible. Vous pouvez faire appel à Bring4You les yeux fermés. Encore merci",
+              text: "Pour résumer mon envoi de commode : Efficacité, Rapidité, Compétitivité, Amabilité . Je ne pensais pas qu'il était encore possible de trouver toutes ces qualités réunies,et pourtant c'est possible. Vous pouvez faire appel à Ton-transporteur les yeux fermés. Encore merci",
               author: "JM B."
             },
             {

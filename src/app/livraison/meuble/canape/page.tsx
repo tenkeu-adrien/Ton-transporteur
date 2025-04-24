@@ -14,7 +14,7 @@ export default function page() {
 
   
     {/* Hero Section */}
-    <div className="bg-green-50 py-12 md:py-20">
+    <div className="bg-green-400 py-12 md:py-20">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
@@ -27,7 +27,7 @@ export default function page() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <a 
-                href="/create" 
+                href="/start" 
                 className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors"
               >
                 J'envoie  mon canapé
@@ -44,7 +44,7 @@ export default function page() {
           <div className="md:w-1/2 flex justify-center">
           <span className="inline-block">
           <div className="text-center -mr-[350px]"> 
-              <a className="mb-1 inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className="mb-1 inline-block text-3xl text-green-800" href="/Accueil" >
                Ton-Transporteur
               </a>
 
@@ -174,16 +174,16 @@ export default function page() {
       {/* Products Section */}
       <section className="py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
-          Quel type de canapé puis-je envoyer ?
+        Transport de canapé pas cher
         </h2>
         
         <p className="text-gray-600 mb-6">
-          Vous pouvez envoyer tout type de canapé via Ton-transporteur. Petit, moyen, gros, encombrants nous avons une solution pour toutes vos demandes d'expédition de canapé.
+        Il n'est pas facile d'envoyer un canapé car ils sont encombrants et volumineux. Mais avec Ton-transporteur c'est facile. Le covoiturage de colis ou colis-voiturage permet d'envoyer votre remorque à bas coût. Un particulier se chargera de l'expédition et transportera votre remorque. Vous pouvez suivre votre colis. Ce sera beaucoup moins cher qu'avec la Poste, UPS, Fedex ou autre companies de transport. En plus vos colis sont assurés pendant le trajet à travers toute la France et l'Europe. Votre canapé peut être de n'importe quelle marque (Ikéa, But, Conforama, La Retoude, Maisons du Monde, Fly, 3 Suisses, Habitat,...) et de n'importe quel modèle (Convertible, scandinave, cuir ou simili cuir, clac, canapé-lit, 2 places, 3 places, panoramique, d'angle, de luxe, en tissu, grand canapé, relevable, avec accoudoir, canapé sofa, en velours, réversible, bicolore, extensible, déhoussable, canapé droit, angle gauche, angle droit, design moderne ou contemporain, lit design ou lit gigogne ...) : avec Ton-transporteur vous êtes sûr de pouvoir livrer votre canapé à moindre coût. C'est pour cette raison qu'à la fois des particuliers et des professionnels font livrer leurs canapés par Ton-transporteur. Votre salle à manger, chambre à coucher ou autre pièce de votre maison va enfin pouvoir êter meublée par un beau canapé 
         </p>
         
-        <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p>
+        {/* <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p> */}
         
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {/* <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {[
             "commode", "chaise", "table", "fauteuil", "console", "lit",
             "matelas", "établi", "tabouret", "tapis", "porte", "canapé",
@@ -201,7 +201,7 @@ export default function page() {
               </a>
             </div>
           ))}
-        </div>
+        </div> */}
         
         <div className="flex justify-center mt-8">
           <a 

@@ -11,17 +11,7 @@ export default function page() {
     <Navbar  user={user} logout={logout}/>
     <section className="bg-white">
     {/* Script section - à placer dans un composant séparé ou dans _document.js */}
-    <script 
-      type="text/plain" 
-      dangerouslySetInnerHTML={{
-        __html: `window.LoadScript = function(src, callback) {
-          var script = document.createElement('script');
-          script.onload = callback;
-          script.src = src;
-          document.head.appendChild(script);
-        };`
-      }} 
-    />
+   
   
     {/* Hero Section */}
     <div className="bg-green-50 py-12 md:py-20">
@@ -105,26 +95,7 @@ export default function page() {
     {/* Main Content */}
     <div className="container mx-auto px-4 py-12">
       {/* FAQ Schema - à mettre dans _document.js idéalement */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "Comment expédier votre meuble ?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "1. Déposez votre demande de livraison <a href=https://bring4you.com/create>ici</a> <br/>2. Recevez des propositions<br/> 3. Validez votre réservation"
-                }
-              },
-              // ... autres questions
-            ]
-          })
-        }}
-      />
+   
   
       {/* How It Works Section */}
       <section className="py-12">

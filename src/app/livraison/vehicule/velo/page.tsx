@@ -11,20 +11,10 @@ export default function page() {
     <Navbar  user={user} logout={logout}/>
     <section className="bg-white">
     {/* Script section - à placer dans un composant séparé ou dans _document.js */}
-    <script 
-      type="text/plain" 
-      dangerouslySetInnerHTML={{
-        __html: `window.LoadScript = function(src, callback) {
-          var script = document.createElement('script');
-          script.onload = callback;
-          script.src = src;
-          document.head.appendChild(script);
-        };`
-      }} 
-    />
+    
   
     {/* Hero Section */}
-    <div className="bg-green-50 py-12 md:py-20">
+    <div className="bg-green-400 py-12 md:py-20">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
@@ -53,7 +43,7 @@ export default function page() {
           
           <div className="md:w-1/2 flex justify-center">
           <div className="text-center -mr-[350px]"> 
-              <a className="mb-1 inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className="mb-1 inline-block text-3xl text-green-800" href="/Accueil" >
                Ton-Transporteur
               </a>
 
@@ -182,16 +172,16 @@ export default function page() {
       {/* Products Section */}
       <section className="py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
-          Quel type de  pièces automobiles puis-je envoyer ?
+        La solution de transport la moins chère
         </h2>
         
         <p className="text-gray-600 mb-6">
-          Vous pouvez envoyer tout type de meuble via Ton-transporteur Petit, moyen, gros, encombrants nous avons une solution pour toutes vos demandes d'expédition de meuble.
+        Vous avez des pièces de véhicule à expédier ? Pas de problème vous pouvez livrer avec Ton-transporteur tout sorte de pièce de véhicule: pneus, remorques, carrosserie, moteur, jantes, capot, échappement, compresseur, bougies, courroie, freins, rétroviseur, filtre à air, habitacle, cardan, boudies d'allumage, durite, culasse, pneus, alternateur, filtre à carburant, pompe à eau, essuie-glaces... La liste est longue mais vous raiment livrer tout type de pièces automobiles : pièces détachées, pièces de rechange, piéces d'origine, pièces neuves, pièces de voiture, pièces d'occasion,...Souvent le coup de livraison exorbitant de livraison empêche de livrer des pièces auto indispensables à votre véhicule. Ton-transporteur aide ainsi des particuliers à expédier ces pièces automobiles à travers toute la France. Le prix de livraison dépend du volume, poids et du trajet. Pour livrer des roues de Paris à Marseille, comptez environ 50€. Si le bien à livrer est volumineux ou encombrant comme un moteur, un capot ou une boite de vitesse comptez plutôt autour de 100€. Si votre véhicule est cassé : vous pouvez transporter vos pièces automobiles nécessaires à la réparation de votre véhicule : compresseur de climatisation, injecteur, rotules, démarreur, pièces pour golf, alfa,... Soyez rassurés les bien sont assurés contre le bris et le vol accidentel ! Plus qu'une chose à faire: déposer votre demande en cliquant sur "J'expédie".
         </p>
         
-        <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p>
+        {/* <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p> */}
         
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {/* <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {[
             "commode", "chaise", "table", "fauteuil", "console", "lit",
             "matelas", "établi", "tabouret", "tapis", "porte", "canapé",
@@ -209,11 +199,11 @@ export default function page() {
               </a>
             </div>
           ))}
-        </div>
+        </div> */}
         
         <div className="flex justify-center mt-8">
           <a 
-            href="/create" 
+            href="/start" 
             className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg inline-flex items-center transition-colors"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

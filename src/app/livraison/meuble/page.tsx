@@ -24,7 +24,7 @@ export default function page() {
     />
   
     {/* Hero Section */}
-    <div className="bg-green-50 py-12 md:py-20">
+    <div className="bg-green-400 py-12 md:py-20">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
@@ -54,7 +54,7 @@ export default function page() {
           <div className="md:w-1/2 flex justify-center">
           <span className="inline-block">
           <div className="text-center -mr-[350px]"> 
-              <a className="mb-1 inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className="mb-1 inline-block text-3xl text-green-800" href="/Accueil" >
                Ton-Transporteur
               </a>
 
@@ -184,14 +184,14 @@ export default function page() {
       {/* Products Section */}
       <section className="py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
-          Quel type de meubles puis-je envoyer ?
+        La meilleure solution pour transporter des meubles
         </h2>
         
         <p className="text-gray-600 mb-6">
-          Vous pouvez envoyer tout type de meuble via Ton-transporteur. Petit, moyen, gros, encombrants nous avons une solution pour toutes vos demandes d'expédition de meuble.
+        Pas facile d’expédier ou déménager un meuble n’est-ce pas? En effet souvent pour le coût de livraison pour livrer cette commode ou chaise dénichée sur leboncoin est plus élevé que le bien lui-même. Les déménageurs et les entreprises de déménagementsont souvent assez chers. C’est pour cette raison que des milliers de Français font appel à Ton-transporteur pour expédier toute sorte de meubles: commode, tableau, chaise, table, fauteuil… Grâce à son réseau de transporteur, vous pouvez livrer ce que vous voulez ou vous voulez en France et en Europe. Alors n’hésitez plus achetez ce canapé, cette armoire ou cette console trouvée sur leboncoin ou BrocanteLab. Ne mettez pas à la poubelle cette armoire ou ce tapis de votre grand-mère! Avec Ton-transporteur, livrez tout n’importe où! Et en toute sécurité, vos bien sont évidemment bien assurés. Des milliers de particuliers et professionnels ont choisi cette solution pour expédier leurs meubles et ils n'ont pas été déçus. Le transport de meubles est compliqué : il faut démonter, emballer, charger, acheminer puis décharger le mobilier qui est souvent lourd et encombrant. Ainsi si vous ne trouvez pas de particulier, Ton-transporteur vous met en relation comme sur Uship ou Fretbay avec des déménageurs professionnels ou des sociétés de déménagement qui pourront vont faire un devis gratuit de déménagement. Ces entreprises familiales peuvent faire du transport de meuble ou des petits démanagements grâce à leur camion de déménagement. Ils sont expérimentés et peuvent transporter des objets louds, des objets fragiles, des colis volumineux, des canapés, des buffets, meubles neufs, meubles de cuisine, meubles frigorifiques, palettes, électroménagers, monte meuble,... vraiment tout type de meuble et par vraiment tout type de véhicule : camions capitonnés, camionettes, véhicules utilitaires, camions,... et enfin sur tout type de trajet : Nice - Paris, Pas-de-Calais, PACA, Paris - Lyon...Plus qu'une chose à faire pour expédier votre meuble: déposer votre demande en cliquant sur "J'expédie".
         </p>
         
-        <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p>
+        {/* <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p>
         
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {[
@@ -211,7 +211,7 @@ export default function page() {
               </a>
             </div>
           ))}
-        </div>
+        </div> */}
         
         <div className="flex justify-center mt-8">
           <a 
@@ -245,7 +245,7 @@ export default function page() {
               author: "Nathalie M."
             },
             {
-              text: "Pour résumer mon envoi de commode : Efficacité, Rapidité, Compétitivité, Amabilité . Je ne pensais pas qu'il était encore possible de trouver toutes ces qualités réunies,et pourtant c'est possible. Vous pouvez faire appel à Bring4You les yeux fermés. Encore merci",
+              text: "Pour résumer mon envoi de commode : Efficacité, Rapidité, Compétitivité, Amabilité . Je ne pensais pas qu'il était encore possible de trouver toutes ces qualités réunies,et pourtant c'est possible. Vous pouvez faire appel à Ton-transporteur les yeux fermés. Encore merci",
               author: "JM B."
             },
             {

@@ -11,20 +11,10 @@ export default function page() {
     <Navbar  user={user} logout={logout}/>
     <section className="bg-white">
     {/* Script section - à placer dans un composant séparé ou dans _document.js */}
-    <script 
-      type="text/plain" 
-      dangerouslySetInnerHTML={{
-        __html: `window.LoadScript = function(src, callback) {
-          var script = document.createElement('script');
-          script.onload = callback;
-          script.src = src;
-          document.head.appendChild(script);
-        };`
-      }} 
-    />
+  
   
     {/* Hero Section */}
-    <div className="bg-green-50 py-12 md:py-20">
+    <div className="bg-green-400 py-12 md:py-20">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
@@ -37,7 +27,7 @@ export default function page() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <a 
-                href="/create" 
+                href="/start" 
                 className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors"
               >
                 J'envoie de l' électroménagers et appareils électroniques
@@ -54,7 +44,7 @@ export default function page() {
           <div className="md:w-1/2 flex justify-center">
           <span className="inline-block">
           <div className="text-center -mr-[350px]"> 
-              <a className="mb-1 inline-block text-3xl text-green-400" href="/Accueil" >
+              <a className="mb-1 inline-block text-3xl text-green-800" href="/Accueil" >
                Ton-Transporteur
               </a>
 
@@ -115,26 +105,6 @@ export default function page() {
     {/* Main Content */}
     <div className="container mx-auto px-4 py-12">
       {/* FAQ Schema - à mettre dans _document.js idéalement */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "Comment expédier votre meuble ?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "1. Déposez votre demande de livraison <a href=https://bring4you.com/create>ici</a> <br/>2. Recevez des propositions<br/> 3. Validez votre réservation"
-                }
-              },
-              // ... autres questions
-            ]
-          })
-        }}
-      />
   
       {/* How It Works Section */}
       <section className="py-12">
@@ -204,16 +174,16 @@ export default function page() {
       {/* Products Section */}
       <section className="py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
-          Quel type de meubles puis-je envoyer ?
+        La meilleure solution de transport
         </h2>
         
         <p className="text-gray-600 mb-6">
-          Vous pouvez envoyer tout type de meuble via Bring4You. Petit, moyen, gros, encombrants nous avons une solution pour toutes vos demandes d'expédition de meuble.
+        "Chéri tu peux livrer la machine à laver que tes parents nous ont offert?". "Euh comment dire, je n’ai pas le véhicule qu’il faut et cela coûte 300€ de faire livrer la machine par un transporteur professionnel". C'est là que Ton-transporteur intervient. Avec notre concept innovant de covoiturage de colis ou colis-voiturage, des particuliers peuvent faire livrer leurs colis volumineux partout en France et en Europe à moindre côut. Vous avez juste à poster votre demande d’envoi. Le jour même vous serez contacté par un voyageur de la communauté Ton-transporteur. Avec Ton-transporteur, vous pouvez tout envoyer que ce soit un four, une télévision, un four ou tout autre appareil trouvé sur le site Homecycle,... Tout vous dit-on et ce pour pas cher. Vous avez un colis volumineux ou encombrant à expédier? Vous savez qui appeler. Avec le covoiturage de colis, le prix d’envoi de tous vo appareils sera jusqu’à 4 fois moins cher qu’avec un transporteur professionnel. Evidemment tous vos colis sont assurés et ce gratuitement. Elle n’est pas belle la vie?
         </p>
         
-        <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p>
+        {/* <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p> */}
         
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {/* <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {[
             "commode", "chaise", "table", "fauteuil", "console", "lit",
             "matelas", "établi", "tabouret", "tapis", "porte", "canapé",
@@ -231,7 +201,7 @@ export default function page() {
               </a>
             </div>
           ))}
-        </div>
+        </div> */}
         
         <div className="flex justify-center mt-8">
           <a 
@@ -246,12 +216,22 @@ export default function page() {
         </div>
       </section>
   
+
+      <section className="py-12">
+        <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
+        Pourquoi c'est pas cher?
+        </h2>
+        
+        <p className="text-gray-600 mb-6">
+        De nombreux expéditeurs choisissent d’envoyer différents appareil d’électroménager ou électrique via Ton-transporteur car les prix sont jusqu’à 4 fois moins cher qu’avec un transporteur professionnel. En effet avec le colis-voiturage les frais de livraisons sont beaucoup plus faibles car vous ne payez que le transport et non tous les frais associés à une société de transport. Une livraison pas chère est ainsi garantie. Ton-transporteur est le site de référence en France de livraison de colis entre particuliers. Des milliers de pièces en tout genre ont ainsi été livrées via Ton-transporteur partout en France et en Europe.
+        </p>
+        </section>
       {/* Testimonials Section */}
       <section className="py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
-          98% de nos clients nous recommandent :{' '}
+          98% de nos clients nous recommandent :
           <a 
-            href="https://fr.trustpilot.com/review/www.bring4you.com" 
+            href="/Accueil#livraison" 
             className="text-green-600 hover:text-green-800 transition-colors"
           >
             Lire plus d'avis
@@ -265,7 +245,7 @@ export default function page() {
               author: "Nathalie M."
             },
             {
-              text: "Pour résumer mon envoi de commode : Efficacité, Rapidité, Compétitivité, Amabilité . Je ne pensais pas qu'il était encore possible de trouver toutes ces qualités réunies,et pourtant c'est possible. Vous pouvez faire appel à Bring4You les yeux fermés. Encore merci",
+              text: "Pour résumer mon envoi de commode : Efficacité, Rapidité, Compétitivité, Amabilité . Je ne pensais pas qu'il était encore possible de trouver toutes ces qualités réunies,et pourtant c'est possible. Vous pouvez faire appel à Ton-transporteur les yeux fermés. Encore merci",
               author: "JM B."
             },
             {
