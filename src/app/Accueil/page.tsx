@@ -45,7 +45,6 @@ export default function Home() {
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Texte descriptif et boutons */}
           <div className="text-center md:text-left">
   <h1 className="text-4xl font-bold text-gray-800 mb-6">
     Transportez vos colis légers, lourds et déménagement simplement et écologiquement
@@ -73,7 +72,7 @@ export default function Home() {
               // objectFit="cover"
               width={600}
               height={600}
-              className="rounded-lg shadow-lg  "
+              className="rounded-lg shadow-lg"
             />
           </div> */}
         </div>
@@ -104,7 +103,7 @@ export default function Home() {
             <div className="text-center">
               <h3 className="text-xl font-semibold text-gray-800 mb-4">Communautaire</h3>
               <p className="text-gray-600">
-                Rejoignez une communauté de particuliers de confiance.
+              Rejoignez une communauté de professionnels et de particuliers de confiance.
               </p>
             </div>
             

@@ -91,11 +91,11 @@ export default function Home() {
         <section className="bg-green-500 overflow-hidden pt-24 xl:pt-36 2xl:pt-40 px-4 md:px-12 xl:px-16 2xl:px-[10rem] min-h-screen">
       <div className="max-w-7xl mx-auto relative py-24">
         <div className="flex flex-col gap-8 max-w-full lg:max-w-[750px] z-[1] relative">
-          <h1 className="text-gray-950 text-5xl md:text-6xl font-bold leading-tight text-white">
-            Ton-transporteur, <br /> comment ça marche ?<br />
+          <h1 className="text-gray-950 text-xl md:text-3xl font-bold leading-tight text-white">
+          Ton-Transporteur est une application web qui vous permet de trouver des solutions pour tous types de transports d’objets et de marchandises générales.
           </h1>
-          <p className="text-gray-950 text-2xl font-medium text-white">
-            Ton-transporteur utilise l'espace vide des véhicules en circulation pour faciliter le transport d'objets. Simple, économique et écologique !
+          <p className="text-gray-950 text-2xl font-normal text-white">
+          Économique, Simple et Écologique
           </p>
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8">
             <a

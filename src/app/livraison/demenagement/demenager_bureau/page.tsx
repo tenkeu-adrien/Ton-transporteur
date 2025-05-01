@@ -14,7 +14,7 @@ export default function page() {
   
   
     {/* Hero Section */}
-    <div className="bg-green-50 py-12 md:py-20">
+    <div className="bg-green-400 py-12 md:py-20">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
@@ -42,8 +42,10 @@ export default function page() {
           </div>
           
           <div className="md:w-1/2 flex justify-center">
-          <span className="inline-block">
-              
+          <span className="">
+          <span className="mb-1  text-3xl text-green-800  ml-18" >
+               Ton-Transporteur
+              </span>
               <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 720 722.539" role="img" className="mt-12 "  >
     <g id="Group_64" data-name="Group 64" transform="translate(-600.001 -166)">
       <g id="Group_63" data-name="Group 63" transform="translate(39.127 -21.613)">
@@ -86,6 +88,8 @@ export default function page() {
   </svg>
                 </span>
           </div>
+
+
         </div>
       </div>
     </div>
@@ -115,7 +119,7 @@ export default function page() {
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Déposez une annonce</h3>
             <p className="text-gray-600">
               Proposez  une demande de déménagement de votre Bureau. Détaillez votre annonce avec l'adresse, les dimensions et le prix
-              proposé pour la livraison. Pensez à ajouter une photo de votre meuble.
+              proposé pour la livraison. Pensez à ajouter une photo de votre Bureau.
             </p>
           </div>
   
@@ -162,46 +166,30 @@ export default function page() {
       {/* Products Section */}
       <section className="py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
-          Quel   type de déménagement puis-je faire?
+        Le déménagement de vos bureaux avec les transporteurs spécialisés
         </h2>
         
         <p className="text-gray-600 mb-6">
-          Vous pouvez envoyer tout type de meuble via Ton-transporteur. Petit, moyen, gros, encombrants nous avons une solution pour toutes vos demandes d'expédition de meuble.
+        Changer de locaux d'entreprise représente un tournant majeur dans le développement de votre activité. 
+        Pour un déménagement réussi, le transport des bureaux peut être simplement effectué par des transporteurs particuliers 
+        qui se chargent du trajet. Économique et écologique, les transporteurs particuliers vous font profiter de leurs voyages pour un 
+        déménagement à moindre coût. De nombreux particuliers ou professionnels passent par Ton-transporteur pour faire le déménagement de leurs bureaux. 
+        En effet souvent un déménagement d'entreprise est cher et lent. Grâce au covoiturage de colis, vous pouvez faire le déménagement de vos locaux 
+        professionnels pour pas cher, à un prix défiant toute concurrence pourrait-on même dire. Vous voulez organiser votre déménagement d'entreprise au 
+        meilleur coût? Vous savez ce qui vous reste à faire.
         </p>
         
-        <p className="text-gray-600 mb-8">Voici des exemples de colis que vous pouvez envoyer :</p>
+      </section>
+
+      <section className="py-12">
+        <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
+        Le transport de votre mobilier professionnel en toute sécurité
+        </h2>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {[
-            "commode", "chaise", "table", "fauteuil", "console", "lit",
-            "matelas", "établi", "tabouret", "tapis", "porte", "canapé",
-            "armoire", "bar", "coffre", "berceau", "pupitre", "tête de lit",
-            "table à langer", "banquette", "buffet", "lit bébé", "meuble TV",
-            "sommier", "table basse", "vitrine", "bureau", "chevet", "pouf",
-            "Secrétaire", "bibliothèque"
-          ].map((item) => (
-            <div key={item} className="text-center">
-              <a 
-                href={`/livraison/meuble/${item.replace(/\s+/g, '-')}`} 
-                className="text-green-600 hover:text-green-800 hover:underline transition-colors"
-              >
-                {item}
-              </a>
-            </div>
-          ))}
-        </div>
+        <p className="text-gray-600 mb-6">
+        Avec les transporteurs de Ton-transporteur, particuliers et professionnels profitent des trajets pour le déménagement du mobilier de vos bureaux. Le concept de covoiturage de colis vous offre une solution efficace à bas coût. L'aspect sécurisant est défini par la mise à disposition de transporteurs de qualité qui sont reconnus par nos équipes. Vos bureaux peuvent être déplacés d'un local à un autre en toute sérénité, avec Ton-transporteur vous bénéficiez d'une assurance contre le vol et les accidents potentiels.
+        </p>
         
-        {/* <div className="flex justify-center mt-8">
-          <a 
-            href="/create" 
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg inline-flex items-center transition-colors"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            J'envoie mon meuble
-          </a>
-        </div> */}
       </section>
   
       {/* Testimonials Section */}
