@@ -95,7 +95,7 @@ const getFriendlyErrorMessage = (error) => {
       case 'auth/user-disabled':
         return 'Votre compte a été désactivé.';
       default:
-        return `Erreur de connexion: ${error.message}`;
+        return ``;
     }
   }
   

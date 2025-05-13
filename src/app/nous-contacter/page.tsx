@@ -121,42 +121,12 @@ const ContactPage = () => {
                 <li>Vous tenir informé à chaque étape</li>
                 <li>Améliorer notre service grâce à votre feedback</li>
               </ul>
-              {/* <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
-                Signaler un bug
-              </button> */}
+             
             </div>
           </div>
         </div>
 
-        {/* Formulaire de contact */}
-        {/* <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-white rounded-xl shadow-lg mb-16">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-2">Envoyez-nous un message</h2>
-          <p className="text-center text-gray-600 mb-8">Nous vous répondrons dans les plus brefs délais</p>
-          
-          <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Pseudo</label>
-              <input type="text" id="name" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input type="email" id="email" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" />
-            </div>
-            <div className="md:col-span-2">
-              <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">Sujet</label>
-              <input type="text" id="subject" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" />
-            </div>
-            <div className="md:col-span-2">
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-              <textarea id="message"  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"></textarea>
-            </div>
-            <div className="md:col-span-2">
-              <button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
-                Envoyer le message
-              </button>
-            </div>
-          </form>
-        </div> */}
+      
       </div>
 
 

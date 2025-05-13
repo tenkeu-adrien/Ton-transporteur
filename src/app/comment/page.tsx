@@ -115,7 +115,7 @@ export default function Home() {
         />
       </div>
     </section>
-    <section className="bg-white px-10 py-16">
+    <section className="bg-white px-10 py-16 -mt-[350px]">
       <div className="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row items-center gap-10">
         <div className="space-y-8 flex-1">
           <h2 className="text-gray-950 text-4xl font-bold">
