@@ -120,6 +120,9 @@ export default function Home() {
         <div className="space-y-8 flex-1">
           <h2 className="text-gray-950 text-4xl font-bold">
             Envoyez ou recevez simplement !
+
+
+            
           </h2>
           <p className="text-gray-950 text-lg">
             Ton-transporteur est une <strong>solution de livraison</strong> collaborative qui s’appuie sur une communauté de livreurs particuliers et professionnels pour permettre des livraisons <strong>moins chères, <span  rel="noreferrer" className="underline text-green-600">plus écologiques</span> dans des délais très courts</strong>, de presque tout, partout en France.
